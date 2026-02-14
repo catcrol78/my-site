@@ -200,16 +200,21 @@
 
   <div class="admin-wrap">
     <!-- Шапка с кнопками -->
-    <div class="admin-header">
-      <h1><i class="fas fa-music" style="color: var(--accent);"></i> Редактор песен</h1>
-      <div class="admin-toolbar">
-        <button class="admin-btn" id="btnNewSong"><i class="fas fa-plus"></i> Новая</button>
-        <button class="admin-btn admin-btn-primary" id="btnSaveSong"><i class="fas fa-save"></i> Сохранить</button>
-        <button class="admin-btn" id="btnExportSetJs"><i class="fas fa-download"></i> Экспорт (songs-data.js)</button>
-        <button class="admin-btn" id="btnClear"><i class="fas fa-eraser"></i> Очистить форму</button>
-        <button class="admin-btn admin-btn-warning" id="btnClearSet"><i class="fas fa-trash-alt"></i> Очистить набор</button>
-      </div>
-    </div>
+   <div class="admin-header">
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <a href="./index.html" class="admin-link" style="text-decoration: none;">
+      <i class="fas fa-arrow-left"></i> Каталог
+    </a>
+    <h1><i class="fas fa-music" style="color: var(--accent);"></i> Редактор песен</h1>
+  </div>
+  <div class="admin-toolbar">
+    <button class="admin-btn" id="btnNewSong"><i class="fas fa-plus"></i> Новая</button>
+    <button class="admin-btn admin-btn-primary" id="btnSaveSong"><i class="fas fa-save"></i> Сохранить</button>
+    <button class="admin-btn" id="btnExportSetJs"><i class="fas fa-download"></i> Экспорт (songs-data.js)</button>
+    <button class="admin-btn" id="btnClear"><i class="fas fa-eraser"></i> Очистить форму</button>
+    <button class="admin-btn admin-btn-warning" id="btnClearSet"><i class="fas fa-trash-alt"></i> Очистить набор</button>
+  </div>
+</div>
 
     <!-- Форма редактирования -->
     <form class="form-grid" id="songForm">
