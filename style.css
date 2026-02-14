@@ -550,3 +550,38 @@ body{
   .logo-text{ font-size:20px; }
   .filters-hint{ display:none; }
 }
+/* ===== Улучшенные карточки песен ===== */
+.song-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.song-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+.song-card-cover {
+  transition: transform 0.2s ease;
+}
+
+.song-card:hover .song-card-cover {
+  transform: scale(1.02);
+}
+
+/* Дополнительно: чуть более плавные углы и аккуратный текст */
+.song-card {
+  border-radius: 20px; /* увеличиваем скругление */
+}
+
+.song-card-info h4 {
+  font-weight: 600; /* делаем название чуть жирнее */
+  letter-spacing: -0.01em;
+}
+
+.song-card-tags span {
+  background-color: #fff;
+  border-color: #d1d5db;
+  color: #1f2937;
+  font-weight: 500;
+  padding: 4px 10px;
+}
