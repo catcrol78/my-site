@@ -178,6 +178,13 @@
     }
     .btn-edit { color: var(--accent); }
     .btn-delete { color: #ef4444; }
+    .yt-preview {
+  transition: opacity 0.2s;
+}
+.yt-preview img {
+  background-color: #f0f0f0;
+  min-height: 60px;
+}
 
     /* Адаптация */
     @media (max-width: 640px) {
@@ -224,10 +231,15 @@
         <input type="number" id="id" placeholder="оставьте пустым" />
       </div>
       <div class="field-group">
-        <label>YouTube ссылка или ID <span class="req-star">*</span></label>
-        <input type="text" id="youtubeInput" placeholder="https://..." />
-      </div>
-
+  <label>YouTube ссылка или ID <span class="req-star">*</span></label>
+  <input type="text" id="youtubeInput" placeholder="https://..." />
+  <div class="yt-preview" id="ytPreview" style="display: none; margin-top: 8px;">
+    <img id="ytPreviewImg" src="" alt="YouTube preview" style="max-width: 100%; border-radius: 12px; box-shadow: var(--shadow);" />
+    <p style="font-size:12px; margin:4px 0 0; color:var(--muted);">
+      <i class="fab fa-youtube" style="color:red;"></i> Предпросмотр обложки видео
+    </p>
+  </div>
+</div>
       <!-- Названия -->
       <div class="field-group">
         <label>Название (ru) <span class="req-star">*</span></label>
