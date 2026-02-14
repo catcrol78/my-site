@@ -66,7 +66,30 @@ function showToast(message, duration = 3000) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
+// ===== Предпросмотр YouTube =====
+function updateYouTubePreview() {
+  const input = document.getElementById('youtubeInput');
+  const previewDiv = document.getElementById('ytPreview');
+  const previewImg = document.getElementById('ytPreviewImg');
+  if (!input || !previewDiv || !previewImg) return;
 
+  const raw = input.value.trim();
+  const id = extractYouTubeId(raw); // extractYouTubeId уже существует в admin.js
+
+  if (id && id.length >= 6) {
+    const coverUrl = youtubeCoverUrl(id); // youtubeCoverUrl тоже уже есть
+    previewImg.src = coverUrl;
+    previewDiv.style.display = 'block';
+    // Если картинка не загрузится (например, YouTube вернёт 404), скроем превью
+    previewImg.onerror = () => {
+      previewDiv.style.display = 'none';
+      previewImg.src = '';
+    };
+  } else {
+    previewDiv.style.display = 'none';
+    previewImg.src = '';
+  }
+}
 // ===== Работа с localStorage =====
 const SET_KEY = "songs_admin_set_v1";
 
@@ -264,6 +287,7 @@ function loadSongIntoForm(song) {
   if (!song) return;
   document.getElementById("id").value = song.id || "";
   document.getElementById("youtubeInput").value = song.youtubeId || "";
+  updateYouTubePreview(); // показать превью для загруженной песни
   document.getElementById("titleRu").value = song.title?.ru || "";
   document.getElementById("titleEs").value = song.title?.es || "";
   document.getElementById("artist").value = song.artist || "";
@@ -415,9 +439,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function primeIdPlaceholder() {
     const idInput = document.getElementById("id");
     if (!idInput.value) idInput.placeholder = `например ${getNextId()}`;
-  }
+      }
   renumberTasks();
   primeIdPlaceholder();
+  // Предпросмотр YouTube с debounce
+let ytPreviewTimeout;
+const debouncedUpdatePreview = () => {
+  clearTimeout(ytPreviewTimeout);
+  ytPreviewTimeout = setTimeout(updateYouTubePreview, 400);
+};
+
+document.getElementById('youtubeInput').addEventListener('input', debouncedUpdatePreview);
 
   // Подписка на изменение полей для снятия ошибок
   ["youtubeInput","artist","titleRu","titleEs"].forEach(id => {
@@ -470,6 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("themes").value = "";
       document.getElementById("lyrics").value = "";
       document.getElementById("tasksContainer").innerHTML = "";
+      updateYouTubePreview(); // скрыть превью
       renumberTasks();
       // Не обновляем YouTube preview здесь, но можно сбросить
       const ytPreview = document.getElementById("ytPreview");
