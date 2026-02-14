@@ -655,8 +655,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (selectedSongId !== null) openSong(selectedSongId);
   });
 
+  // ===== ДОБАВЛЕНО: debounced функция для автоматического применения фильтров =====
+  let filterTimeout;
+  const debouncedApplyFilters = () => {
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(() => applyFilters(), 400); // задержка 400 мс
+  };
+
+  // Применяем debounced ко всем полям фильтров (включая поиск)
+  $("#main-search").addEventListener("input", debouncedApplyFilters);
+  $("#level-select").addEventListener("change", debouncedApplyFilters);
+  $("#culture-select").addEventListener("change", debouncedApplyFilters);
+  $("#exclude-16plus").addEventListener("change", debouncedApplyFilters);
+  $("#exclude-otherlang").addEventListener("change", debouncedApplyFilters);
+
+  // Кнопка "Применить" остаётся для явного применения (без задержки)
   $("#apply-filters").addEventListener("click", () => applyFilters({ collapseToList: true }));
 
+  // Кнопка "Сбросить"
   $("#clear-filters").addEventListener("click", () => {
     $("#main-search").value = "";
     $("#level-select").value = "";
@@ -681,18 +697,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsClick = document.querySelector("#results-click");
   if (resultsClick) resultsClick.addEventListener("click", showResults);
 
-  // Debounced search
-  let searchTimeout;
-  $("#main-search").addEventListener("input", () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => applyFilters(), 300);
-  });
-
-  $("#level-select").addEventListener("change", applyFilters);
-  $("#culture-select").addEventListener("change", applyFilters);
-  $("#exclude-16plus").addEventListener("change", applyFilters);
-  $("#exclude-otherlang").addEventListener("change", applyFilters);
-
+  // Сортировка
   $("#sort-select").addEventListener("change", () => {
     filteredSongs = sortSongs(filteredSongs);
     visibleCount = 20;
