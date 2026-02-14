@@ -5,6 +5,7 @@
 // - сохранение (добавление/обновление) в localStorage
 // - экспорт в songs-data.js (одна кнопка)
 // - очистка формы и набора с подтверждением
+// - предпросмотр YouTube обложки при вводе ID/ссылки
 
 // ===== Вспомогательные функции =====
 function linesToArray(text) {
@@ -66,30 +67,7 @@ function showToast(message, duration = 3000) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
-// ===== Предпросмотр YouTube =====
-function updateYouTubePreview() {
-  const input = document.getElementById('youtubeInput');
-  const previewDiv = document.getElementById('ytPreview');
-  const previewImg = document.getElementById('ytPreviewImg');
-  if (!input || !previewDiv || !previewImg) return;
 
-  const raw = input.value.trim();
-  const id = extractYouTubeId(raw); // extractYouTubeId уже существует в admin.js
-
-  if (id && id.length >= 6) {
-    const coverUrl = youtubeCoverUrl(id); // youtubeCoverUrl тоже уже есть
-    previewImg.src = coverUrl;
-    previewDiv.style.display = 'block';
-    // Если картинка не загрузится (например, YouTube вернёт 404), скроем превью
-    previewImg.onerror = () => {
-      previewDiv.style.display = 'none';
-      previewImg.src = '';
-    };
-  } else {
-    previewDiv.style.display = 'none';
-    previewImg.src = '';
-  }
-}
 // ===== Работа с localStorage =====
 const SET_KEY = "songs_admin_set_v1";
 
@@ -148,6 +126,30 @@ function getNextId() {
   const maxInSet = maxIdFromArray(set);
   const maxInExternal = getExternalSongs().length ? maxIdFromArray(getExternalSongs()) : 0;
   return Math.max(maxInSet, maxInExternal) + 1;
+}
+
+// ===== Предпросмотр YouTube =====
+function updateYouTubePreview() {
+  const input = document.getElementById('youtubeInput');
+  const previewDiv = document.getElementById('ytPreview');
+  const previewImg = document.getElementById('ytPreviewImg');
+  if (!input || !previewDiv || !previewImg) return;
+
+  const raw = input.value.trim();
+  const id = extractYouTubeId(raw);
+
+  if (id && id.length >= 6) {
+    const coverUrl = youtubeCoverUrl(id);
+    previewImg.src = coverUrl;
+    previewDiv.style.display = 'block';
+    previewImg.onerror = () => {
+      previewDiv.style.display = 'none';
+      previewImg.src = '';
+    };
+  } else {
+    previewDiv.style.display = 'none';
+    previewImg.src = '';
+  }
 }
 
 // ===== Редактор заданий =====
@@ -287,7 +289,6 @@ function loadSongIntoForm(song) {
   if (!song) return;
   document.getElementById("id").value = song.id || "";
   document.getElementById("youtubeInput").value = song.youtubeId || "";
-  updateYouTubePreview(); // показать превью для загруженной песни
   document.getElementById("titleRu").value = song.title?.ru || "";
   document.getElementById("titleEs").value = song.title?.es || "";
   document.getElementById("artist").value = song.artist || "";
@@ -329,8 +330,8 @@ function loadSongIntoForm(song) {
     });
   }
   renumberTasks();
-  // Не обновляем YouTube preview автоматически, но можно вызвать
-  // updateYouTubePreview(); // если нужен показ
+  // Обновить предпросмотр YouTube
+  updateYouTubePreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
 
@@ -429,27 +430,12 @@ function saveSong() {
     renderSet();
     showToast(`Песня сохранена`);
   }
-  // обновить ID placeholder (может измениться)
-  primeIdPlaceholder();
 }
 
 // ===== Инициализация =====
 document.addEventListener("DOMContentLoaded", () => {
   const tasksContainer = document.getElementById("tasksContainer");
-  function primeIdPlaceholder() {
-    const idInput = document.getElementById("id");
-    if (!idInput.value) idInput.placeholder = `например ${getNextId()}`;
-      }
   renumberTasks();
-  primeIdPlaceholder();
-  // Предпросмотр YouTube с debounce
-let ytPreviewTimeout;
-const debouncedUpdatePreview = () => {
-  clearTimeout(ytPreviewTimeout);
-  ytPreviewTimeout = setTimeout(updateYouTubePreview, 400);
-};
-
-document.getElementById('youtubeInput').addEventListener('input', debouncedUpdatePreview);
 
   // Подписка на изменение полей для снятия ошибок
   ["youtubeInput","artist","titleRu","titleEs"].forEach(id => {
@@ -460,6 +446,14 @@ document.getElementById('youtubeInput').addEventListener('input', debouncedUpdat
       showErrors([]);
     });
   });
+
+  // Предпросмотр YouTube с debounce
+  let ytPreviewTimeout;
+  const debouncedUpdatePreview = () => {
+    clearTimeout(ytPreviewTimeout);
+    ytPreviewTimeout = setTimeout(updateYouTubePreview, 400);
+  };
+  document.getElementById('youtubeInput').addEventListener('input', debouncedUpdatePreview);
 
   // Кнопки
   document.getElementById("btnAddTask").addEventListener("click", () => {
@@ -502,16 +496,10 @@ document.getElementById('youtubeInput').addEventListener('input', debouncedUpdat
       document.getElementById("themes").value = "";
       document.getElementById("lyrics").value = "";
       document.getElementById("tasksContainer").innerHTML = "";
-      updateYouTubePreview(); // скрыть превью
       renumberTasks();
-      // Не обновляем YouTube preview здесь, но можно сбросить
-      const ytPreview = document.getElementById("ytPreview");
-      if (ytPreview) ytPreview.style.display = "none";
-      const ytMeta = document.getElementById("ytMeta");
-      if (ytMeta) ytMeta.style.display = "none";
+      updateYouTubePreview(); // скрыть превью
       clearInvalidAll();
       showErrors([]);
-      primeIdPlaceholder();
       showToast("Форма очищена");
     }
   });
@@ -578,4 +566,7 @@ document.getElementById('youtubeInput').addEventListener('input', debouncedUpdat
     });
     scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
+
+  // Принудительно обновить превью при загрузке (если поле уже заполнено)
+  setTimeout(updateYouTubePreview, 100);
 });
