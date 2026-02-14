@@ -36,12 +36,12 @@
     /* Сетка формы */
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 20px;
+      padding: 16px;
       margin-bottom: 30px;
       box-shadow: var(--shadow);
     }
@@ -51,7 +51,7 @@
       gap: 4px;
     }
     .field-group label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: #4b5563;
       letter-spacing: 0.3px;
@@ -61,8 +61,8 @@
     .field-group textarea {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 14px;
+      padding: 8px 10px;
+      font-size: 13px;
       font-family: inherit;
       background: #f9fafb;
       transition: 0.2s;
@@ -74,35 +74,35 @@
       outline: none;
       background: #fff;
     }
-    .field-group textarea { min-height: 80px; resize: vertical; }
+    .field-group textarea { min-height: 60px; resize: vertical; }
 
     /* Заголовки секций */
     .section-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: #1f2937;
-      margin: 0 0 12px 0;
-      padding-bottom: 6px;
+      margin: 0 0 8px 0;
+      padding-bottom: 4px;
       border-bottom: 2px solid #e5e7eb;
     }
-    .section-title i { color: var(--accent); margin-right: 8px; }
+    .section-title i { color: var(--accent); margin-right: 6px; font-size: 14px; }
 
     /* Чипсы (культура) */
     .chipset {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       margin-top: 4px;
     }
     .chipset label {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       border: 1px solid var(--border);
       border-radius: 30px;
-      padding: 6px 12px;
+      padding: 4px 10px;
       background: #fff;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
     }
     .chipset input { margin: 0; }
@@ -178,13 +178,63 @@
     }
     .btn-edit { color: var(--accent); }
     .btn-delete { color: #ef4444; }
+
+    /* Предпросмотр YouTube */
     .yt-preview {
-  transition: opacity 0.2s;
-}
-.yt-preview img {
-  background-color: #f0f0f0;
-  min-height: 60px;
-}
+      margin-top: 6px;
+      transition: opacity 0.2s;
+    }
+    .yt-preview img {
+      max-width: 100%;
+      max-height: 90px;
+      width: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background-color: #f0f0f0;
+      display: block;
+    }
+
+    /* Задания */
+    .task-editor {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .task-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .task-top h4 { margin: 0; font-size: 14px; }
+    .task-remove {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .admin-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .admin-field label { font-size: 11px; color: #6b7280; }
+    .admin-field input,
+    .admin-field select,
+    .admin-field textarea {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
 
     /* Адаптация */
     @media (max-width: 640px) {
@@ -193,11 +243,63 @@
       .admin-toolbar { justify-content: center; }
     }
 
-    /* Toast и прочее (оставим как есть) */
-    .toast { /* ... */ }
-    .loader { /* ... */ }
-    .scroll-top { /* ... */ }
-    /* (можно скопировать из предыдущей версии) */
+    /* Индикация ошибок */
+    .invalid { border-color: #ef4444 !important; background: #fff5f5 !important; }
+    .req-star { color: #ef4444; margin-left: 2px; }
+    .hint { color: #9ca3af; font-size: 11px; margin-left: 4px; }
+
+    /* Toast и loader (как в index) */
+    .loader {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.3s;
+    }
+    .loader.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .scroll-top {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+    .scroll-top.visible { display: flex; }
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -207,40 +309,32 @@
 
   <div class="admin-wrap">
     <!-- Шапка с кнопками -->
-   <div class="admin-header">
-  <div style="display: flex; align-items: center; gap: 16px;">
-    <a href="./index.html" class="admin-link" style="text-decoration: none;">
-      <i class="fas fa-arrow-left"></i> Каталог
-    </a>
-    <h1><i class="fas fa-music" style="color: var(--accent);"></i> Редактор песен</h1>
-  </div>
-  <div class="admin-toolbar">
-    <button class="admin-btn" id="btnNewSong"><i class="fas fa-plus"></i> Новая</button>
-    <button class="admin-btn admin-btn-primary" id="btnSaveSong"><i class="fas fa-save"></i> Сохранить</button>
-    <button class="admin-btn" id="btnExportSetJs"><i class="fas fa-download"></i> Экспорт (songs-data.js)</button>
-    <button class="admin-btn" id="btnClear"><i class="fas fa-eraser"></i> Очистить форму</button>
-    <button class="admin-btn admin-btn-warning" id="btnClearSet"><i class="fas fa-trash-alt"></i> Очистить набор</button>
-  </div>
-</div>
-
-    <!-- Форма редактирования -->
-    <form class="form-grid" id="songForm">
-      <!-- ID и YouTube -->
-      <div class="field-group">
-        <label>ID <span class="hint">(авто)</span></label>
-        <input type="number" id="id" placeholder="оставьте пустым" />
+    <div class="admin-header">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="./index.html" class="admin-link" style="text-decoration: none;">
+          <i class="fas fa-arrow-left"></i> Каталог
+        </a>
+        <h1><i class="fas fa-music" style="color: var(--accent);"></i> Редактор песен</h1>
       </div>
-      <div class="field-group">
-  <label>YouTube ссылка или ID <span class="req-star">*</span></label>
-  <input type="text" id="youtubeInput" placeholder="https://..." />
-  <div class="yt-preview" id="ytPreview" style="display: none; margin-top: 8px;">
-    <img id="ytPreviewImg" src="" alt="YouTube preview" style="max-width: 100%; border-radius: 12px; box-shadow: var(--shadow);" />
-    <p style="font-size:12px; margin:4px 0 0; color:var(--muted);">
-      <i class="fab fa-youtube" style="color:red;"></i> Предпросмотр обложки видео
-    </p>
-  </div>
-</div>
-      <!-- Названия -->
+      <div class="admin-toolbar">
+        <button class="admin-btn" id="btnNewSong"><i class="fas fa-plus"></i> Новая</button>
+        <button class="admin-btn admin-btn-primary" id="btnSaveSong"><i class="fas fa-save"></i> Сохранить</button>
+        <button class="admin-btn" id="btnExportSetJs"><i class="fas fa-download"></i> Экспорт (songs-data.js)</button>
+        <button class="admin-btn" id="btnClear"><i class="fas fa-eraser"></i> Очистить форму</button>
+        <button class="admin-btn admin-btn-warning" id="btnClearSet"><i class="fas fa-trash-alt"></i> Очистить набор</button>
+      </div>
+    </div>
+
+    <!-- Форма редактирования (полная, компактная) -->
+    <form class="form-grid" id="songForm">
+      <!-- Скрытое поле ID -->
+      <input type="hidden" id="id" />
+
+      <!-- ===== БЛОК 1: Основное ===== -->
+      <div style="grid-column: span 2;">
+        <h4 class="section-title"><i class="fas fa-info-circle"></i> Основное</h4>
+      </div>
+
       <div class="field-group">
         <label>Название (ru) <span class="req-star">*</span></label>
         <input type="text" id="titleRu" />
@@ -249,14 +343,23 @@
         <label>Название (es) <span class="req-star">*</span></label>
         <input type="text" id="titleEs" />
       </div>
-
-      <!-- Исполнитель -->
       <div class="field-group" style="grid-column: span 2;">
         <label>Исполнитель <span class="req-star">*</span></label>
         <input type="text" id="artist" />
       </div>
+      <div class="field-group" style="grid-column: span 2;">
+        <label>YouTube ссылка или ID <span class="req-star">*</span></label>
+        <input type="text" id="youtubeInput" placeholder="https://... или ID" />
+        <div class="yt-preview" id="ytPreview" style="display: none;">
+          <img id="ytPreviewImg" src="" alt="YouTube preview" />
+        </div>
+      </div>
 
-      <!-- Уровень, возраст и пр. -->
+      <!-- ===== БЛОК 2: Параметры ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-sliders-h"></i> Параметры</h4>
+      </div>
+
       <div class="field-group">
         <label>Уровень</label>
         <select id="level">
@@ -289,16 +392,18 @@
           <option value="explicit">explicit</option>
         </select>
       </div>
-
-      <!-- Примечание -->
       <div class="field-group" style="grid-column: span 2;">
         <label>Примечание по ограничениям</label>
         <input type="text" id="restrNote" placeholder="например: есть французский" />
       </div>
 
-      <!-- Культура (типы) -->
+      <!-- ===== БЛОК 3: Культура ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-globe"></i> Культура</h4>
+      </div>
+
       <div class="field-group" style="grid-column: span 2;">
-        <label>Культура (типы)</label>
+        <label>Типы культуры</label>
         <div class="chipset" id="cultureTags">
           <label><input type="checkbox" value="holidays"> праздники</label>
           <label><input type="checkbox" value="traditions"> традиции</label>
@@ -309,44 +414,53 @@
           <label><input type="checkbox" value="music"> музыка</label>
         </div>
       </div>
-
-      <!-- Культура (конкретика) -->
       <div class="field-group" style="grid-column: span 2;">
-        <label>Культура (конкретика)</label>
-        <textarea id="cultureItems" placeholder="Malasaña&#10;La Habana"></textarea>
+        <label>Конкретика (каждая на новой строке)</label>
+        <textarea id="cultureItems" placeholder="Malasaña&#10;La Habana" rows="2"></textarea>
       </div>
 
-      <!-- Лексика и грамматика -->
-      <div class="field-group">
+      <!-- ===== БЛОК 4: Лексика и грамматика ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-language"></i> Лексика и грамматика</h4>
+      </div>
+
+      <div class="field-group" style="grid-column: span 2;">
         <label>Лексика (по слову на строке)</label>
-        <textarea id="vocabulary" placeholder="ritmo&#10;playa"></textarea>
+        <textarea id="vocabulary" placeholder="ritmo&#10;playa" rows="3"></textarea>
       </div>
-      <div class="field-group">
+      <div class="field-group" style="grid-column: span 2;">
         <label>Грамматика (через запятую)</label>
-        <input type="text" id="grammar" placeholder="presente, gustar" />
+        <input type="text" id="grammar" placeholder="presente, gustar, subjuntivo" />
       </div>
 
-      <!-- PDF и темы -->
-      <div class="field-group">
+      <!-- ===== БЛОК 5: Темы и PDF ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-tags"></i> Темы и материалы</h4>
+      </div>
+
+      <div class="field-group" style="grid-column: span 2;">
+        <label>Темы (через запятую)</label>
+        <input type="text" id="themes" placeholder="love, party, naturaleza" />
+      </div>
+      <div class="field-group" style="grid-column: span 2;">
         <label>PDF ссылка</label>
         <input type="text" id="pdfLink" placeholder="./pdf/lesson.pdf" />
       </div>
-      <div class="field-group">
-        <label>Темы (через запятую)</label>
-        <input type="text" id="themes" placeholder="love, party" />
+
+      <!-- ===== БЛОК 6: Текст песни ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-file-alt"></i> Текст / таймкоды</h4>
       </div>
 
-      <!-- Текст/таймкоды -->
       <div class="field-group" style="grid-column: span 2;">
-        <label>Текст / таймкоды (time | текст)</label>
-        <textarea id="lyrics" placeholder="0:00 | Intro"></textarea>
+        <textarea id="lyrics" placeholder="0:00 | Intro&#10;0:15 | primera estrofa..." rows="6"></textarea>
       </div>
 
-      <!-- Задания (динамические) -->
-      <div style="grid-column: span 2;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin: 10px 0;">
-          <h3 class="section-title"><i class="fas fa-tasks"></i> Задания <span class="pill" id="tasksCount">0</span></h3>
-          <button class="admin-btn" id="btnAddTask" type="button"><i class="fas fa-plus-circle"></i> Добавить задание</button>
+      <!-- ===== БЛОК 7: Задания ===== -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h4 class="section-title"><i class="fas fa-tasks"></i> Задания <span class="pill" id="tasksCount">0</span></h4>
+          <button class="admin-btn" id="btnAddTask" type="button"><i class="fas fa-plus-circle"></i> Добавить</button>
         </div>
         <div id="tasksContainer"></div>
       </div>
@@ -362,6 +476,7 @@
     </div>
   </div>
 
+  <!-- Подключение скриптов -->
   <script src="songs-data.js"></script>
   <script src="admin.js"></script>
   <script>
