@@ -39,4 +39,61 @@ const songsDataFromExternal = [
       }
     ]
   }
+    {
+    "id": 2,
+    "title": {
+      "ru": "танцуем",
+      "es": "Bailando"
+    },
+    "artist": "Enrique Iglesias",
+    "youtubeId": "yv-DcNTOMp4",
+    "cover": "https://img.youtube.com/vi/yv-DcNTOMp4/mqdefault.jpg",
+    "level": ["A2"],
+    "themes": ["amor", "baile", "cuerpo"],
+    "grammar": ["Герундий", "использование se", "ir + герундий"],
+    "vocabulary": ["mirar", "respiración", "corazón", "palpitar", "silencio", "palabra", "noche", "sol", "bailar", "cuerpo", "vacío", "subir", "bajar", "fuego", "dentro", "enloquecer", "saturar", "física", "química", "anatomía", "cerveza", "tequila", "boca", "melodía", "color", "fantasía", "filosofía", "cabeza", "querer", "estar", "vivir", "tener", "besar", "contigo", "loco", "notar", "llevar", "dimensión", "latido", "acelerar", "ironía", "destino", "poder", "tocar", "abrazar", "sentir", "magia", "olor", "amor", "dolor"],
+    "culture": {
+      "tags": ["holidays", "music"],
+      "items": ["не написали"]
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "note": ""
+    },
+    "lyrics": [],
+    "tasks": []
+  },
+  {
+    "id": 3,
+    "title": {
+      "ru": "Дикий ангел",
+      "es": "Cambio Dolor"
+    },
+    "artist": "Natalia Oreiro",
+    "youtubeId": "G6OYDUomYwI",
+    "cover": "https://img.youtube.com/vi/G6OYDUomYwI/mqdefault.jpg",
+    "level": ["A1"],
+    "themes": [],
+    "grammar": [],
+    "vocabulary": ["Cambio", "Dolor", "Libertad", "Sueños", "Heridas", "Miedo", "Amor", "Corazón", "Vivir", "Volver", "Sentir", "Locura", "Alas", "Difícil", "Tropezar"],
+    "culture": {
+      "tags": ["music"],
+      "items": []
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "note": ""
+    },
+    "lyrics": [
+      {"time": "", "text": "Juraría que no sé bien lo que quiero"},
+      {"time": "", "text": "pero sé que moriría"},
+      {"time": "", "text": "si me quedo en la mitad"},
+      {"time": "", "text": "por eso vuelo a otros senderos"}
+    ],
+    "tasks": []
+  }
 ];
