@@ -7,11 +7,36 @@ const songsDataFromExternal = [
     },
     "artist": "Manu Chao",
     "youtubeId": "rs6Y4kZ8qtw",
+    "cover": "https://img.youtube.com/vi/rs6Y4kZ8qtw/mqdefault.jpg",
     "level": ["A1"],
+    "themes": ["naturaleza", "tiempo atmosférico"],
+    "grammar": ["gustar"],
+    "vocabulary": ["viajar", "soñar", "correr", "volver", "moto", "viento", "lluvia", "montaña", "noche", "cena", "vecino", "cocina", "guitarra", "canela", "fuego", "avión", "mañana", "¿qué voy a hacer?"],
+    "culture": {
+      "tags": ["holidays", "traditions", "geography", "cities", "food", "music"],
+      "items": ["La Habana", "Guatemala", "La Coruña", "Malasaña (район в Мадриде)"]
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": true,
+      "profanity": "none",
+      "note": "Есть части на французском языке"
+    },
     "lyrics": [
-      {"text": "Me gustas tú"},
-      {"text": "Me gustas tú, Manu Chao"}
+      {"time": "", "text": "¿Qué horas son, mi corazón?"},
+      {"time": "", "text": "Te lo dije bien clarito"},
+      {"time": "", "text": "Permanece a la escucha"},
+      {"time": "", "text": "Me gustan los aviones, me gustas tú"},
+      {"time": "", "text": "Me gusta viajar, me gustas tú"},
+      {"time": "", "text": "Me gusta la mañana, me gustas tú"}
     ],
-    "tasks": []
+    "tasks": [
+      {
+        "title": {"ru": "Аудирование", "es": "Audición"},
+        "type": "listening",
+        "instruction": {"ru": "Послушай и найди слова", "es": "Escucha y encuentra"},
+        "content": "Найди все формы глагола gustar"
+      }
+    ]
   }
 ];
