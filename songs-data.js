@@ -1,7 +1,5 @@
 // Автосгенерировано из admin.html
-// Автосгенерировано из admin.html
 const songsDataFromExternal = [
-  // ... ваши песни
   {
     "id": 1,
     "title": {
