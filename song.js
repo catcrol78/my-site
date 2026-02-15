@@ -9,8 +9,6 @@ let highlightedColor = null;
 // ===== Вспомогательные функции =====
 const $ = (id) => document.getElementById(id);
 
-// ... (весь остальной код без изменений)
-
 function showToast(message, duration = 3000) {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -60,16 +58,25 @@ function getSongIdFromUrl() {
 
 // ===== Загрузка песни =====
 function loadSong() {
+  console.log("loadSong started");
   const songId = getSongIdFromUrl();
+  console.log("Song ID from URL:", songId);
+  
   if (!songId) {
+    console.log("No song ID found");
     showNotFound();
     return;
   }
 
+  // Проверяем, загрузились ли данные
+  console.log("songsDataFromExternal:", window.songsDataFromExternal);
+  
   // Ищем песню в глобальном массиве
   const song = window.songsDataFromExternal?.find(s => s.id === songId);
+  console.log("Found song:", song);
   
   if (!song) {
+    console.log("Song not found");
     showNotFound();
     return;
   }
@@ -79,33 +86,47 @@ function loadSong() {
 }
 
 function showNotFound() {
-  $('loader')?.classList.add('hidden');
-  $('song-content').style.display = 'none';
-  $('not-found').style.display = 'block';
+  const loader = $('loader');
+  if (loader) loader.classList.add('hidden');
+  
+  const songContent = $('song-content');
+  if (songContent) songContent.style.display = 'none';
+  
+  const notFound = $('not-found');
+  if (notFound) notFound.style.display = 'block';
 }
 
 // ===== Отрисовка песни =====
 function renderSong() {
+  console.log("renderSong started");
   if (!currentSong) return;
 
   // Заголовок и исполнитель
-  $('song-title').textContent = safeText(currentSong.title);
-  $('song-artist').textContent = currentSong.artist || '';
+  const titleEl = $('song-title');
+  const artistEl = $('song-artist');
+  if (titleEl) titleEl.textContent = safeText(currentSong.title);
+  if (artistEl) artistEl.textContent = currentSong.artist || '';
 
   // Бейджи
   renderBadges();
 
   // Видео
   const youtubeId = currentSong.youtubeId;
-  $('video-iframe').src = youtubeEmbedUrl(youtubeId);
-  $('youtube-link').href = youtubeWatchUrl(youtubeId);
+  const videoIframe = $('video-iframe');
+  const youtubeLink = $('youtube-link');
+  
+  if (videoIframe) videoIframe.src = youtubeEmbedUrl(youtubeId);
+  if (youtubeLink) youtubeLink.href = youtubeWatchUrl(youtubeId);
 
   // PDF
-  if (currentSong.pdf) {
-    $('pdf-download').href = currentSong.pdf;
-    $('pdf-download').style.display = 'inline-flex';
-  } else {
-    $('pdf-download').style.display = 'none';
+  const pdfDownload = $('pdf-download');
+  if (pdfDownload) {
+    if (currentSong.pdf) {
+      pdfDownload.href = currentSong.pdf;
+      pdfDownload.style.display = 'inline-flex';
+    } else {
+      pdfDownload.style.display = 'none';
+    }
   }
 
   // Текст песни
@@ -127,12 +148,16 @@ function renderSong() {
   renderRestrictions();
 
   // Показываем контент
-  $('song-content').style.display = 'block';
+  const songContent = $('song-content');
+  if (songContent) songContent.style.display = 'block';
+  
   hideLoader();
 }
 
 function renderBadges() {
   const badges = $('song-badges');
+  if (!badges) return;
+  
   badges.innerHTML = '';
 
   const items = [];
@@ -161,6 +186,8 @@ function renderBadges() {
 
 function renderLyrics() {
   const container = $('lyrics-content');
+  if (!container) return;
+  
   container.innerHTML = '';
 
   if (!currentSong.lyrics?.length) {
@@ -247,6 +274,8 @@ function renderLyrics() {
 
 function renderTasks() {
   const container = $('tasks-container');
+  if (!container) return;
+  
   container.innerHTML = '';
 
   if (!currentSong.tasks?.length) {
@@ -486,6 +515,8 @@ function renderDefaultTask(container, task) {
 
 function renderVocabulary() {
   const container = $('vocab-content');
+  if (!container) return;
+  
   container.innerHTML = '';
   
   if (!currentSong.vocabulary?.length) {
@@ -503,6 +534,8 @@ function renderVocabulary() {
 
 function renderCulture() {
   const list = $('culture-list');
+  if (!list) return;
+  
   list.innerHTML = '';
   
   const items = currentSong.culture?.items;
@@ -520,6 +553,8 @@ function renderCulture() {
 
 function renderGrammar() {
   const list = $('grammar-list');
+  if (!list) return;
+  
   list.innerHTML = '';
   
   if (!currentSong.analysis?.length && !currentSong.grammar?.length) {
@@ -546,6 +581,8 @@ function renderGrammar() {
 
 function renderRestrictions() {
   const list = $('restrictions-list');
+  if (!list) return;
+  
   list.innerHTML = '';
   
   const r = currentSong.restrictions || {};
@@ -570,6 +607,6 @@ function renderRestrictions() {
 
 // ===== Инициализация =====
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM loaded, starting loadSong");
   loadSong();
-
 });
