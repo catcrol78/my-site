@@ -1,130 +1,92 @@
-// song.js - Упрощенная версия для проверки
-console.log("🚀 song.js загружен");
+// song.js
+console.log("song.js загружен");
 
-// ===== Состояние =====
-let currentLang = localStorage.getItem("lang") || "ru";
-let currentSong = null;
-
-// ===== Вспомогательные функции =====
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 function hideLoader() {
   const loader = document.getElementById('loader');
-  if (loader) {
-    loader.classList.add('hidden');
-    setTimeout(() => loader.style.display = 'none', 300);
-  }
+  if (loader) loader.style.display = 'none';
 }
 
-function safeText(objOrString) {
-  if (!objOrString) return "";
-  if (typeof objOrString === "string") return objOrString;
-  if (typeof objOrString === "object") return objOrString[currentLang] || objOrString.ru || objOrString.es || "";
-  return "";
+function safeText(obj) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  return obj.ru || obj.es || '';
 }
 
-function youtubeEmbedUrl(youtubeId) {
-  return youtubeId ? `https://www.youtube.com/embed/${youtubeId}` : "";
-}
+// Получаем ID из URL
+const urlParams = new URLSearchParams(window.location.search);
+const songId = parseInt(urlParams.get('id'));
 
-// ===== Получение ID песни из URL =====
-function getSongIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  console.log("ID из URL:", id);
-  return id ? parseInt(id, 10) : null;
-}
-
-// ===== Загрузка песни =====
-function loadSong() {
-  console.log("🎵 loadSong начат");
+// Ждем загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOM загружен, ищем песню с ID:", songId);
   
   // Проверяем данные
-  console.log("window.songsDataFromExternal:", window.songsDataFromExternal);
-  
-  if (!window.songsDataFromExternal || !Array.isArray(window.songsDataFromExternal)) {
-    console.error("❌ Данные не загружены!");
-    showError("Данные не загружены");
-    return;
-  }
-  
-  console.log("✅ Данные загружены, песен:", window.songsDataFromExternal.length);
-  
-  const songId = getSongIdFromUrl();
-  if (!songId) {
-    console.error("❌ Нет ID в URL");
-    showNotFound();
+  if (!songsDataFromExternal) {
+    alert('Ошибка: данные не загружены!');
     return;
   }
   
   // Ищем песню
-  const song = window.songsDataFromExternal.find(s => s.id === songId);
-  console.log("🔍 Найденная песня:", song);
+  const song = songsDataFromExternal.find(s => s.id === songId);
   
   if (!song) {
-    console.error("❌ Песня не найдена");
-    showNotFound();
+    $('not-found').style.display = 'block';
+    hideLoader();
     return;
   }
   
-  console.log("✅ Песня найдена, рендерим...");
-  currentSong = song;
-  renderSong();
-}
-
-function showError(message) {
-  const notFound = document.getElementById('not-found');
-  if (notFound) {
-    notFound.style.display = 'block';
-    notFound.innerHTML = `
-      <i class="fas fa-exclamation-triangle" style="font-size: 60px; color: red; margin-bottom: 20px;"></i>
-      <h2>Ошибка</h2>
-      <p>${message}</p>
-      <p style="color: #666; font-size: 12px;">Проверьте консоль (F12)</p>
-      <a href="./index.html" class="back-link" style="margin-top: 20px;">Вернуться в каталог</a>
-    `;
-  }
-  hideLoader();
-}
-
-function showNotFound() {
-  const notFound = document.getElementById('not-found');
-  if (notFound) {
-    notFound.style.display = 'block';
-  }
-  hideLoader();
-}
-
-function renderSong() {
-  console.log("🎨 Рендерим песню:", currentSong);
+  console.log("Песня найдена:", song);
   
-  // Заполняем заголовки
-  document.getElementById('song-title').textContent = safeText(currentSong.title);
-  document.getElementById('song-artist').textContent = currentSong.artist || '';
+  // Заполняем информацию
+  $('song-title').textContent = safeText(song.title);
+  $('song-artist').textContent = song.artist || '';
   
   // Видео
-  if (currentSong.youtubeId) {
-    document.getElementById('video-iframe').src = youtubeEmbedUrl(currentSong.youtubeId);
-    document.getElementById('youtube-link').href = `https://www.youtube.com/watch?v=${currentSong.youtubeId}`;
+  if (song.youtubeId) {
+    $('video-iframe').src = `https://www.youtube.com/embed/${song.youtubeId}`;
   }
   
-  // Текст песни (упрощенно)
-  const lyricsDiv = document.getElementById('lyrics-content');
-  if (currentSong.lyrics && currentSong.lyrics.length > 0) {
-    lyricsDiv.innerHTML = currentSong.lyrics.map(l => `<p>${l.text}</p>`).join('');
+  // Текст песни
+  const lyricsDiv = $('lyrics-content');
+  if (song.lyrics && song.lyrics.length) {
+    lyricsDiv.innerHTML = song.lyrics.map(l => `<p>${l.text}</p>`).join('');
   } else {
     lyricsDiv.innerHTML = '<p>Текст пока не добавлен</p>';
   }
   
-  // Показываем контент
-  document.getElementById('song-content').style.display = 'block';
-  hideLoader();
+  // Лексика
+  const vocabDiv = $('vocab-content');
+  if (song.vocabulary && song.vocabulary.length) {
+    vocabDiv.innerHTML = song.vocabulary.map(w => 
+      `<span style="border:1px solid #e5e7eb; border-radius:30px; padding:8px 10px; background:white;">${w}</span>`
+    ).join('');
+  }
   
-  console.log("✅ Рендер завершен");
-}
-
-// Запускаем
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("📅 DOM загружен");
-  loadSong();
+  // Задания
+  const tasksDiv = $('tasks-container');
+  if (song.tasks && song.tasks.length) {
+    tasksDiv.innerHTML = song.tasks.map(t => `
+      <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:16px; padding:20px; margin-bottom:10px;">
+        <h3>${safeText(t.title)}</h3>
+        <p>${safeText(t.instruction)}</p>
+        <p>${t.content || ''}</p>
+      </div>
+    `).join('');
+  } else {
+    tasksDiv.innerHTML = '<p>Заданий пока нет</p>';
+  }
+  
+  // Бейджи
+  const badgesDiv = $('song-badges');
+  const badges = [];
+  if (song.level) badges.push(`<span class="badge"><i class="fas fa-signal"></i> ${song.level.join(', ')}</span>`);
+  if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${t}</span>`));
+  if (song.grammar) song.grammar.forEach(g => badges.push(`<span class="badge"><i class="fas fa-language"></i> ${g}</span>`));
+  badgesDiv.innerHTML = badges.join('');
+  
+  // Показываем контент
+  $('song-content').style.display = 'block';
+  hideLoader();
 });
