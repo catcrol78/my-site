@@ -1,45 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Песня</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Песня | Каталог испанских песен</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Страница песни</h1>
-    
-    <div id="info">Загрузка...</div>
-    
-    <script src="songs-data.js"></script>
-    <script>
-        // Просто выводим всю информацию на экран
-        const infoDiv = document.getElementById('info');
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <main class="song-page" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+      <i class="fas fa-arrow-left"></i> Вернуться к каталогу
+    </a>
+
+    <div id="song-content" style="display: none;">
+      <!-- Шапка песни -->
+      <div class="song-header" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <h1 id="song-title" style="margin: 0 0 8px 0; font-size: 32px;"></h1>
+        <p id="song-artist" style="margin: 0 0 20px 0; font-size: 18px; color: #64748b;"></p>
         
-        // Проверяем URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const songId = urlParams.get('id');
-        
-        let html = `
-            <p>URL текущей страницы: ${window.location.href}</p>
-            <p>ID из URL: ${songId || 'не указан'}</p>
-            <p>songsDataFromExternal существует: ${typeof songsDataFromExternal !== 'undefined'}</p>
-        `;
-        
-        if (typeof songsDataFromExternal !== 'undefined') {
-            html += `<p>Количество песен: ${songsDataFromExternal.length}</p>`;
-            html += `<p>ID первой песни: ${songsDataFromExternal[0].id}</p>`;
-            
-            // Ищем песню
-            const song = songsDataFromExternal.find(s => s.id === parseInt(songId));
-            if (song) {
-                html += `<p style="color:green">✅ Песня найдена: ${song.title.ru}</p>`;
-            } else {
-                html += `<p style="color:red">❌ Песня с ID ${songId} не найдена!</p>`;
-            }
-        }
-        
-        infoDiv.innerHTML = html;
-    </script>
-    
-    <p><a href="index.html">← Назад</a></p>
+        <div id="song-badges" class="badges-section" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+
+        <!-- Видео -->
+        <div class="video-container" style="margin-bottom: 20px;">
+          <iframe id="video-iframe" width="100%" height="400" frameborder="0" allowfullscreen style="border-radius: 16px;"></iframe>
+        </div>
+      </div>
+
+      <!-- Текст песни -->
+      <div class="content-card" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="margin: 0 0 20px 0;"><i class="fas fa-file-alt"></i> Текст песни</h2>
+        <div id="lyrics-content"></div>
+      </div>
+
+      <!-- Задания -->
+      <div class="content-card" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="margin: 0 0 20px 0;"><i class="fas fa-tasks"></i> Задания</h2>
+        <div id="tasks-container"></div>
+      </div>
+
+      <!-- Лексика -->
+      <div class="content-card" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="margin: 0 0 20px 0;"><i class="fas fa-language"></i> Лексика</h2>
+        <div id="vocab-content" class="chips-wrap" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- Сообщение об ошибке -->
+    <div id="not-found" style="display: none; text-align: center; padding: 60px 20px;">
+      <i class="fas fa-music" style="font-size: 60px; color: #64748b; margin-bottom: 20px;"></i>
+      <h2>Песня не найдена</h2>
+      <p>К сожалению, запрошенная песня отсутствует в каталоге.</p>
+      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+        <i class="fas fa-arrow-left"></i> Вернуться в каталог
+      </a>
+    </div>
+  </main>
+
+  <script src="songs-data.js"></script>
+  <script src="song.js"></script>
 </body>
 </html>
