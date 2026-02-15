@@ -1,45 +1,45 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Песня</title>
+    <meta charset="UTF-8">
+    <title>Песня</title>
 </head>
 <body>
-  <div id="app">
-    <a href="index.html">← Назад</a>
-    <div id="content"></div>
-  </div>
-
-  <script src="songs-data.js"></script>
-  <script>
-    // Получаем ID из URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const songId = parseInt(urlParams.get('id'));
+    <h1>Страница песни</h1>
     
-    const contentDiv = document.getElementById('content');
+    <div id="info">Загрузка...</div>
     
-    // Проверяем, загрузились ли данные
-    if (typeof songsDataFromExternal === 'undefined') {
-      contentDiv.innerHTML = '<h2 style="color:red">Ошибка: данные не загружены!</h2>';
-    } else {
-      const song = songsDataFromExternal.find(s => s.id === songId);
-      
-      if (song) {
-        contentDiv.innerHTML = `
-          <h1>${song.title.ru}</h1>
-          <h2>${song.artist}</h2>
-          <p>ID: ${song.id}</p>
-          <p>YouTube: ${song.youtubeId}</p>
-          <h3>Текст:</h3>
-          ${song.lyrics.map(l => `<p>${l.text}</p>`).join('')}
+    <script src="songs-data.js"></script>
+    <script>
+        // Просто выводим всю информацию на экран
+        const infoDiv = document.getElementById('info');
+        
+        // Проверяем URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const songId = urlParams.get('id');
+        
+        let html = `
+            <p>URL текущей страницы: ${window.location.href}</p>
+            <p>ID из URL: ${songId || 'не указан'}</p>
+            <p>songsDataFromExternal существует: ${typeof songsDataFromExternal !== 'undefined'}</p>
         `;
-      } else {
-        contentDiv.innerHTML = `
-          <h2 style="color:red">Песня с ID ${songId} не найдена!</h2>
-          <p>Доступные ID: ${songsDataFromExternal.map(s => s.id).join(', ')}</p>
-        `;
-      }
-    }
-  </script>
+        
+        if (typeof songsDataFromExternal !== 'undefined') {
+            html += `<p>Количество песен: ${songsDataFromExternal.length}</p>`;
+            html += `<p>ID первой песни: ${songsDataFromExternal[0].id}</p>`;
+            
+            // Ищем песню
+            const song = songsDataFromExternal.find(s => s.id === parseInt(songId));
+            if (song) {
+                html += `<p style="color:green">✅ Песня найдена: ${song.title.ru}</p>`;
+            } else {
+                html += `<p style="color:red">❌ Песня с ID ${songId} не найдена!</p>`;
+            }
+        }
+        
+        infoDiv.innerHTML = html;
+    </script>
+    
+    <p><a href="index.html">← Назад</a></p>
 </body>
 </html>
