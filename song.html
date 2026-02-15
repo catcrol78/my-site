@@ -1,51 +1,45 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Песня | Каталог испанских песен</title>
-
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    /* ... (стили те же, что и были) ... */
-  </style>
+  <meta charset="UTF-8">
+  <title>Песня</title>
 </head>
 <body>
-  <div class="loader" id="loader">
-    <div class="spinner"></div>
+  <div id="app">
+    <a href="index.html">← Назад</a>
+    <div id="content"></div>
   </div>
-  
-  <div class="toast" id="toast"></div>
 
-  <main class="song-page">
-    <a href="./index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Вернуться к каталогу
-    </a>
-
-    <div id="song-content" style="display: none;">
-      <!-- ... (контент тот же) ... -->
-    </div>
-
-    <div id="not-found" style="display: none; text-align: center; padding: 60px 20px;">
-      <i class="fas fa-music" style="font-size: 60px; color: var(--muted); margin-bottom: 20px;"></i>
-      <h2>Песня не найдена</h2>
-      <p>К сожалению, запрошенная песня отсутствует в каталоге.</p>
-      <a href="./index.html" class="back-link" style="margin-top: 20px;">
-        <i class="fas fa-arrow-left"></i> Вернуться в каталог
-      </a>
-    </div>
-  </main>
-
-  <!-- Загружаем данные ПЕРЕД основным скриптом -->
   <script src="songs-data.js"></script>
   <script>
-    // Проверяем сразу после загрузки
-    console.log("✅ songs-data.js загружен в song.html");
-    console.log("📊 songsDataFromExternal:", window.songsDataFromExternal);
-    console.log("📊 длина:", window.songsDataFromExternal?.length);
+    // Получаем ID из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const songId = parseInt(urlParams.get('id'));
+    
+    const contentDiv = document.getElementById('content');
+    
+    // Проверяем, загрузились ли данные
+    if (typeof songsDataFromExternal === 'undefined') {
+      contentDiv.innerHTML = '<h2 style="color:red">Ошибка: данные не загружены!</h2>';
+    } else {
+      const song = songsDataFromExternal.find(s => s.id === songId);
+      
+      if (song) {
+        contentDiv.innerHTML = `
+          <h1>${song.title.ru}</h1>
+          <h2>${song.artist}</h2>
+          <p>ID: ${song.id}</p>
+          <p>YouTube: ${song.youtubeId}</p>
+          <h3>Текст:</h3>
+          ${song.lyrics.map(l => `<p>${l.text}</p>`).join('')}
+        `;
+      } else {
+        contentDiv.innerHTML = `
+          <h2 style="color:red">Песня с ID ${songId} не найдена!</h2>
+          <p>Доступные ID: ${songsDataFromExternal.map(s => s.id).join(', ')}</p>
+        `;
+      }
+    }
   </script>
-  <script src="song.js"></script>
 </body>
 </html>
