@@ -9,6 +9,8 @@ let highlightedColor = null;
 // ===== Вспомогательные функции =====
 const $ = (id) => document.getElementById(id);
 
+// ... (весь остальной код без изменений)
+
 function showToast(message, duration = 3000) {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -569,4 +571,5 @@ function renderRestrictions() {
 // ===== Инициализация =====
 document.addEventListener('DOMContentLoaded', () => {
   loadSong();
+
 });
