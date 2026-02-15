@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест загрузки</title>
+</head>
+<body>
+    <h1>Тест загрузки songs-data.js</h1>
+    
+    <!-- Пробуем загрузить файл -->
+    <script src="songs-data.js"></script>
+    
+    <script>
+        console.log("Тест начат");
+        console.log("songsDataFromExternal:", window.songsDataFromExternal);
+        
+        if (typeof songsDataFromExternal !== 'undefined') {
+            document.body.innerHTML += '<p style="color: green;">✅ Файл загружен! Найдено песен: ' + songsDataFromExternal.length + '</p>';
+        } else {
+            document.body.innerHTML += '<p style="color: red;">❌ Файл НЕ загружен!</p>';
+        }
+    </script>
+    
+    <p>Открой консоль (F12) и посмотри, есть ли ошибки</p>
+</body>
+</html>
