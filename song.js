@@ -53,34 +53,67 @@ function youtubeWatchUrl(youtubeId) {
 function getSongIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
+  console.log("Raw ID from URL:", id, "Type:", typeof id);
   return id ? parseInt(id, 10) : null;
 }
 
 // ===== Загрузка песни =====
 function loadSong() {
-  console.log("loadSong started");
+  console.log("🚀 loadSong started");
+  
+  // Проверяем, загрузился ли songs-data.js
+  console.log("📊 window.songsDataFromExternal exists:", !!window.songsDataFromExternal);
+  console.log("📊 Is array:", Array.isArray(window.songsDataFromExternal));
+  console.log("📊 Length:", window.songsDataFromExternal?.length);
+  
+  if (window.songsDataFromExternal && window.songsDataFromExternal.length > 0) {
+    console.log("📊 First song ID:", window.songsDataFromExternal[0].id);
+    console.log("📊 First song title:", window.songsDataFromExternal[0].title);
+  } else {
+    console.log("❌ songsDataFromExternal is empty or not loaded!");
+    // Показываем сообщение об ошибке на странице
+    const notFound = $('not-found');
+    if (notFound) {
+      notFound.style.display = 'block';
+      notFound.innerHTML = `
+        <i class="fas fa-music" style="font-size: 60px; color: var(--muted); margin-bottom: 20px;"></i>
+        <h2>Ошибка загрузки данных</h2>
+        <p>Файл с песнями не загрузился. Проверьте, что файл songs-data.js существует и содержит данные.</p>
+        <p style="color: red; font-size: 12px;">songsDataFromExternal: ${!!window.songsDataFromExternal}, длина: ${window.songsDataFromExternal?.length}</p>
+        <a href="./index.html" class="back-link" style="margin-top: 20px;">
+          <i class="fas fa-arrow-left"></i> Вернуться в каталог
+        </a>
+      `;
+    }
+    hideLoader();
+    return;
+  }
+
   const songId = getSongIdFromUrl();
-  console.log("Song ID from URL:", songId);
+  console.log("🔍 Song ID from URL (parsed):", songId);
   
   if (!songId) {
-    console.log("No song ID found");
+    console.log("❌ No song ID found in URL");
     showNotFound();
     return;
   }
 
-  // Проверяем, загрузились ли данные
-  console.log("songsDataFromExternal:", window.songsDataFromExternal);
-  
   // Ищем песню в глобальном массиве
-  const song = window.songsDataFromExternal?.find(s => s.id === songId);
-  console.log("Found song:", song);
+  console.log("🔍 Searching for song with ID:", songId);
+  const song = window.songsDataFromExternal?.find(s => {
+    console.log("Comparing:", s.id, "with", songId, "result:", s.id === songId);
+    return s.id === songId;
+  });
+  
+  console.log("🔍 Found song:", song);
   
   if (!song) {
-    console.log("Song not found");
+    console.log("❌ Song not found, available IDs:", window.songsDataFromExternal.map(s => s.id));
     showNotFound();
     return;
   }
 
+  console.log("✅ Song found, rendering...");
   currentSong = song;
   renderSong();
 }
@@ -93,12 +126,14 @@ function showNotFound() {
   if (songContent) songContent.style.display = 'none';
   
   const notFound = $('not-found');
-  if (notFound) notFound.style.display = 'block';
+  if (notFound) {
+    notFound.style.display = 'block';
+  }
 }
 
 // ===== Отрисовка песни =====
 function renderSong() {
-  console.log("renderSong started");
+  console.log("🎨 renderSong started");
   if (!currentSong) return;
 
   // Заголовок и исполнитель
@@ -106,6 +141,7 @@ function renderSong() {
   const artistEl = $('song-artist');
   if (titleEl) titleEl.textContent = safeText(currentSong.title);
   if (artistEl) artistEl.textContent = currentSong.artist || '';
+  console.log("Title set to:", safeText(currentSong.title));
 
   // Бейджи
   renderBadges();
@@ -117,6 +153,7 @@ function renderSong() {
   
   if (videoIframe) videoIframe.src = youtubeEmbedUrl(youtubeId);
   if (youtubeLink) youtubeLink.href = youtubeWatchUrl(youtubeId);
+  console.log("YouTube ID:", youtubeId);
 
   // PDF
   const pdfDownload = $('pdf-download');
@@ -152,6 +189,7 @@ function renderSong() {
   if (songContent) songContent.style.display = 'block';
   
   hideLoader();
+  console.log("✅ renderSong completed");
 }
 
 function renderBadges() {
@@ -607,6 +645,6 @@ function renderRestrictions() {
 
 // ===== Инициализация =====
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("DOM loaded, starting loadSong");
+  console.log("📅 DOM loaded, starting loadSong");
   loadSong();
 });
