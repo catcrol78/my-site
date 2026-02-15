@@ -7,9 +7,7 @@ const allSongs = (typeof songsDataFromExternal !== "undefined" && Array.isArray(
   : [];
 
 let filteredSongs = [...allSongs];
-let selectedSongId = null;
 let visibleCount = 20;
-let isLoading = true;
 
 // ===== UI Helpers =====
 function showToast(message, duration = 3000) {
@@ -46,7 +44,7 @@ const i18n = {
     reset: "Сбросить",
     foundLabel: "Найдено песен:",
     welcome: "Добро пожаловать!",
-    welcomeText: "Выберите песню из списка, чтобы увидеть её детали.",
+    welcomeText: "Выберите песню из списка, чтобы открыть страницу с заданиями.",
     songList: "Список песен",
     mobileDetail: "Детали",
     mobileList: "Список",
@@ -55,23 +53,6 @@ const i18n = {
     sortArtist: "По исполнителю",
     loadMore: "Показать ещё",
     footerNote: "Каталог для учителей: испанский по песням",
-    videoFallback: "Если видео не отображается, открой его по ссылке:",
-    downloadPdf: "Скачать PDF",
-
-    tabLyrics: "Текст",
-    tabGrammar: "Грамматика",
-    tabTasks: "Задания",
-    tabVocab: "Лексика",
-    tabCulture: "Культура",
-    tabRestrictions: "Ограничения",
-
-    lyricsHeader: "Текст / таймкоды",
-    grammarHeader: "Грамматические заметки",
-    tasksHeader: "Задания",
-    tasksEmpty: "Для этой песни задания пока не добавлены.",
-    vocabHeader: "Ключевая лексика",
-    cultureHeader: "Культура / реалии",
-    restrHeader: "Ограничения",
 
     allLevels: "Все уровни",
     allCulture: "Любая культура",
@@ -83,11 +64,7 @@ const i18n = {
     culture_dance_music: "Танцы/музыка",
 
     listShowing: (shown, total) => `Показано: ${shown} из ${total}`,
-    noMatches: "Ничего не найдено по текущим фильтрам.",
-
-    showAnswer: "Показать ответ",
-    hideAnswer: "Скрыть ответ",
-    loading: "Загрузка..."
+    noMatches: "Ничего не найдено по текущим фильтрам."
   },
   es: {
     siteTitle: "Catálogo de canciones en español",
@@ -105,7 +82,7 @@ const i18n = {
     reset: "Restablecer",
     foundLabel: "Canciones encontradas:",
     welcome: "¡Bienvenido!",
-    welcomeText: "Selecciona una canción de la lista para ver los detalles.",
+    welcomeText: "Selecciona una canción de la lista para abrir la página con tareas.",
     songList: "Lista de canciones",
     mobileDetail: "Detalles",
     mobileList: "Lista",
@@ -114,23 +91,6 @@ const i18n = {
     sortArtist: "Por artista",
     loadMore: "Mostrar más",
     footerNote: "Catálogo para profesores: español con canciones",
-    videoFallback: "Si el vídeo no se muestra, ábrelo con el enlace:",
-    downloadPdf: "Descargar PDF",
-
-    tabLyrics: "Letra",
-    tabGrammar: "Gramática",
-    tabTasks: "Tareas",
-    tabVocab: "Vocabulario",
-    tabCulture: "Cultura",
-    tabRestrictions: "Restricciones",
-
-    lyricsHeader: "Letra / marcas de tiempo",
-    grammarHeader: "Notas gramaticales",
-    tasksHeader: "Tareas",
-    tasksEmpty: "Aún no hay tareas para esta canción.",
-    vocabHeader: "Vocabulario clave",
-    cultureHeader: "Cultura / referencias",
-    restrHeader: "Restricciones",
 
     allLevels: "Todos los niveles",
     allCulture: "Cualquier cultura",
@@ -142,11 +102,7 @@ const i18n = {
     culture_dance_music: "Baile/música",
 
     listShowing: (shown, total) => `Mostrando: ${shown} de ${total}`,
-    noMatches: "No hay resultados con los filtros actuales.",
-
-    showAnswer: "Mostrar respuesta",
-    hideAnswer: "Ocultar respuesta",
-    loading: "Cargando..."
+    noMatches: "No hay resultados con los filtros actuales."
   }
 };
 
@@ -194,13 +150,6 @@ function songTitle(song) {
   return song?.title?.[currentLang] || song?.title?.ru || song?.title?.es || "";
 }
 
-function youtubeEmbedUrl(youtubeId) {
-  return youtubeId ? `https://www.youtube.com/embed/${youtubeId}` : "";
-}
-function youtubeWatchUrl(youtubeId) {
-  return youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : "#";
-}
-
 function escapeHtml(str) {
   return (str ?? "").toString()
     .replaceAll("&", "&amp;")
@@ -227,8 +176,7 @@ function applyLanguage() {
     el.setAttribute("placeholder", t(key));
   });
 
-  // update culture select labels
-  buildSelectOptions(); // language-sensitive labels
+  buildSelectOptions();
 }
 
 // ===== Build filter options from data =====
@@ -371,12 +319,15 @@ function renderSongList() {
       </div>
     `;
 
-    const open = () => openSong(song.id);
-    card.addEventListener("click", open);
+    // Открываем страницу песни при клике
+    card.addEventListener("click", () => {
+      window.location.href = `song.html?id=${song.id}`;
+    });
+    
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        open();
+        window.location.href = `song.html?id=${song.id}`;
       }
     });
 
@@ -385,23 +336,6 @@ function renderSongList() {
 
   loadMoreBtn.style.display = (shown < filteredSongs.length) ? "block" : "none";
   hint.textContent = t("listShowing")(shown, filteredSongs.length);
-}
-
-// ===== Detail tabs =====
-function setupTabs() {
-  const tabs = $$(".detail-tab");
-  const panels = $$(".detail-panel");
-
-  function activate(name) {
-    tabs.forEach(btn => {
-      const active = btn.dataset.tab === name;
-      btn.classList.toggle("active", active);
-      btn.setAttribute("aria-selected", active ? "true" : "false");
-    });
-    panels.forEach(p => p.classList.toggle("active", p.dataset.panel === name));
-  }
-
-  tabs.forEach(btn => btn.addEventListener("click", () => activate(btn.dataset.tab)));
 }
 
 // ===== Mobile toggle =====
@@ -438,205 +372,6 @@ function setupScrollTop() {
   });
 }
 
-// ===== Open song =====
-function openSong(id) {
-  const song = allSongs.find(s => String(s.id) === String(id));
-  if (!song) return;
-
-  selectedSongId = song.id;
-
-  $("#placeholder-detail").style.display = "none";
-  $("#song-detail-content").style.display = "block";
-
-  // video
-  $("#video-iframe").src = youtubeEmbedUrl(song.youtubeId);
-  $("#youtube-link").href = youtubeWatchUrl(song.youtubeId);
-  $("#video-fallback").classList.remove("hidden");
-
-  // meta
-  $("#detail-title").textContent = songTitle(song);
-  $("#detail-artist").textContent = song.artist || "";
-
-  // badges
-  const badgesWrap = $("#detail-badges");
-  badgesWrap.innerHTML = "";
-  const badges = [
-    ...(song.level || []).map(l => ({ icon: "fa-signal", text: l })),
-    ...(song.themes || []).map(k => ({ icon: "fa-tag", text: themeLabels[k]?.[currentLang] || k })),
-    ...(song.grammar || []).map(k => ({ icon: "fa-language", text: grammarLabels[k]?.[currentLang] || k }))
-  ].slice(0, 8);
-
-  badges.forEach(b => {
-    const span = document.createElement("span");
-    span.className = "badge";
-    span.innerHTML = `<i class="fas ${b.icon}"></i> ${escapeHtml(b.text)}`;
-    badgesWrap.appendChild(span);
-  });
-
-  // PDF download (optional)
-  const pdfBtn = document.querySelector("#pdf-download");
-  if (pdfBtn) {
-    const href = (song.pdf || "").trim();
-    if (href) {
-      pdfBtn.href = href;
-      pdfBtn.classList.remove("hidden");
-    } else {
-      pdfBtn.classList.add("hidden");
-      pdfBtn.href = "#";
-    }
-  }
-
-  // lyrics
-  $("#lyrics-note").textContent = safeText(song.lyricsNote);
-  const lyricsWrap = $("#lyrics-text");
-  lyricsWrap.innerHTML = "";
-  (song.lyrics || []).forEach(line => {
-    const p = document.createElement("p");
-    const time = line.time ? `<strong>${escapeHtml(line.time)}</strong> ` : "";
-    p.innerHTML = `${time}${escapeHtml(line.text || "")}`;
-    lyricsWrap.appendChild(p);
-  });
-
-  // analysis
-  const analysisList = document.querySelector("#analysis-list");
-  analysisList.innerHTML = "";
-
-  const analysisArr = Array.isArray(song.analysis) ? song.analysis : [];
-  analysisArr.forEach(item => {
-    let text = "";
-
-    if (typeof item === "string") {
-      text = item;
-    } else if (item && typeof item === "object") {
-      text = item[currentLang] || item.ru || item.es || item.text || "";
-    }
-
-    text = String(text).trim();
-    if (!text) return;
-
-    const li = document.createElement("li");
-    li.textContent = text;
-    analysisList.appendChild(li);
-  });
-
-  // tasks
-  const tasks = Array.isArray(song.tasks) ? song.tasks : [];
-  const tasksList = $("#tasks-list");
-  const tasksEmpty = $("#tasks-empty");
-  const badge = $("#tasks-count-badge");
-
-  tasksList.innerHTML = "";
-  if (!tasks.length) {
-    tasksEmpty.style.display = "block";
-    badge.style.display = "none";
-  } else {
-    tasksEmpty.style.display = "none";
-    badge.textContent = String(tasks.length);
-    badge.style.display = "inline-flex";
-
-    tasks.forEach((task, idx) => {
-      const card = document.createElement("div");
-      card.className = "task-card";
-
-      const title = safeText(task.title) || (currentLang === "ru" ? `Задание ${idx + 1}` : `Tarea ${idx + 1}`);
-      const instruction = safeText(task.instruction);
-      const type = task.type || "";
-
-      const bodyHtml = renderTaskBody(task);
-
-      card.innerHTML = `
-        <div class="task-top">
-          <h4 class="task-title">${escapeHtml(title)}</h4>
-          <div class="task-type">${escapeHtml(type)}</div>
-        </div>
-        ${instruction ? `<p class="task-instruction">${escapeHtml(instruction)}</p>` : ""}
-        <div class="task-body">${bodyHtml}</div>
-        ${task.answer ? `
-          <div class="task-actions">
-            <button class="task-btn primary" type="button" data-action="toggle-answer">${escapeHtml(t("showAnswer"))}</button>
-          </div>
-          <div class="task-answer">${escapeHtml(task.answer)}</div>
-        ` : ""}
-      `;
-
-      const toggleBtn = card.querySelector('[data-action="toggle-answer"]');
-      if (toggleBtn) {
-        toggleBtn.addEventListener("click", () => {
-          const ans = card.querySelector(".task-answer");
-          const shown = ans.style.display === "block";
-          ans.style.display = shown ? "none" : "block";
-          toggleBtn.textContent = shown ? t("showAnswer") : t("hideAnswer");
-        });
-      }
-
-      tasksList.appendChild(card);
-    });
-  }
-
-  // vocab chips
-  const chips = $("#vocab-chips");
-  chips.innerHTML = "";
-  (song.vocabulary || []).forEach(w => {
-    const span = document.createElement("span");
-    span.className = "chip";
-    span.textContent = w;
-    chips.appendChild(span);
-  });
-
-  // culture list
-  const cultureList = $("#culture-list");
-  cultureList.innerHTML = "";
-  const items = Array.isArray(song?.culture?.items) ? song.culture.items : [];
-  if (!items.length) {
-    const li = document.createElement("li");
-    li.textContent = "—";
-    cultureList.appendChild(li);
-  } else {
-    items.forEach(x => {
-      const li = document.createElement("li");
-      li.textContent = x;
-      cultureList.appendChild(li);
-    });
-  }
-
-  // restrictions
-  const restrList = $("#restr-list");
-  restrList.innerHTML = "";
-  const r = song.restrictions || {};
-  const restrLines = [];
-  if (r.age) restrLines.push((currentLang === "ru" ? `Возраст: ${r.age}` : `Edad: ${r.age}`));
-  if (r.containsOtherLanguages) restrLines.push(currentLang === "ru" ? "Есть фрагменты на другом языке" : "Hay fragmentos en otro idioma");
-  if (r.profanity && r.profanity !== "none") restrLines.push(currentLang === "ru" ? `Ненормативная лексика: ${r.profanity}` : `Lenguaje: ${r.profanity}`);
-  if (r.note) restrLines.push(r.note);
-
-  if (!restrLines.length) {
-    const li = document.createElement("li");
-    li.textContent = "—";
-    restrList.appendChild(li);
-  } else {
-    restrLines.forEach(x => {
-      const li = document.createElement("li");
-      li.textContent = x;
-      restrList.appendChild(li);
-    });
-  }
-
-  // on mobile show detail
-  document.body.classList.remove("mobile-show-list");
-  document.body.classList.add("mobile-show-detail");
-}
-
-// ===== Task body renderer =====
-function renderTaskBody(task) {
-  if (Array.isArray(task.content)) {
-    return `<ul>${task.content.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
-  }
-  if (typeof task.content === "string") {
-    return `<p>${escapeHtml(task.content).replace(/\n/g, "<br/>")}</p>`;
-  }
-  return "<p>—</p>";
-}
-
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
   // Hide loader after everything is ready
@@ -650,26 +385,24 @@ document.addEventListener("DOMContentLoaded", () => {
     currentLang = langSelect.value;
     localStorage.setItem("lang", currentLang);
     applyLanguage();
-    // re-render with fresh filter
     applyFilters();
-    if (selectedSongId !== null) openSong(selectedSongId);
   });
 
-  // ===== ДОБАВЛЕНО: debounced функция для автоматического применения фильтров =====
+  // ===== debounced функция для автоматического применения фильтров =====
   let filterTimeout;
   const debouncedApplyFilters = () => {
     clearTimeout(filterTimeout);
-    filterTimeout = setTimeout(() => applyFilters(), 400); // задержка 400 мс
+    filterTimeout = setTimeout(() => applyFilters(), 400);
   };
 
-  // Применяем debounced ко всем полям фильтров (включая поиск)
+  // Применяем debounced ко всем полям фильтров
   $("#main-search").addEventListener("input", debouncedApplyFilters);
   $("#level-select").addEventListener("change", debouncedApplyFilters);
   $("#culture-select").addEventListener("change", debouncedApplyFilters);
   $("#exclude-16plus").addEventListener("change", debouncedApplyFilters);
   $("#exclude-otherlang").addEventListener("change", debouncedApplyFilters);
 
-  // Кнопка "Применить" остаётся для явного применения (без задержки)
+  // Кнопка "Применить"
   $("#apply-filters").addEventListener("click", () => applyFilters({ collapseToList: true }));
 
   // Кнопка "Сбросить"
@@ -709,7 +442,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSongList();
   });
 
-  setupTabs();
   setupMobileToggle();
   setupScrollTop();
 
