@@ -1,10 +1,17 @@
 // ===== State =====
 let currentLang = localStorage.getItem("lang") || "ru";
 
-// songs-data.js should define: const songsDataFromExternal = [...]
+// Проверяем загрузку данных
+console.log("🚀 script.js загружен");
+console.log("songsDataFromExternal:", window.songsDataFromExternal);
+
+// songs-data.js должен определить: const songsDataFromExternal = [...]
 const allSongs = (typeof songsDataFromExternal !== "undefined" && Array.isArray(songsDataFromExternal))
   ? songsDataFromExternal
   : [];
+
+console.log("📊 allSongs:", allSongs);
+console.log("📊 Количество песен:", allSongs.length);
 
 let filteredSongs = [...allSongs];
 let visibleCount = 20;
@@ -111,14 +118,19 @@ const themeLabels = {
   weather: { ru: "Погода", es: "Tiempo" },
   love: { ru: "Любовь", es: "Amor" },
   dance: { ru: "Танцы", es: "Baile" },
-  body: { ru: "Тело", es: "Cuerpo" }
+  body: { ru: "Тело", es: "Cuerpo" },
+  naturaleza: { ru: "Природа", es: "Naturaleza" },
+  "tiempo atmosférico": { ru: "Погода", es: "Tiempo" },
+  amor: { ru: "Любовь", es: "Amor" },
+  baile: { ru: "Танцы", es: "Baile" },
+  cuerpo: { ru: "Тело", es: "Cuerpo" }
 };
 
 const grammarLabels = {
   gustar: { ru: "Gustar", es: "Gustar" },
   gerundio: { ru: "Герундий", es: "Gerundio" },
   se: { ru: "Se", es: "Se" },
-  ir_gerundio: { ru: "Ir + gerundio", es: "Ir + gerundio" }
+  ir_gerundio: { ru: "Ir + герундий", es: "Ir + gerundio" }
 };
 
 const cultureLabels = {
@@ -127,7 +139,9 @@ const cultureLabels = {
   holidays: { ru: "Праздники", es: "Fiestas" },
   traditions: { ru: "Традиции", es: "Tradiciones" },
   food: { ru: "Еда", es: "Comida" },
-  dance_music: { ru: "Танцы/музыка", es: "Baile/música" }
+  dance_music: { ru: "Танцы/музыка", es: "Baile/música" },
+  music: { ru: "Музыка", es: "Música" },
+  cities: { ru: "Города", es: "Ciudades" }
 };
 
 // ===== Helpers =====
@@ -163,7 +177,8 @@ function escapeHtml(str) {
 function applyLanguage() {
   document.documentElement.lang = currentLang;
   document.title = t("siteTitle");
-  $("#year").textContent = new Date().getFullYear();
+  const yearEl = $("#year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   $$("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
@@ -185,24 +200,30 @@ function uniq(arr) {
 }
 
 function buildSelectOptions() {
+  if (!allSongs || allSongs.length === 0) return;
+  
   // Levels
   const levels = uniq(allSongs.flatMap(s => Array.isArray(s.level) ? s.level : []));
   const levelSelect = $("#level-select");
-  levelSelect.innerHTML = "";
-  levelSelect.appendChild(new Option(t("allLevels"), ""));
-  levels.sort((a, b) => a.localeCompare(b));
-  levels.forEach(lv => levelSelect.appendChild(new Option(lv, lv)));
+  if (levelSelect) {
+    levelSelect.innerHTML = "";
+    levelSelect.appendChild(new Option(t("allLevels"), ""));
+    levels.sort((a, b) => a.localeCompare(b));
+    levels.forEach(lv => levelSelect.appendChild(new Option(lv, lv)));
+  }
 
   // Culture tags (types)
   const tags = uniq(allSongs.flatMap(s => Array.isArray(s?.culture?.tags) ? s.culture.tags : []));
   const cultureSelect = $("#culture-select");
-  cultureSelect.innerHTML = "";
-  cultureSelect.appendChild(new Option(t("allCulture"), ""));
-  tags.sort((a, b) => (cultureLabels[a]?.[currentLang] || a).localeCompare((cultureLabels[b]?.[currentLang] || b), currentLang));
-  tags.forEach(tag => {
-    const label = cultureLabels[tag]?.[currentLang] || tag;
-    cultureSelect.appendChild(new Option(label, tag));
-  });
+  if (cultureSelect) {
+    cultureSelect.innerHTML = "";
+    cultureSelect.appendChild(new Option(t("allCulture"), ""));
+    tags.sort((a, b) => (cultureLabels[a]?.[currentLang] || a).localeCompare((cultureLabels[b]?.[currentLang] || b), currentLang));
+    tags.forEach(tag => {
+      const label = cultureLabels[tag]?.[currentLang] || tag;
+      cultureSelect.appendChild(new Option(label, tag));
+    });
+  }
 }
 
 // ===== Search haystack =====
@@ -219,11 +240,11 @@ function songSearchHaystack(song) {
 
 // ===== Filtering & sorting =====
 function filterSongs() {
-  const q = normalize($("#main-search").value);
-  const level = $("#level-select").value;
-  const cultureTag = $("#culture-select").value;
-  const exclude16 = $("#exclude-16plus").checked;
-  const excludeOther = $("#exclude-otherlang").checked;
+  const q = normalize($("#main-search")?.value || "");
+  const level = $("#level-select")?.value || "";
+  const cultureTag = $("#culture-select")?.value || "";
+  const exclude16 = $("#exclude-16plus")?.checked || false;
+  const excludeOther = $("#exclude-otherlang")?.checked || false;
 
   return allSongs.filter(song => {
     const searchOk = !q || songSearchHaystack(song).includes(q);
@@ -237,7 +258,7 @@ function filterSongs() {
 }
 
 function sortSongs(songsToSort) {
-  const mode = $("#sort-select").value;
+  const mode = $("#sort-select")?.value || "relevance";
   const sorted = [...songsToSort];
   
   if (mode === "title") {
@@ -253,7 +274,9 @@ function sortSongs(songsToSort) {
 }
 
 function applyFilters(opts = {}) {
+  console.log("🔍 Применяем фильтры");
   const filtered = filterSongs();
+  console.log("📊 Отфильтровано песен:", filtered.length);
   filteredSongs = sortSongs(filtered);
   visibleCount = 20;
   renderSongList();
@@ -272,14 +295,18 @@ function applyFilters(opts = {}) {
 
 // ===== Render list =====
 function renderSongList() {
+  console.log("🎨 Рендерим список, песен:", filteredSongs.length);
+  
   const grid = $("#song-grid");
   const countEl = $("#song-count");
   const hint = $("#list-hint");
   const subtitle = $("#results-subtitle");
   const loadMoreBtn = $("#load-more-btn");
 
+  if (!grid) return;
+  
   grid.innerHTML = "";
-  countEl.textContent = String(filteredSongs.length);
+  if (countEl) countEl.textContent = String(filteredSongs.length);
 
   const showBtnInList = document.querySelector("#show-results-btn");
   if (showBtnInList) {
@@ -291,14 +318,14 @@ function renderSongList() {
   }
 
   if (filteredSongs.length === 0) {
-    subtitle.textContent = t("noMatches");
-    hint.textContent = "";
-    loadMoreBtn.style.display = "none";
+    if (subtitle) subtitle.textContent = t("noMatches");
+    if (hint) hint.textContent = "";
+    if (loadMoreBtn) loadMoreBtn.style.display = "none";
     return;
   }
 
   const shown = Math.min(visibleCount, filteredSongs.length);
-  subtitle.textContent = t("listShowing")(shown, filteredSongs.length);
+  if (subtitle) subtitle.textContent = t("listShowing")(shown, filteredSongs.length);
 
   filteredSongs.slice(0, shown).forEach(song => {
     const card = document.createElement("div");
@@ -308,10 +335,11 @@ function renderSongList() {
 
     const themeTags = (song.themes || []).map(k => themeLabels[k]?.[currentLang] || k);
     const levelTag = (song.level || [])[0] ? [`${(song.level || [])[0]}`] : [];
-    const tags = [...levelTag, ...themeTags].slice(0, 5);
+    const grammarTags = (song.grammar || []).slice(0, 2).map(g => grammarLabels[g]?.[currentLang] || g);
+    const tags = [...levelTag, ...themeTags, ...grammarTags].slice(0, 5);
 
     card.innerHTML = `
-      <img class="song-card-cover" src="${song.cover || ""}" alt="" loading="lazy" />
+      <img class="song-card-cover" src="${song.cover || ""}" alt="" loading="lazy" onerror="this.src='./img/dino.png'" />
       <div class="song-card-info">
         <h4>${escapeHtml(songTitle(song))}</h4>
         <p>${escapeHtml(song.artist || "")}</p>
@@ -319,7 +347,6 @@ function renderSongList() {
       </div>
     `;
 
-    // Открываем страницу песни при клике
     card.addEventListener("click", () => {
       window.location.href = `song.html?id=${song.id}`;
     });
@@ -334,8 +361,8 @@ function renderSongList() {
     grid.appendChild(card);
   });
 
-  loadMoreBtn.style.display = (shown < filteredSongs.length) ? "block" : "none";
-  hint.textContent = t("listShowing")(shown, filteredSongs.length);
+  if (loadMoreBtn) loadMoreBtn.style.display = (shown < filteredSongs.length) ? "block" : "none";
+  if (hint) hint.textContent = t("listShowing")(shown, filteredSongs.length);
 }
 
 // ===== Mobile toggle =====
@@ -374,19 +401,28 @@ function setupScrollTop() {
 
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("📅 DOM загружен");
+  
+  // Проверяем данные еще раз
+  console.log("🔍 Проверка данных в DOMContentLoaded:");
+  console.log("allSongs:", allSongs);
+  console.log("allSongs.length:", allSongs.length);
+  
   // Hide loader after everything is ready
   setTimeout(hideLoader, 500);
   
   // controls
   const langSelect = $("#language-select");
-  langSelect.value = currentLang;
+  if (langSelect) {
+    langSelect.value = currentLang;
 
-  langSelect.addEventListener("change", () => {
-    currentLang = langSelect.value;
-    localStorage.setItem("lang", currentLang);
-    applyLanguage();
-    applyFilters();
-  });
+    langSelect.addEventListener("change", () => {
+      currentLang = langSelect.value;
+      localStorage.setItem("lang", currentLang);
+      applyLanguage();
+      applyFilters();
+    });
+  }
 
   // ===== debounced функция для автоматического применения фильтров =====
   let filterTimeout;
@@ -396,24 +432,37 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Применяем debounced ко всем полям фильтров
-  $("#main-search").addEventListener("input", debouncedApplyFilters);
-  $("#level-select").addEventListener("change", debouncedApplyFilters);
-  $("#culture-select").addEventListener("change", debouncedApplyFilters);
-  $("#exclude-16plus").addEventListener("change", debouncedApplyFilters);
-  $("#exclude-otherlang").addEventListener("change", debouncedApplyFilters);
+  const mainSearch = $("#main-search");
+  if (mainSearch) mainSearch.addEventListener("input", debouncedApplyFilters);
+  
+  const levelSelect = $("#level-select");
+  if (levelSelect) levelSelect.addEventListener("change", debouncedApplyFilters);
+  
+  const cultureSelect = $("#culture-select");
+  if (cultureSelect) cultureSelect.addEventListener("change", debouncedApplyFilters);
+  
+  const exclude16 = $("#exclude-16plus");
+  if (exclude16) exclude16.addEventListener("change", debouncedApplyFilters);
+  
+  const excludeOther = $("#exclude-otherlang");
+  if (excludeOther) excludeOther.addEventListener("change", debouncedApplyFilters);
 
   // Кнопка "Применить"
-  $("#apply-filters").addEventListener("click", () => applyFilters({ collapseToList: true }));
+  const applyBtn = $("#apply-filters");
+  if (applyBtn) applyBtn.addEventListener("click", () => applyFilters({ collapseToList: true }));
 
   // Кнопка "Сбросить"
-  $("#clear-filters").addEventListener("click", () => {
-    $("#main-search").value = "";
-    $("#level-select").value = "";
-    $("#culture-select").value = "";
-    $("#exclude-16plus").checked = false;
-    $("#exclude-otherlang").checked = false;
-    applyFilters({ collapseToList: true });
-  });
+  const clearBtn = $("#clear-filters");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (mainSearch) mainSearch.value = "";
+      if (levelSelect) levelSelect.value = "";
+      if (cultureSelect) cultureSelect.value = "";
+      if (exclude16) exclude16.checked = false;
+      if (excludeOther) excludeOther.checked = false;
+      applyFilters({ collapseToList: true });
+    });
+  }
 
   const showResults = () => {
     const details = document.querySelector('.filters-collapse');
@@ -431,16 +480,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (resultsClick) resultsClick.addEventListener("click", showResults);
 
   // Сортировка
-  $("#sort-select").addEventListener("change", () => {
-    filteredSongs = sortSongs(filteredSongs);
-    visibleCount = 20;
-    renderSongList();
-  });
+  const sortSelect = $("#sort-select");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      filteredSongs = sortSongs(filteredSongs);
+      visibleCount = 20;
+      renderSongList();
+    });
+  }
 
-  $("#load-more-btn").addEventListener("click", () => {
-    visibleCount += 20;
-    renderSongList();
-  });
+  const loadMoreBtn = $("#load-more-btn");
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener("click", () => {
+      visibleCount += 20;
+      renderSongList();
+    });
+  }
 
   setupMobileToggle();
   setupScrollTop();
