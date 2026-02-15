@@ -485,8 +485,25 @@
     </div>
   </main>
 
-  <!-- Скрипты - ВАЖНЫЙ ПОРЯДОК: сначала данные, потом логика -->
-  <script src="songs-data.js"></script>
+  <!-- Скрипты - добавим проверку загрузки -->
+  <script>
+    console.log("🔍 Проверка загрузки songs-data.js на song.html");
+    // Добавляем обработчик ошибки загрузки скрипта
+    window.addEventListener('error', function(e) {
+      if (e.target.tagName === 'SCRIPT') {
+        console.error('❌ Ошибка загрузки скрипта:', e.target.src);
+      }
+    }, true);
+  </script>
+  
+  <!-- Пробуем загрузить с абсолютным путем -->
+  <script src="./songs-data.js"></script>
+  <script>
+    console.log("📊 После загрузки songs-data.js:");
+    console.log("songsDataFromExternal существует?", typeof songsDataFromExternal !== 'undefined');
+    console.log("songsDataFromExternal длина:", songsDataFromExternal?.length);
+    console.log("songsDataFromExternal содержимое:", songsDataFromExternal);
+  </script>
   <script src="song.js"></script>
 </body>
 </html>
