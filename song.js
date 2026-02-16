@@ -1,4 +1,4 @@
-// song.js - с поддержкой интерактивных заданий
+// song.js - с поддержкой интерактивных заданий (включая match)
 console.log("🎵 song.js загружен");
 
 const $ = id => document.getElementById(id);
@@ -30,7 +30,6 @@ const songId = parseInt(urlParams.get('id'));
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM загружен, ищем песню с ID:", songId);
   
-  // Проверяем наличие данных (без window, напрямую)
   if (typeof songsDataFromExternal === 'undefined') {
     showError('Данные не загружены. Файл songs-data.js не найден или содержит ошибку.');
     return;
@@ -159,6 +158,9 @@ function renderTasks(tasks) {
         break;
       case 'quiz':
         renderQuiz(contentDiv, task);
+        break;
+      case 'match':
+        renderMatchTask(contentDiv, task);
         break;
       default:
         renderDefault(contentDiv, task);
@@ -327,4 +329,82 @@ function renderQuiz(container, task) {
 
   container.appendChild(checkBtn);
   container.appendChild(resultDiv);
+}
+
+// Сопоставление (match)
+function renderMatchTask(container, task) {
+  if (!task.pairs || !task.pairs.length) return;
+
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+
+  const leftCol = document.createElement('div');
+  leftCol.className = 'match-column';
+  leftCol.innerHTML = '<h4 style="margin-top:0;">Испанский</h4>';
+
+  const rightCol = document.createElement('div');
+  rightCol.className = 'match-column';
+  rightCol.innerHTML = '<h4 style="margin-top:0;">Русский</h4>';
+
+  const matchedPairs = new Set();
+  let selectedLeft = null;
+
+  task.pairs.forEach((pair, idx) => {
+    // Левый элемент
+    const leftItem = document.createElement('div');
+    leftItem.className = 'match-item';
+    leftItem.textContent = pair.left;
+    leftItem.dataset.pairId = idx;
+    leftItem.dataset.side = 'left';
+
+    leftItem.addEventListener('click', () => {
+      if (leftItem.classList.contains('matched')) return;
+
+      if (selectedLeft === leftItem) {
+        leftItem.classList.remove('selected');
+        selectedLeft = null;
+      } else {
+        document.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected'));
+        leftItem.classList.add('selected');
+        selectedLeft = leftItem;
+      }
+    });
+
+    // Правый элемент
+    const rightItem = document.createElement('div');
+    rightItem.className = 'match-item';
+    rightItem.textContent = pair.right;
+    rightItem.dataset.pairId = idx;
+    rightItem.dataset.side = 'right';
+
+    rightItem.addEventListener('click', () => {
+      if (rightItem.classList.contains('matched')) return;
+
+      if (selectedLeft) {
+        const leftId = selectedLeft.dataset.pairId;
+        if (leftId === String(idx)) {
+          // Правильно
+          selectedLeft.classList.add('matched');
+          selectedLeft.classList.remove('selected');
+          rightItem.classList.add('matched');
+          matchedPairs.add(idx);
+
+          if (matchedPairs.size === task.pairs.length) {
+            showToast('🎉 Отлично! Все пары собраны!');
+          }
+        } else {
+          // Неправильно
+          showToast('Попробуйте другую пару', 1000);
+        }
+        selectedLeft = null;
+      }
+    });
+
+    leftCol.appendChild(leftItem);
+    rightCol.appendChild(rightItem);
+  });
+
+  grid.appendChild(leftCol);
+  grid.appendChild(rightCol);
+  container.appendChild(grid);
 }
