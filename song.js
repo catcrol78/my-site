@@ -1,5 +1,5 @@
-// song.js - с поддержкой интерактивных заданий (включая match) + отладка
-console.log("🎵 song.js загружен (с отладкой)");
+// song.js - с поддержкой карточек-перевёртышей (flashcards)
+console.log("🎵 song.js загружен (с карточками)");
 
 const $ = id => document.getElementById(id);
 
@@ -80,8 +80,11 @@ function renderSong(song) {
   // Задания
   renderTasks(song.tasks);
   
-  // Лексика
+  // Лексика (обычная)
   renderVocabulary(song.vocabulary);
+  
+  // Карточки-перевёртыши
+  renderFlashcards(song.flashcards || song.vocabulary_cards);
   
   // Бейджи
   renderBadges(song);
@@ -89,6 +92,35 @@ function renderSong(song) {
   // Показываем контент
   $('song-content').style.display = 'block';
   hideLoader();
+  
+  // Настраиваем вкладки
+  setupTabs();
+}
+
+function setupTabs() {
+  const tabs = document.querySelectorAll('.detail-tab');
+  const panels = document.querySelectorAll('.detail-panel');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.dataset.tab;
+      
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      
+      panels.forEach(p => {
+        p.classList.remove('active');
+      });
+      
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      
+      const activePanel = document.querySelector(`[data-panel="${tabName}"]`);
+      if (activePanel) activePanel.classList.add('active');
+    });
+  });
 }
 
 function renderLyrics(lyrics) {
@@ -118,6 +150,166 @@ function renderBadges(song) {
   if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`));
   if (song.grammar) song.grammar.forEach(g => badges.push(`<span class="badge"><i class="fas fa-language"></i> ${escapeHtml(g)}</span>`));
   badgesDiv.innerHTML = badges.join('');
+}
+
+// ===== Карточки-перевёртыши =====
+function renderFlashcards(flashcards) {
+  const container = $('flashcard-wrapper');
+  const emptyDiv = $('flashcards-empty');
+  const counterSpan = $('flashcards-counter');
+  const prevBtn = $('flashcards-prev');
+  const nextBtn = $('flashcards-next');
+  const resetBtn = $('flashcards-reset');
+  const progressFill = $('flashcards-progress-fill');
+  const progressText = $('flashcards-progress-text');
+  
+  if (!flashcards || !flashcards.length) {
+    if (emptyDiv) emptyDiv.style.display = 'block';
+    if (container) container.innerHTML = '';
+    if (counterSpan) counterSpan.textContent = '0 / 0';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressText) progressText.textContent = '0/0';
+    return;
+  }
+  
+  if (emptyDiv) emptyDiv.style.display = 'none';
+  
+  // Состояние
+  let currentIndex = 0;
+  let learnedCards = loadProgress(songId, flashcards.length);
+  
+  // Обновляем интерфейс
+  updateCard();
+  updateProgress();
+  
+  // Обработчики
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCard();
+      }
+    });
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        updateCard();
+      }
+    });
+  }
+  
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Сбросить прогресс по всем карточкам?')) {
+        learnedCards = new Set();
+        saveProgress(songId, learnedCards);
+        updateCard();
+        updateProgress();
+        showToast('Прогресс сброшен');
+      }
+    });
+  }
+  
+  // Функция обновления карточки
+  function updateCard() {
+    const card = flashcards[currentIndex];
+    
+    // Проверяем, выучена ли карточка
+    const isLearned = learnedCards.has(currentIndex);
+    
+    // Генерируем HTML карточки
+    container.innerHTML = `
+      <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}" data-index="${currentIndex}">
+        <div class="flashcard-front">
+          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
+          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
+          ${isLearned ? '<div class="learned-stamp"><i class="fas fa-check"></i> Выучено</div>' : ''}
+        </div>
+        <div class="flashcard-back">
+          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
+          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
+          ${!isLearned ? `
+            <button class="flashcards-btn mark-learned" data-index="${currentIndex}">
+              <i class="fas fa-check"></i> Я выучил(а)
+            </button>
+          ` : `
+            <div class="learned-badge">
+              <i class="fas fa-check-circle"></i> Выучено
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+    
+    // Добавляем обработчик переворота
+    const flashcard = container.querySelector('.flashcard');
+    if (flashcard) {
+      flashcard.addEventListener('click', (e) => {
+        // Не переворачиваем, если клик по кнопке
+        if (e.target.closest('.mark-learned')) return;
+        flashcard.classList.toggle('flipped');
+      });
+    }
+    
+    // Обработчик кнопки "Я выучил(а)"
+    const markBtn = container.querySelector('.mark-learned');
+    if (markBtn) {
+      markBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(markBtn.dataset.index);
+        learnedCards.add(idx);
+        saveProgress(songId, learnedCards);
+        updateCard();
+        updateProgress();
+        showToast('🎉 Отлично! Слово добавлено в выученные');
+      });
+    }
+    
+    // Обновляем счётчик
+    if (counterSpan) {
+      counterSpan.textContent = `${currentIndex + 1} / ${flashcards.length}`;
+    }
+    
+    // Обновляем состояние кнопок навигации
+    if (prevBtn) prevBtn.disabled = currentIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
+  }
+  
+  // Функция обновления прогресс-бара
+  function updateProgress() {
+    const percent = Math.round((learnedCards.size / flashcards.length) * 100);
+    if (progressFill) progressFill.style.width = `${percent}%`;
+    if (progressText) progressText.textContent = `${learnedCards.size}/${flashcards.length}`;
+  }
+  
+  // Загрузка прогресса из localStorage
+  function loadProgress(songId, total) {
+    const key = `flashcards_${songId}`;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const data = JSON.parse(saved);
+        return new Set(data.learned || []);
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки прогресса:', e);
+    }
+    return new Set();
+  }
+  
+  // Сохранение прогресса в localStorage
+  function saveProgress(songId, learnedSet) {
+    const key = `flashcards_${songId}`;
+    const data = {
+      learned: Array.from(learnedSet),
+      updated: new Date().toISOString()
+    };
+    localStorage.setItem(key, JSON.stringify(data));
+  }
 }
 
 // ===== Отрисовка заданий =====
@@ -332,7 +524,6 @@ function renderQuiz(container, task) {
 
 // Сопоставление (match)
 function renderMatchTask(container, task) {
-  console.log('renderMatchTask вызван, пар:', task.pairs.length);
   if (!task.pairs || !task.pairs.length) return;
 
   const grid = document.createElement('div');
@@ -358,7 +549,6 @@ function renderMatchTask(container, task) {
     leftItem.dataset.side = 'left';
 
     leftItem.addEventListener('click', () => {
-      console.log('Клик по левому элементу:', pair.left);
       if (leftItem.classList.contains('matched')) return;
 
       if (selectedLeft === leftItem) {
@@ -379,12 +569,10 @@ function renderMatchTask(container, task) {
     rightItem.dataset.side = 'right';
 
     rightItem.addEventListener('click', () => {
-      console.log('Клик по правому элементу:', pair.right);
       if (rightItem.classList.contains('matched')) return;
 
       if (selectedLeft) {
         const leftId = selectedLeft.dataset.pairId;
-        console.log('Сравниваем leftId:', leftId, 'с idx:', idx);
         if (leftId === String(idx)) {
           // Правильно
           selectedLeft.classList.add('matched');
@@ -400,8 +588,6 @@ function renderMatchTask(container, task) {
           showToast('Попробуйте другую пару', 1000);
         }
         selectedLeft = null;
-      } else {
-        console.log('Не выбран левый элемент');
       }
     });
 
@@ -415,17 +601,9 @@ function renderMatchTask(container, task) {
 }
 
 function showToast(message, duration = 3000) {
-  console.log('TOAST:', message);
   const toast = document.getElementById('toast');
   if (!toast) return;
   toast.textContent = message;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
-// Добавьте в объект i18n.ru
-tabFlashcards: "Карточки",
-flashcardsTitle: "Словарь в карточках",
-
-// Добавьте в объект i18n.es
-tabFlashcards: "Tarjetas",
-flashcardsTitle: "Vocabulario en tarjetas",
