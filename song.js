@@ -1,5 +1,5 @@
-// song.js - с поддержкой интерактивных заданий (включая match)
-console.log("🎵 song.js загружен");
+// song.js - с поддержкой интерактивных заданий (включая match) + отладка
+console.log("🎵 song.js загружен (с отладкой)");
 
 const $ = id => document.getElementById(id);
 
@@ -191,8 +191,7 @@ function renderDefault(container, task) {
 function renderGapFill(container, task) {
   if (!task.text) return;
 
-  const text = task.text;
-  const parts = text.split('___');
+  const parts = task.text.split('___');
   const answers = task.answers || [];
   const options = task.options || [];
 
@@ -333,6 +332,7 @@ function renderQuiz(container, task) {
 
 // Сопоставление (match)
 function renderMatchTask(container, task) {
+  console.log('renderMatchTask вызван, пар:', task.pairs.length);
   if (!task.pairs || !task.pairs.length) return;
 
   const grid = document.createElement('div');
@@ -358,6 +358,7 @@ function renderMatchTask(container, task) {
     leftItem.dataset.side = 'left';
 
     leftItem.addEventListener('click', () => {
+      console.log('Клик по левому элементу:', pair.left);
       if (leftItem.classList.contains('matched')) return;
 
       if (selectedLeft === leftItem) {
@@ -378,10 +379,12 @@ function renderMatchTask(container, task) {
     rightItem.dataset.side = 'right';
 
     rightItem.addEventListener('click', () => {
+      console.log('Клик по правому элементу:', pair.right);
       if (rightItem.classList.contains('matched')) return;
 
       if (selectedLeft) {
         const leftId = selectedLeft.dataset.pairId;
+        console.log('Сравниваем leftId:', leftId, 'с idx:', idx);
         if (leftId === String(idx)) {
           // Правильно
           selectedLeft.classList.add('matched');
@@ -397,6 +400,8 @@ function renderMatchTask(container, task) {
           showToast('Попробуйте другую пару', 1000);
         }
         selectedLeft = null;
+      } else {
+        console.log('Не выбран левый элемент');
       }
     });
 
@@ -407,4 +412,13 @@ function renderMatchTask(container, task) {
   grid.appendChild(leftCol);
   grid.appendChild(rightCol);
   container.appendChild(grid);
+}
+
+function showToast(message, duration = 3000) {
+  console.log('TOAST:', message);
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
 }
