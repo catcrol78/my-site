@@ -1015,6 +1015,32 @@ body{
   color: white;
 }
 
+/* ===== Синхронизация текста с видео ===== */
+.lyric-line {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  margin: 2px 0;
+  border-radius: 8px;
+}
+
+.lyric-line.active {
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(31, 111, 235, 0.3);
+}
+
+.lyric-line:hover:not(.active) {
+  background-color: rgba(31, 111, 235, 0.1);
+}
+
+/* Плавная прокрутка к активной строке */
+.lyrics-text {
+  scroll-margin-top: 20px;
+}
+
 /* Адаптация для мобильных */
 @media (max-width: 640px) {
   .flashcard-wrapper {
