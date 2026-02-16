@@ -25,6 +25,47 @@
         <p id="song-artist" style="margin: 0 0 20px 0; font-size: 18px; color: #64748b;"></p>
         
         <div id="song-badges" class="badges-section" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+        <!-- Панель Словарь (карточки) -->
+<div class="detail-panel" data-panel="flashcards">
+  <div class="panel-card">
+    <div class="flashcards-header">
+      <h3><i class="fas fa-layer-group"></i> <span data-i18n="flashcardsTitle">Словарь в карточках</span></h3>
+      <div class="flashcards-progress">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="flashcards-progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="progress-text" id="flashcards-progress-text">0/0</span>
+      </div>
+    </div>
+    
+    <div class="flashcards-container">
+      <div class="flashcard-wrapper" id="flashcard-wrapper">
+        <!-- Карточка будет создаваться динамически -->
+      </div>
+      
+      <div class="flashcards-controls">
+        <button class="flashcards-nav-btn" id="flashcards-prev" disabled>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="flashcards-counter" id="flashcards-counter">1 / 0</span>
+        <button class="flashcards-nav-btn" id="flashcards-next" disabled>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      
+      <div class="flashcards-actions">
+        <button class="flashcards-btn" id="flashcards-reset">
+          <i class="fas fa-redo-alt"></i> <span data-i18n="reset">Сбросить прогресс</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Пустое состояние -->
+    <div id="flashcards-empty" style="display: none; text-align: center; padding: 40px 0;">
+      <p class="muted">Для этой песни пока нет карточек</p>
+    </div>
+  </div>
+</div>
 
         <!-- Видео -->
         <div class="video-container" style="margin-bottom: 20px;">
@@ -71,4 +112,5 @@
   <script src="song.js"></script>
 </body>
 </html>
+
 
