@@ -57,6 +57,14 @@ function onYouTubeIframeAPIReady() {
   // Плеер будет инициализирован после того, как iframe появится в DOM
   if (document.getElementById('video-iframe')) {
     initPlayer();
+    // Если через 2 секунды плеер не создался, ставим src вручную (запасной вариант)
+setTimeout(() => {
+  const iframe = $('video-iframe');
+  if (iframe && !iframe.src && song.youtubeId) {
+    console.log("YouTube API не сработал, устанавливаем src вручную");
+    iframe.src = `https://www.youtube.com/embed/${song.youtubeId}`;
+  }
+}, 2000);
   } else {
     // Если iframe ещё не загружен, подождём немного
     setTimeout(onYouTubeIframeAPIReady, 100);
@@ -202,12 +210,8 @@ function showError(message) {
 }
 
 function renderSong(song) {
-  // Заголовок и исполнитель
   $('song-title').textContent = safeText(song.title);
   $('song-artist').textContent = song.artist || '';
-  
-  // НЕ устанавливаем src вручную – YouTube API сделает это сам
-  // Просто убедимся, что iframe есть и имеет id
   
   // Текст песни
   renderLyrics(song.lyrics);
@@ -220,10 +224,10 @@ function renderSong(song) {
   // Задания
   renderTasks(song.tasks);
   
-  // Лексика (обычная)
+  // Лексика
   renderVocabulary(song.vocabulary);
   
-  // Карточки-перевёртыши: ищем задание с типом flashcards
+  // Карточки
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   const flashcards = flashcardTask ? flashcardTask.flashcards : null;
   renderFlashcards(flashcards);
@@ -234,17 +238,24 @@ function renderSong(song) {
   // Показываем контент
   $('song-content').style.display = 'block';
   hideLoader();
-  
-  // Настраиваем вкладки
   setupTabs();
   
-  // Инициализируем плеер, если API уже загружен
-  if (window.YT && YT.Player) {
-    initPlayer();
+  // Работа с видео
+  if (song.youtubeId) {
+    // Пытаемся использовать API
+    if (window.YT && YT.Player) {
+      initPlayer();
+    }
+    // Запасной вариант: если через 2 секунды iframe всё ещё пустой, ставим src вручную
+    setTimeout(() => {
+      const iframe = $('video-iframe');
+      if (iframe && !iframe.src && song.youtubeId) {
+        console.log("YouTube API не сработал, устанавливаем src вручную");
+        iframe.src = `https://www.youtube.com/embed/${song.youtubeId}`;
+      }
+    }, 2000);
   }
-  // Если API ещё не готов, он вызовет onYouTubeIframeAPIReady позже
 }
-
 function setupTabs() {
   const tabs = document.querySelectorAll('.detail-tab');
   const panels = document.querySelectorAll('.detail-panel');
@@ -774,3 +785,4 @@ function showToast(message, duration = 3000) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
+
