@@ -1,7 +1,12 @@
-// song.js - с поддержкой карточек-перевёртышей (flashcards)
-console.log("🎵 song.js загружен (с карточками)");
+// song.js - с поддержкой карточек-перевёртышей (flashcards) и синхронизацией текста с видео
+console.log("🎵 song.js загружен (с карточками и синхронизацией)");
 
 const $ = id => document.getElementById(id);
+
+// Глобальные переменные для YouTube плеера
+let player;
+let syncInterval;
+let currentSong = null; // будет хранить объект текущей песни
 
 function hideLoader() {
   const loader = document.getElementById('loader');
@@ -43,8 +48,124 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   console.log("Песня найдена:", song);
+  currentSong = song; // сохраняем для доступа из функций синхронизации
   renderSong(song);
 });
+
+// Функция вызывается автоматически, когда YouTube Iframe API готов
+function onYouTubeIframeAPIReady() {
+  // Плеер будет инициализирован после того, как iframe появится в DOM
+  if (document.getElementById('video-iframe')) {
+    initPlayer();
+  } else {
+    // Если iframe ещё не загружен, подождём немного
+    setTimeout(onYouTubeIframeAPIReady, 100);
+  }
+}
+
+function initPlayer() {
+  if (!currentSong || !currentSong.youtubeId) return;
+  
+  player = new YT.Player('video-iframe', {
+    videoId: currentSong.youtubeId,
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerReady(event) {
+  console.log("YouTube плеер готов");
+  startSyncInterval();
+}
+
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    startSyncInterval();
+  } else {
+    stopSyncInterval();
+  }
+}
+
+function startSyncInterval() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(() => {
+    if (player && player.getCurrentTime && currentSong) {
+      const currentTimeSec = player.getCurrentTime();
+      highlightCurrentLyric(currentTimeSec * 1000); // переводим в миллисекунды
+    }
+  }, 100); // проверяем каждые 100 мс
+}
+
+function stopSyncInterval() {
+  if (syncInterval) {
+    clearInterval(syncInterval);
+    syncInterval = null;
+  }
+}
+
+// Преобразование времени из формата "мм:сс" или "мм:сс.сс" в миллисекунды
+function parseTimeToMs(time) {
+  if (!time) return 0;
+  if (typeof time === 'number') return time * 1000; // если уже число (секунды)
+  
+  const parts = time.split(':');
+  if (parts.length === 2) {
+    const minutes = parseInt(parts[0]);
+    const seconds = parseFloat(parts[1]);
+    return (minutes * 60 + seconds) * 1000;
+  }
+  return 0;
+}
+
+// Подсветка текущей строки по времени
+function highlightCurrentLyric(timeMs) {
+  const lyrics = currentSong.lyrics;
+  if (!lyrics || !lyrics.length) return;
+
+  // Находим индекс последней строки, время которой <= текущему
+  let activeIndex = -1;
+  for (let i = 0; i < lyrics.length; i++) {
+    const lyricTime = parseTimeToMs(lyrics[i].time);
+    if (lyricTime <= timeMs) {
+      activeIndex = i;
+    } else {
+      break; // строки идут по порядку, дальше можно не искать
+    }
+  }
+
+  // Убираем класс active у всех строк
+  document.querySelectorAll('.lyric-line').forEach(line => {
+    line.classList.remove('active');
+  });
+
+  // Добавляем класс active найденной строке
+  if (activeIndex >= 0) {
+    const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
+    if (activeLine) {
+      activeLine.classList.add('active');
+      // Плавно прокручиваем к активной строке (если нужно)
+      activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}
+
+// Делаем строки кликабельными для перемотки
+function makeLyricsClickable() {
+  document.querySelectorAll('.lyric-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const index = line.dataset.index;
+      if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
+        const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
+        if (player && player.seekTo) {
+          player.seekTo(timeMs / 1000, true); // seekTo принимает секунды
+          player.playVideo(); // можно сразу запустить воспроизведение
+        }
+      }
+    });
+  });
+}
 
 function showError(message) {
   hideLoader();
@@ -69,9 +190,12 @@ function renderSong(song) {
   $('song-title').textContent = safeText(song.title);
   $('song-artist').textContent = song.artist || '';
   
-  // Видео
+  // Видео (iframe уже есть в HTML, его src будет установлен через API)
+  // Но для случая, если API не загрузится, оставим fallback
   if (song.youtubeId) {
-    $('video-iframe').src = `https://www.youtube.com/embed/${song.youtubeId}`;
+    // Можно сразу установить src, но API перезапишет его при инициализации
+    // Для красоты оставим, но если API не загрузится, видео всё равно будет работать
+    $('video-iframe').src = `https://www.youtube.com/embed/${song.youtubeId}?enablejsapi=1`;
   }
   
   // Текст песни
@@ -97,6 +221,12 @@ function renderSong(song) {
   
   // Настраиваем вкладки
   setupTabs();
+  
+  // Инициализируем плеер, если API уже загружен
+  if (window.YT && YT.Player) {
+    initPlayer();
+  }
+  // Если API ещё не готов, он вызовет onYouTubeIframeAPIReady позже
 }
 
 function setupTabs() {
@@ -131,7 +261,15 @@ function renderLyrics(lyrics) {
     container.innerHTML = '<p class="muted">Текст пока не добавлен</p>';
     return;
   }
-  container.innerHTML = lyrics.map(l => `<p>${escapeHtml(l.text)}</p>`).join('');
+  
+  let html = '';
+  lyrics.forEach((line, index) => {
+    html += `<p class="lyric-line" data-index="${index}" data-time="${line.time || ''}">${escapeHtml(line.text)}</p>`;
+  });
+  container.innerHTML = html;
+  
+  // После добавления строк в DOM делаем их кликабельными
+  setTimeout(makeLyricsClickable, 100);
 }
 
 function renderVocabulary(vocab) {
