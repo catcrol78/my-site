@@ -64,120 +64,40 @@ const songsDataFromExternal = [
     },
     "lyrics": [
       {
-        "time": "",
+        "time": "0:08",
         "text": "¿Qué horas son, mi corazón?"
       },
       {
-        "time": "",
+        "time": "0:11",
         "text": "Te lo dije bien clarito"
       },
       {
-        "time": "",
+        "time": "0:14",
         "text": "Permanece a la escucha"
       },
       {
-        "time": "",
+        "time": "0:17",
         "text": "Permanece a la escucha"
       },
       {
-        "time": "",
+        "time": "0:20",
         "text": "Doce de la noche en La Habana, Cuba"
       },
       {
-        "time": "",
+        "time": "0:23",
         "text": "Once de la noche en San Salvador, El Salvador"
       },
       {
-        "time": "",
+        "time": "0:26",
         "text": "Once de la noche en Managua, Nicaragua"
       },
       {
-        "time": "",
+        "time": "0:29",
         "text": "Me gustan los aviones, me gustas tú"
       },
       {
-        "time": "",
+        "time": "0:32",
         "text": "Me gusta viajar, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la mañana, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta el viento, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta soñar, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la mar, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je ne sais pas"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je ne sais plus"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je suis perdu"
-      },
-      {
-        "time": "",
-        "text": "¿Qué horas son, mi corazón?"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la moto, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta correr, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la lluvia, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta volver, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta marihuana, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta Colombiana, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la montaña, me gustas tú"
-      },
-      {
-        "time": "",
-        "text": "Me gusta la noche (me gustas tú)"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je ne sais pas"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je ne sais plus"
-      },
-      {
-        "time": "",
-        "text": "¿Qué voy a hacer?, je suis perdu"
-      },
-      {
-        "time": "",
-        "text": "¿Qué horas son, mi corazón?"
       }
     ],
     "pdf": "",
