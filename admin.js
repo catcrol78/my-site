@@ -1,10 +1,10 @@
-// admin.js – полная версия с поддержкой интерактивных заданий
+// admin.js – полная версия с поддержкой карточек-перевёртышей
 // Возможности:
 // - загрузка песен из localStorage и songs-data.js
 // - редактирование песен (клик по строке или кнопка ✏️)
 // - сохранение (добавление/обновление) в localStorage
 // - экспорт в songs-data.js (одна кнопка)
-// - поддержка типов заданий: gapfill, quiz, match, listening и др.
+// - поддержка типов заданий: gapfill, quiz, match, flashcards и др.
 // - динамические поля для каждого типа задания
 
 // ===== Вспомогательные функции =====
@@ -167,11 +167,11 @@ function createTaskEditor(index, taskData = null) {
     <div class="task-grid">
       <div class="admin-field">
         <label>Название (ru)</label>
-        <input type="text" data-field="titleRu" placeholder="Разминка" value="${taskData?.title?.ru || ''}" />
+        <input type="text" data-field="titleRu" placeholder="Разминка" value="${(taskData?.title?.ru || '').replace(/"/g, '&quot;')}" />
       </div>
       <div class="admin-field">
         <label>Название (es)</label>
-        <input type="text" data-field="titleEs" placeholder="Calentamiento" value="${taskData?.title?.es || ''}" />
+        <input type="text" data-field="titleEs" placeholder="Calentamiento" value="${(taskData?.title?.es || '').replace(/"/g, '&quot;')}" />
       </div>
       <div class="admin-field">
         <label>Тип</label>
@@ -186,15 +186,16 @@ function createTaskEditor(index, taskData = null) {
           <option value="gapfill" ${taskData?.type === 'gapfill' ? 'selected' : ''}>Заполнение пропусков</option>
           <option value="quiz" ${taskData?.type === 'quiz' ? 'selected' : ''}>Викторина</option>
           <option value="match" ${taskData?.type === 'match' ? 'selected' : ''}>Сопоставление</option>
+          <option value="flashcards" ${taskData?.type === 'flashcards' ? 'selected' : ''}>Карточки-перевёртыши</option>
         </select>
       </div>
       <div class="admin-field">
         <label>Инструкция (ru)</label>
-        <textarea data-field="instrRu" placeholder="что сделать ученику">${taskData?.instruction?.ru || ''}</textarea>
+        <textarea data-field="instrRu" placeholder="что сделать ученику">${(taskData?.instruction?.ru || '').replace(/</g, '&lt;')}</textarea>
       </div>
       <div class="admin-field">
         <label>Инструкция (es)</label>
-        <textarea data-field="instrEs" placeholder="instrucciones">${taskData?.instruction?.es || ''}</textarea>
+        <textarea data-field="instrEs" placeholder="instrucciones">${(taskData?.instruction?.es || '').replace(/</g, '&lt;')}</textarea>
       </div>
     </div>
     <div class="task-extra-fields" id="task-extra-${index}"></div>
@@ -205,7 +206,7 @@ function createTaskEditor(index, taskData = null) {
   // Добавляем обработчик изменения типа
   const typeSelect = wrap.querySelector('.task-type-select');
   typeSelect.addEventListener('change', () => {
-    updateExtraFields(wrap, typeSelect.value, taskData);
+    updateExtraFields(wrap, typeSelect.value, null);
   });
 
   // Заполняем дополнительные поля в соответствии с типом
@@ -232,17 +233,36 @@ function updateExtraFields(wrap, type, taskData) {
   let extraHtml = '';
 
   switch (type) {
+    case 'flashcards':
+      // Для карточек-перевёртышей
+      const cards = taskData?.flashcards || taskData?.cards || [];
+      
+      extraHtml = `
+        <div class="admin-field" style="grid-column: span 2;">
+          <label>Карточки для словаря (каждая карточка с новой строки в формате: испанское | перевод | пример | перевод примера)</label>
+          <textarea data-field="flashcardsData" rows="8" placeholder="viajar | путешествовать | Me gusta viajar | Мне нравится путешествовать&#10;soñar | мечтать | Sueño con viajar | Я мечтаю путешествовать">${cards.map(c => 
+            `${c.es || c.word || ''} | ${c.ru || c.translation || ''} | ${c.example || ''} | ${c.example_translation || ''}`
+          ).join('\n')}</textarea>
+          <small>Формат: слово | перевод | пример | перевод примера (три черты разделяют поля, можно оставлять пустыми)</small>
+        </div>
+        <div class="admin-field">
+          <label>Транскрипция (если есть, будет показана на лицевой стороне)</label>
+          <input type="text" data-field="flashcardsTranscription" placeholder="[bjaˈxaɾ]" value="${taskData?.transcription || ''}" />
+        </div>
+      `;
+      break;
+
     case 'gapfill':
       extraHtml = `
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Текст с пропусками (используйте ___ для пропусков)</label>
-          <textarea data-field="gapText" placeholder="Yo ___ (ir) a la playa. Tú ___ (bailar) bien.">${taskData?.text || ''}</textarea>
+          <textarea data-field="gapText" placeholder="Yo ___ (ir) a la playa. Tú ___ (bailar) bien.">${(taskData?.text || '').replace(/</g, '&lt;')}</textarea>
         </div>
         <div class="admin-field">
           <label>Ответы (через запятую, в порядке пропусков)</label>
-          <input type="text" data-field="gapAnswers" placeholder="voy, bailas" value="${taskData?.answers ? taskData.answers.join(', ') : ''}" />
+          <input type="text" data-field="gapAnswers" placeholder="voy, bailas" value="${(taskData?.answers || []).join(', ')}" />
         </div>
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Варианты для выпадающего списка (опционально, для каждого пропуска через |, варианты через запятую)</label>
           <textarea data-field="gapOptions" placeholder="voy, vas, va | bailo, bailas, baila">${taskData?.options ? taskData.options.map(arr => arr.join(', ')).join(' | ') : ''}</textarea>
           <small>Пример: для двух пропусков: "voy, vas, va | bailo, bailas, baila"</small>
@@ -251,11 +271,10 @@ function updateExtraFields(wrap, type, taskData) {
       break;
 
     case 'quiz':
-      // Для викторины нужны вопросы. Упростим: будем хранить как JSON-строку
       extraHtml = `
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Вопросы (JSON-формат)</label>
-          <textarea data-field="quizQuestions" placeholder='[{"question": "¿Cómo se dice casa?", "options": ["casa","perro","gato"], "correct": 0}]'>${taskData?.questions ? JSON.stringify(taskData.questions, null, 2) : ''}</textarea>
+          <textarea data-field="quizQuestions" rows="8" placeholder='[{"question": "¿Cómo se dice casa?", "options": ["casa","perro","gato"], "correct": 0}]'>${taskData?.questions ? JSON.stringify(taskData.questions, null, 2) : ''}</textarea>
           <small>Массив объектов: { "question": "...", "options": ["...", "..."], "correct": индекс правильного ответа }</small>
         </div>
       `;
@@ -263,9 +282,9 @@ function updateExtraFields(wrap, type, taskData) {
 
     case 'match':
       extraHtml = `
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Пары для сопоставления (левая часть | правая часть, каждая пара с новой строки)</label>
-          <textarea data-field="matchPairs" placeholder="casa | дом&#10;perro | собака">${taskData?.pairs ? taskData.pairs.map(p => `${p.left} | ${p.right}`).join('\n') : ''}</textarea>
+          <textarea data-field="matchPairs" rows="6" placeholder="casa | дом&#10;perro | собака">${taskData?.pairs ? taskData.pairs.map(p => `${p.left} | ${p.right}`).join('\n') : ''}</textarea>
         </div>
       `;
       break;
@@ -273,17 +292,17 @@ function updateExtraFields(wrap, type, taskData) {
     default:
       // Для обычных типов (listening, speaking...) используем стандартные поля
       extraHtml = `
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Контент (текст задания)</label>
-          <textarea data-field="content" placeholder="Текст задания">${taskData?.content || ''}</textarea>
+          <textarea data-field="content" placeholder="Текст задания" rows="4">${(taskData?.content || '').replace(/</g, '&lt;')}</textarea>
         </div>
-        <div class="admin-field">
+        <div class="admin-field" style="grid-column: span 2;">
           <label>Word bank (по слову на строке)</label>
-          <textarea data-field="wordBank" placeholder="palabra1&#10;palabra2">${taskData?.wordBank ? taskData.wordBank.join('\n') : ''}</textarea>
+          <textarea data-field="wordBank" placeholder="palabra1&#10;palabra2" rows="4">${(taskData?.wordBank || []).join('\n')}</textarea>
         </div>
         <div class="admin-field">
           <label>Ответ (если есть)</label>
-          <input type="text" data-field="answer" placeholder="Правильный ответ" value="${taskData?.answer || ''}" />
+          <input type="text" data-field="answer" placeholder="Правильный ответ" value="${(taskData?.answer || '').replace(/"/g, '&quot;')}" />
         </div>
       `;
   }
@@ -307,6 +326,24 @@ function collectTaskData(wrap) {
 
   // Собираем дополнительные поля в зависимости от типа
   switch (type) {
+    case 'flashcards':
+      const cardsText = wrap.querySelector('[data-field="flashcardsData"]')?.value || '';
+      const transcription = wrap.querySelector('[data-field="flashcardsTranscription"]')?.value || '';
+      
+      const cards = cardsText.split('\n').map(line => {
+        const parts = line.split('|').map(s => s.trim());
+        return {
+          es: parts[0] || '',
+          ru: parts[1] || '',
+          example: parts[2] || '',
+          example_translation: parts[3] || '',
+          transcription: transcription // общая транскрипция для всех или можно сделать для каждой
+        };
+      }).filter(card => card.es || card.ru);
+      
+      task.flashcards = cards;
+      break;
+
     case 'gapfill':
       task.text = wrap.querySelector('[data-field="gapText"]')?.value || '';
       const answersStr = wrap.querySelector('[data-field="gapAnswers"]')?.value || '';
