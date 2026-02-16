@@ -54,25 +54,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Функция вызывается автоматически, когда YouTube Iframe API готов
 function onYouTubeIframeAPIReady() {
-  // Плеер будет инициализирован после того, как iframe появится в DOM
-  if (document.getElementById('video-iframe')) {
+  // Плеер будет инициализирован, только если данные уже загружены
+  if (document.getElementById('video-iframe') && currentSong) {
     initPlayer();
-    // Если через 2 секунды плеер не создался, ставим src вручную (запасной вариант)
-    setTimeout(() => {
-      const iframe = $('video-iframe');
-      if (iframe && !iframe.src && currentSong && currentSong.youtubeId) {
-        console.log("YouTube API не сработал, устанавливаем src вручную");
-        iframe.src = `https://www.youtube.com/embed/${currentSong.youtubeId}`;
-      }
-    }, 2000);
   } else {
-    // Если iframe ещё не загружен, подождём немного
+    // Если iframe ещё не загружен или нет данных, подождём немного
     setTimeout(onYouTubeIframeAPIReady, 100);
   }
 }
 
 function initPlayer() {
-  if (!currentSong || !currentSong.youtubeId) return;
+  // Защита от повторного создания
+  if (player || !currentSong || !currentSong.youtubeId) return;
   
   player = new YT.Player('video-iframe', {
     videoId: currentSong.youtubeId,
@@ -242,18 +235,18 @@ function renderSong(song) {
   
   // Работа с видео
   if (song.youtubeId) {
-    // Пытаемся использовать API
+    // Пытаемся использовать API (если уже готов)
     if (window.YT && YT.Player) {
       initPlayer();
     }
-    // Запасной вариант: если через 2 секунды iframe всё ещё пустой, ставим src вручную
+    // Запасной вариант: если через 3 секунды плеер не создан, ставим src вручную
     setTimeout(() => {
       const iframe = $('video-iframe');
-      if (iframe && !iframe.src && song.youtubeId) {
+      if (iframe && !player && !iframe.src) {
         console.log("YouTube API не сработал, устанавливаем src вручную");
         iframe.src = `https://www.youtube.com/embed/${song.youtubeId}`;
       }
-    }, 2000);
+    }, 3000);
   }
 }
 
