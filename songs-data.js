@@ -1,4 +1,4 @@
-const songsDataFromExternal = [
+var songsDataFromExternal = [
   {
     "id": 1,
     "title": {
