@@ -1,11 +1,11 @@
-// admin.js – полная версия для новой админки (компактный интерфейс)
+// admin.js – полная версия с поддержкой интерактивных заданий
 // Возможности:
 // - загрузка песен из localStorage и songs-data.js
 // - редактирование песен (клик по строке или кнопка ✏️)
 // - сохранение (добавление/обновление) в localStorage
 // - экспорт в songs-data.js (одна кнопка)
-// - очистка формы и набора с подтверждением
-// - предпросмотр YouTube обложки при вводе ID/ссылки
+// - поддержка типов заданий: gapfill, quiz, match, listening и др.
+// - динамические поля для каждого типа задания
 
 // ===== Вспомогательные функции =====
 function linesToArray(text) {
@@ -152,11 +152,14 @@ function updateYouTubePreview() {
   }
 }
 
-// ===== Редактор заданий =====
-function createTaskEditor(index) {
+// ===== Редактор заданий с динамическими полями =====
+function createTaskEditor(index, taskData = null) {
   const wrap = document.createElement("div");
   wrap.className = "task-editor";
-  wrap.innerHTML = `
+  wrap.dataset.taskIndex = index;
+
+  // Базовая часть (заголовок, тип, инструкция)
+  let html = `
     <div class="task-top">
       <h4>Задание <span class="task-number">${index + 1}</span></h4>
       <button class="task-remove" type="button" data-action="remove">Удалить</button>
@@ -164,47 +167,51 @@ function createTaskEditor(index) {
     <div class="task-grid">
       <div class="admin-field">
         <label>Название (ru)</label>
-        <input type="text" data-field="titleRu" placeholder="Разминка" />
+        <input type="text" data-field="titleRu" placeholder="Разминка" value="${taskData?.title?.ru || ''}" />
       </div>
       <div class="admin-field">
         <label>Название (es)</label>
-        <input type="text" data-field="titleEs" placeholder="Calentamiento" />
+        <input type="text" data-field="titleEs" placeholder="Calentamiento" value="${taskData?.title?.es || ''}" />
       </div>
       <div class="admin-field">
         <label>Тип</label>
-        <select data-field="type">
-          <option value="warm-up">warm-up</option>
-          <option value="gap-fill">gap-fill</option>
-          <option value="grammar">grammar</option>
-          <option value="speaking">speaking</option>
-          <option value="listening">listening</option>
-          <option value="writing">writing</option>
-          <option value="vocabulary">vocabulary</option>
-          <option value="culture">culture</option>
+        <select data-field="type" class="task-type-select">
+          <option value="listening" ${taskData?.type === 'listening' ? 'selected' : ''}>Аудирование</option>
+          <option value="speaking" ${taskData?.type === 'speaking' ? 'selected' : ''}>Говорение</option>
+          <option value="reading" ${taskData?.type === 'reading' ? 'selected' : ''}>Чтение</option>
+          <option value="writing" ${taskData?.type === 'writing' ? 'selected' : ''}>Письмо</option>
+          <option value="grammar" ${taskData?.type === 'grammar' ? 'selected' : ''}>Грамматика</option>
+          <option value="vocabulary" ${taskData?.type === 'vocabulary' ? 'selected' : ''}>Лексика</option>
+          <option value="culture" ${taskData?.type === 'culture' ? 'selected' : ''}>Культура</option>
+          <option value="gapfill" ${taskData?.type === 'gapfill' ? 'selected' : ''}>Заполнение пропусков</option>
+          <option value="quiz" ${taskData?.type === 'quiz' ? 'selected' : ''}>Викторина</option>
+          <option value="match" ${taskData?.type === 'match' ? 'selected' : ''}>Сопоставление</option>
         </select>
       </div>
       <div class="admin-field">
-        <label>Ответ (необязательно)</label>
-        <input type="text" data-field="answer" placeholder="respirar / oído / acuerdes" />
-      </div>
-      <div class="admin-field">
         <label>Инструкция (ru)</label>
-        <textarea data-field="instrRu" placeholder="что сделать ученику"></textarea>
+        <textarea data-field="instrRu" placeholder="что сделать ученику">${taskData?.instruction?.ru || ''}</textarea>
       </div>
       <div class="admin-field">
         <label>Инструкция (es)</label>
-        <textarea data-field="instrEs" placeholder="instrucciones"></textarea>
-      </div>
-      <div class="admin-field">
-        <label>Контент (по строке)</label>
-        <textarea data-field="content" placeholder="строка 1\nстрока 2\n..."></textarea>
-      </div>
-      <div class="admin-field">
-        <label>Word bank (по слову на строке, опционально)</label>
-        <textarea data-field="wordBank" placeholder="palabra1\npalabra2"></textarea>
+        <textarea data-field="instrEs" placeholder="instrucciones">${taskData?.instruction?.es || ''}</textarea>
       </div>
     </div>
+    <div class="task-extra-fields" id="task-extra-${index}"></div>
   `;
+
+  wrap.innerHTML = html;
+
+  // Добавляем обработчик изменения типа
+  const typeSelect = wrap.querySelector('.task-type-select');
+  typeSelect.addEventListener('change', () => {
+    updateExtraFields(wrap, typeSelect.value, taskData);
+  });
+
+  // Заполняем дополнительные поля в соответствии с типом
+  updateExtraFields(wrap, typeSelect.value, taskData);
+
+  // Обработчик удаления
   wrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-action='remove']");
     if (!btn) return;
@@ -213,13 +220,143 @@ function createTaskEditor(index) {
       renumberTasks();
     }
   });
+
   return wrap;
 }
+
+// Функция обновления дополнительных полей в зависимости от типа
+function updateExtraFields(wrap, type, taskData) {
+  const container = wrap.querySelector('.task-extra-fields');
+  container.innerHTML = ''; // очищаем
+
+  let extraHtml = '';
+
+  switch (type) {
+    case 'gapfill':
+      extraHtml = `
+        <div class="admin-field">
+          <label>Текст с пропусками (используйте ___ для пропусков)</label>
+          <textarea data-field="gapText" placeholder="Yo ___ (ir) a la playa. Tú ___ (bailar) bien.">${taskData?.text || ''}</textarea>
+        </div>
+        <div class="admin-field">
+          <label>Ответы (через запятую, в порядке пропусков)</label>
+          <input type="text" data-field="gapAnswers" placeholder="voy, bailas" value="${taskData?.answers ? taskData.answers.join(', ') : ''}" />
+        </div>
+        <div class="admin-field">
+          <label>Варианты для выпадающего списка (опционально, для каждого пропуска через |, варианты через запятую)</label>
+          <textarea data-field="gapOptions" placeholder="voy, vas, va | bailo, bailas, baila">${taskData?.options ? taskData.options.map(arr => arr.join(', ')).join(' | ') : ''}</textarea>
+          <small>Пример: для двух пропусков: "voy, vas, va | bailo, bailas, baila"</small>
+        </div>
+      `;
+      break;
+
+    case 'quiz':
+      // Для викторины нужны вопросы. Упростим: будем хранить как JSON-строку
+      extraHtml = `
+        <div class="admin-field">
+          <label>Вопросы (JSON-формат)</label>
+          <textarea data-field="quizQuestions" placeholder='[{"question": "¿Cómo se dice casa?", "options": ["casa","perro","gato"], "correct": 0}]'>${taskData?.questions ? JSON.stringify(taskData.questions, null, 2) : ''}</textarea>
+          <small>Массив объектов: { "question": "...", "options": ["...", "..."], "correct": индекс правильного ответа }</small>
+        </div>
+      `;
+      break;
+
+    case 'match':
+      extraHtml = `
+        <div class="admin-field">
+          <label>Пары для сопоставления (левая часть | правая часть, каждая пара с новой строки)</label>
+          <textarea data-field="matchPairs" placeholder="casa | дом&#10;perro | собака">${taskData?.pairs ? taskData.pairs.map(p => `${p.left} | ${p.right}`).join('\n') : ''}</textarea>
+        </div>
+      `;
+      break;
+
+    default:
+      // Для обычных типов (listening, speaking...) используем стандартные поля
+      extraHtml = `
+        <div class="admin-field">
+          <label>Контент (текст задания)</label>
+          <textarea data-field="content" placeholder="Текст задания">${taskData?.content || ''}</textarea>
+        </div>
+        <div class="admin-field">
+          <label>Word bank (по слову на строке)</label>
+          <textarea data-field="wordBank" placeholder="palabra1&#10;palabra2">${taskData?.wordBank ? taskData.wordBank.join('\n') : ''}</textarea>
+        </div>
+        <div class="admin-field">
+          <label>Ответ (если есть)</label>
+          <input type="text" data-field="answer" placeholder="Правильный ответ" value="${taskData?.answer || ''}" />
+        </div>
+      `;
+  }
+
+  container.innerHTML = extraHtml;
+}
+
+// Сбор данных задания из формы
+function collectTaskData(wrap) {
+  const type = wrap.querySelector('[data-field="type"]').value;
+  const titleRu = wrap.querySelector('[data-field="titleRu"]').value;
+  const titleEs = wrap.querySelector('[data-field="titleEs"]').value;
+  const instrRu = wrap.querySelector('[data-field="instrRu"]').value;
+  const instrEs = wrap.querySelector('[data-field="instrEs"]').value;
+
+  const task = {
+    title: { ru: titleRu, es: titleEs },
+    instruction: { ru: instrRu, es: instrEs },
+    type: type
+  };
+
+  // Собираем дополнительные поля в зависимости от типа
+  switch (type) {
+    case 'gapfill':
+      task.text = wrap.querySelector('[data-field="gapText"]')?.value || '';
+      const answersStr = wrap.querySelector('[data-field="gapAnswers"]')?.value || '';
+      task.answers = answersStr.split(',').map(s => s.trim()).filter(Boolean);
+      
+      const optionsStr = wrap.querySelector('[data-field="gapOptions"]')?.value || '';
+      if (optionsStr) {
+        task.options = optionsStr.split('|').map(part => 
+          part.split(',').map(s => s.trim()).filter(Boolean)
+        );
+      }
+      break;
+
+    case 'quiz':
+      const questionsStr = wrap.querySelector('[data-field="quizQuestions"]')?.value || '';
+      try {
+        task.questions = JSON.parse(questionsStr);
+      } catch (e) {
+        alert('Ошибка в JSON вопросов для викторины');
+        task.questions = [];
+      }
+      break;
+
+    case 'match':
+      const pairsStr = wrap.querySelector('[data-field="matchPairs"]')?.value || '';
+      task.pairs = pairsStr.split('\n').map(line => {
+        const parts = line.split('|').map(s => s.trim());
+        if (parts.length === 2) {
+          return { left: parts[0], right: parts[1] };
+        }
+        return null;
+      }).filter(Boolean);
+      break;
+
+    default:
+      task.content = wrap.querySelector('[data-field="content"]')?.value || '';
+      const wb = wrap.querySelector('[data-field="wordBank"]')?.value || '';
+      task.wordBank = linesToArray(wb);
+      task.answer = wrap.querySelector('[data-field="answer"]')?.value || '';
+  }
+
+  return task;
+}
+
 function renumberTasks() {
   const tasks = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
   tasks.forEach((el, idx) => {
     const num = el.querySelector(".task-number");
     if (num) num.textContent = String(idx + 1);
+    el.dataset.taskIndex = idx;
   });
   document.getElementById("tasksCount").textContent = String(tasks.length);
 }
@@ -247,20 +384,7 @@ function buildSong() {
   const cover = youtubeCoverUrl(youtubeId);
 
   const taskEditors = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
-  const tasks = taskEditors.map(el => {
-    const get = (field) => (el.querySelector(`[data-field="${field}"]`)?.value || "").trim();
-    const title = { ru: get("titleRu"), es: get("titleEs") };
-    const instruction = { ru: get("instrRu"), es: get("instrEs") };
-    const type = get("type") || "warm-up";
-    const answer = get("answer");
-    const contentLines = linesToArray(el.querySelector('[data-field="content"]')?.value || "");
-    const content = contentLines.length <= 1 ? (contentLines[0] || "") : contentLines;
-    const wordBank = linesToArray(get("wordBank"));
-    const taskObj = { title, type, instruction, content };
-    if (answer) taskObj.answer = answer;
-    if (wordBank.length) taskObj.wordBank = wordBank;
-    return taskObj;
-  }).filter(t => t.title.ru || t.title.es || t.instruction.ru || t.instruction.es || t.content);
+  const tasks = taskEditors.map(el => collectTaskData(el));
 
   const autoId = getNextId();
   const finalId = idVal ? Number(idVal) : autoId;
@@ -313,24 +437,11 @@ function loadSongIntoForm(song) {
   tasksContainer.innerHTML = "";
   if (song.tasks && song.tasks.length > 0) {
     song.tasks.forEach((task, index) => {
-      const editor = createTaskEditor(index);
-      editor.querySelector('[data-field="titleRu"]').value = task.title?.ru || "";
-      editor.querySelector('[data-field="titleEs"]').value = task.title?.es || "";
-      editor.querySelector('[data-field="type"]').value = task.type || "warm-up";
-      editor.querySelector('[data-field="answer"]').value = task.answer || "";
-      editor.querySelector('[data-field="instrRu"]').value = task.instruction?.ru || "";
-      editor.querySelector('[data-field="instrEs"]').value = task.instruction?.es || "";
-      const contentField = editor.querySelector('[data-field="content"]');
-      if (Array.isArray(task.content)) contentField.value = task.content.join("\n");
-      else contentField.value = task.content || "";
-      const wbField = editor.querySelector('[data-field="wordBank"]');
-      if (Array.isArray(task.wordBank)) wbField.value = task.wordBank.join("\n");
-      else wbField.value = "";
+      const editor = createTaskEditor(index, task);
       tasksContainer.appendChild(editor);
     });
   }
   renumberTasks();
-  // Обновить предпросмотр YouTube
   updateYouTubePreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
