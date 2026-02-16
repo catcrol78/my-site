@@ -255,51 +255,51 @@ const songsDataFromExternal = [
     },
     "lyrics": [
       {
-        "time": "",
+        "time": " 0:18",
         "text": "Juraría que no sé bien lo que quiero"
       },
       {
-        "time": "",
+        "time": "0:26",
         "text": "pero sé que moriría"
       },
       {
-        "time": "",
+        "time": "0:33",
         "text": "si me quedo en la mitad"
       },
       {
-        "time": "",
+        "time": "0:50",
         "text": "por eso vuelo a otros senderos"
       },
       {
-        "time": "",
+        "time": "1:00",
         "text": "para conocer el mundo de verdad"
       },
       {
-        "time": "",
+        "time": "1:22",
         "text": "Aún no es tarde pero así me estoy sintiendo"
       },
       {
-        "time": "",
+        "time": "2:21",
         "text": "y aparecen tantos miedos"
       },
       {
-        "time": "",
+        "time": "2:22",
         "text": "que no me dejan pensar"
       },
       {
-        "time": "",
+        "time": "2:55",
         "text": "y tengo sueños de amores nuevos"
       },
       {
-        "time": "",
+        "time": "3:01",
         "text": "y me cuesta imaginar lo que vendrá."
       },
       {
-        "time": "",
+        "time": "3:02",
         "text": "Cambio dolor por libertad"
       },
       {
-        "time": "",
+        "time": "3:03",
         "text": "cambio heridas por un sueño"
       },
       {
