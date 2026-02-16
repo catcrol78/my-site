@@ -422,3 +422,10 @@ function showToast(message, duration = 3000) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
+// Добавьте в объект i18n.ru
+tabFlashcards: "Карточки",
+flashcardsTitle: "Словарь в карточках",
+
+// Добавьте в объект i18n.es
+tabFlashcards: "Tarjetas",
+flashcardsTitle: "Vocabulario en tarjetas",
