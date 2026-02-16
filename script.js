@@ -32,7 +32,13 @@ function hideLoader() {
     setTimeout(() => loader.style.display = 'none', 300);
   }
 }
+// Добавьте в объект i18n.ru
+tabFlashcards: "Карточки",
+flashcardsTitle: "Словарь в карточках",
 
+// Добавьте в объект i18n.es
+tabFlashcards: "Tarjetas",
+flashcardsTitle: "Vocabulario en tarjetas",
 // ===== i18n =====
 const i18n = {
   ru: {
