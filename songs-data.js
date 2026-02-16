@@ -63,6 +63,25 @@ const songsDataFromExternal = [
       }
     ]
   },
+      "tasks": [
+      {
+        "title": {"ru": "Аудирование", "es": "Audición"},
+        "type": "listening",
+        "instruction": {"ru": "Послушай и найди слова", "es": "Escucha y encuentra"},
+        "content": "Найди все формы глагола gustar"
+      },
+      {
+        "type": "gapfill",
+        "title": {"ru": "Вставь пропущенные слова", "es": "Completa las palabras"},
+        "instruction": {"ru": "Вставь правильные формы глаголов", "es": "Inserta las formas correctas"},
+        "text": "Yo ___ (gustar) la música. Tú ___ (bailar) muy bien.",
+        "answers": ["gusto", "bailas"],
+        "options": [
+          ["gusto", "gustas", "gusta"],
+          ["bailo", "bailas", "baila"]
+        ]
+      }
+    ]
   {
     "id": 2,
     "title": {
