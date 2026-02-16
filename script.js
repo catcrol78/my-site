@@ -32,13 +32,7 @@ function hideLoader() {
     setTimeout(() => loader.style.display = 'none', 300);
   }
 }
-// Добавьте в объект i18n.ru
-tabFlashcards: "Карточки",
-flashcardsTitle: "Словарь в карточках",
 
-// Добавьте в объект i18n.es
-tabFlashcards: "Tarjetas",
-flashcardsTitle: "Vocabulario en tarjetas",
 // ===== i18n =====
 const i18n = {
   ru: {
@@ -77,7 +71,11 @@ const i18n = {
     culture_dance_music: "Танцы/музыка",
 
     listShowing: (shown, total) => `Показано: ${shown} из ${total}`,
-    noMatches: "Ничего не найдено по текущим фильтрам."
+    noMatches: "Ничего не найдено по текущим фильтрам.",
+
+    // Добавленные переводы для карточек
+    tabFlashcards: "Карточки",
+    flashcardsTitle: "Словарь в карточках"
   },
   es: {
     siteTitle: "Catálogo de canciones en español",
@@ -115,7 +113,11 @@ const i18n = {
     culture_dance_music: "Baile/música",
 
     listShowing: (shown, total) => `Mostrando: ${shown} de ${total}`,
-    noMatches: "No hay resultados con los filtros actuales."
+    noMatches: "No hay resultados con los filtros actuales.",
+
+    // Добавленные переводы для карточек
+    tabFlashcards: "Tarjetas",
+    flashcardsTitle: "Vocabulario en tarjetas"
   }
 };
 
