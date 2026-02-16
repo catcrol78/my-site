@@ -1,5 +1,6 @@
-// song.js
-console.log("song.js загружен");
+// song.js - с поддержкой интерактивных заданий
+
+console.log("🎵 song.js загружен (интерактивная версия)");
 
 const $ = id => document.getElementById(id);
 
@@ -14,22 +15,28 @@ function safeText(obj) {
   return obj.ru || obj.es || '';
 }
 
+function escapeHtml(str) {
+  return (str ?? '').toString()
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 // Получаем ID из URL
 const urlParams = new URLSearchParams(window.location.search);
 const songId = parseInt(urlParams.get('id'));
 
-// Ждем загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM загружен, ищем песню с ID:", songId);
   
-  // Проверяем данные
-  if (!songsDataFromExternal) {
+  if (!window.songsDataFromExternal) {
     alert('Ошибка: данные не загружены!');
     return;
   }
   
-  // Ищем песню
-  const song = songsDataFromExternal.find(s => s.id === songId);
+  const song = window.songsDataFromExternal.find(s => s.id === songId);
   
   if (!song) {
     $('not-found').style.display = 'block';
@@ -38,8 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   console.log("Песня найдена:", song);
-  
-  // Заполняем информацию
+  renderSong(song);
+});
+
+function renderSong(song) {
+  // Заголовок и исполнитель
   $('song-title').textContent = safeText(song.title);
   $('song-artist').textContent = song.artist || '';
   
@@ -49,44 +59,271 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Текст песни
-  const lyricsDiv = $('lyrics-content');
-  if (song.lyrics && song.lyrics.length) {
-    lyricsDiv.innerHTML = song.lyrics.map(l => `<p>${l.text}</p>`).join('');
-  } else {
-    lyricsDiv.innerHTML = '<p>Текст пока не добавлен</p>';
-  }
-  
-  // Лексика
-  const vocabDiv = $('vocab-content');
-  if (song.vocabulary && song.vocabulary.length) {
-    vocabDiv.innerHTML = song.vocabulary.map(w => 
-      `<span style="border:1px solid #e5e7eb; border-radius:30px; padding:8px 10px; background:white;">${w}</span>`
-    ).join('');
-  }
+  renderLyrics(song.lyrics);
   
   // Задания
-  const tasksDiv = $('tasks-container');
-  if (song.tasks && song.tasks.length) {
-    tasksDiv.innerHTML = song.tasks.map(t => `
-      <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:16px; padding:20px; margin-bottom:10px;">
-        <h3>${safeText(t.title)}</h3>
-        <p>${safeText(t.instruction)}</p>
-        <p>${t.content || ''}</p>
-      </div>
-    `).join('');
-  } else {
-    tasksDiv.innerHTML = '<p>Заданий пока нет</p>';
-  }
+  renderTasks(song.tasks);
+  
+  // Лексика
+  renderVocabulary(song.vocabulary);
   
   // Бейджи
-  const badgesDiv = $('song-badges');
-  const badges = [];
-  if (song.level) badges.push(`<span class="badge"><i class="fas fa-signal"></i> ${song.level.join(', ')}</span>`);
-  if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${t}</span>`));
-  if (song.grammar) song.grammar.forEach(g => badges.push(`<span class="badge"><i class="fas fa-language"></i> ${g}</span>`));
-  badgesDiv.innerHTML = badges.join('');
+  renderBadges(song);
   
   // Показываем контент
   $('song-content').style.display = 'block';
   hideLoader();
-});
+}
+
+function renderLyrics(lyrics) {
+  const container = $('lyrics-content');
+  if (!lyrics || !lyrics.length) {
+    container.innerHTML = '<p class="muted">Текст пока не добавлен</p>';
+    return;
+  }
+  container.innerHTML = lyrics.map(l => `<p>${escapeHtml(l.text)}</p>`).join('');
+}
+
+function renderVocabulary(vocab) {
+  const container = $('vocab-content');
+  if (!vocab || !vocab.length) {
+    container.innerHTML = '<p class="muted">Лексика пока не добавлена</p>';
+    return;
+  }
+  container.innerHTML = vocab.map(w => 
+    `<span class="chip">${escapeHtml(w)}</span>`
+  ).join('');
+}
+
+function renderBadges(song) {
+  const badgesDiv = $('song-badges');
+  const badges = [];
+  if (song.level) badges.push(`<span class="badge"><i class="fas fa-signal"></i> ${song.level.join(', ')}</span>`);
+  if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`));
+  if (song.grammar) song.grammar.forEach(g => badges.push(`<span class="badge"><i class="fas fa-language"></i> ${escapeHtml(g)}</span>`));
+  badgesDiv.innerHTML = badges.join('');
+}
+
+// ===== Отрисовка заданий =====
+function renderTasks(tasks) {
+  const container = $('tasks-container');
+  if (!tasks || !tasks.length) {
+    container.innerHTML = '<p class="muted">Заданий пока нет</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  tasks.forEach((task, index) => {
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'task-block';
+    taskDiv.dataset.taskIndex = index;
+
+    // Заголовок и тип
+    const header = document.createElement('div');
+    header.className = 'task-header';
+    header.innerHTML = `
+      <h3>${safeText(task.title) || `Задание ${index + 1}`}</h3>
+      <span class="task-type-badge">${task.type || 'задание'}</span>
+    `;
+    taskDiv.appendChild(header);
+
+    // Инструкция
+    if (task.instruction) {
+      const instr = document.createElement('div');
+      instr.className = 'task-instruction';
+      instr.innerHTML = `<i class="fas fa-info-circle"></i> ${safeText(task.instruction)}`;
+      taskDiv.appendChild(instr);
+    }
+
+    // Контент в зависимости от типа
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'task-content';
+
+    switch (task.type) {
+      case 'gapfill':
+        renderGapFill(contentDiv, task);
+        break;
+      case 'quiz':
+        renderQuiz(contentDiv, task);
+        break;
+      default:
+        renderDefault(contentDiv, task);
+    }
+
+    taskDiv.appendChild(contentDiv);
+    container.appendChild(taskDiv);
+  });
+}
+
+// Задание по умолчанию (простой текст)
+function renderDefault(container, task) {
+  if (task.content) {
+    const p = document.createElement('p');
+    p.textContent = task.content;
+    container.appendChild(p);
+  }
+  if (task.wordBank) {
+    const bankDiv = document.createElement('div');
+    bankDiv.className = 'word-bank';
+    bankDiv.innerHTML = '<strong>Слова для справки:</strong> ' + 
+      task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+    container.appendChild(bankDiv);
+  }
+}
+
+// Заполнение пропусков
+function renderGapFill(container, task) {
+  if (!task.text) return;
+
+  const text = task.text;
+  const parts = text.split('___');
+  const answers = task.answers || [];
+  const options = task.options || [];
+
+  const form = document.createElement('div');
+  form.className = 'gap-fill-form';
+
+  parts.forEach((part, idx) => {
+    // Добавляем текст перед пропуском
+    if (part) {
+      const span = document.createElement('span');
+      span.textContent = part;
+      form.appendChild(span);
+    }
+
+    // Добавляем поле для ввода, если это не последний элемент
+    if (idx < parts.length - 1) {
+      if (options[idx] && Array.isArray(options[idx])) {
+        // Выпадающий список с вариантами
+        const select = document.createElement('select');
+        select.className = 'gap-select';
+        select.dataset.index = idx;
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '— выберите —';
+        select.appendChild(defaultOption);
+        
+        options[idx].forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          select.appendChild(option);
+        });
+        form.appendChild(select);
+      } else {
+        // Простое текстовое поле
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'gap-input';
+        input.dataset.index = idx;
+        input.placeholder = '...';
+        form.appendChild(input);
+      }
+    }
+  });
+
+  container.appendChild(form);
+
+  // Кнопка проверки
+  if (answers && answers.length) {
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'check-btn';
+    checkBtn.textContent = 'Проверить';
+    
+    const resultDiv = document.createElement('div');
+    resultDiv.className = 'result-message';
+    resultDiv.style.display = 'none';
+
+    checkBtn.addEventListener('click', () => {
+      const inputs = form.querySelectorAll('input.gap-input, select.gap-select');
+      let correctCount = 0;
+      
+      inputs.forEach((input, i) => {
+        const userAnswer = input.value.trim().toLowerCase();
+        const correct = answers[i].toLowerCase();
+        if (userAnswer === correct) {
+          input.style.borderColor = 'green';
+          correctCount++;
+        } else {
+          input.style.borderColor = 'red';
+        }
+      });
+
+      if (correctCount === answers.length) {
+        resultDiv.textContent = '✅ Всё верно! Молодец!';
+        resultDiv.className = 'result-message correct';
+      } else {
+        resultDiv.textContent = `❌ Правильно ${correctCount} из ${answers.length}`;
+        resultDiv.className = 'result-message incorrect';
+      }
+      resultDiv.style.display = 'block';
+    });
+
+    container.appendChild(checkBtn);
+    container.appendChild(resultDiv);
+  }
+}
+
+// Викторина с выбором ответа
+function renderQuiz(container, task) {
+  if (!task.questions) return;
+
+  const form = document.createElement('div');
+  form.className = 'quiz-form';
+
+  task.questions.forEach((q, qIdx) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'quiz-question';
+    questionDiv.innerHTML = `<p><strong>${q.question}</strong></p>`;
+
+    q.options.forEach((opt, optIdx) => {
+      const label = document.createElement('label');
+      label.className = 'quiz-option';
+      
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `q_${qIdx}`;
+      radio.value = optIdx;
+      
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(' ' + opt));
+      questionDiv.appendChild(label);
+    });
+
+    form.appendChild(questionDiv);
+  });
+
+  container.appendChild(form);
+
+  // Кнопка проверки
+  const checkBtn = document.createElement('button');
+  checkBtn.className = 'check-btn';
+  checkBtn.textContent = 'Проверить';
+
+  const resultDiv = document.createElement('div');
+  resultDiv.className = 'result-message';
+  resultDiv.style.display = 'none';
+
+  checkBtn.addEventListener('click', () => {
+    let correctCount = 0;
+    task.questions.forEach((q, qIdx) => {
+      const selected = document.querySelector(`input[name="q_${qIdx}"]:checked`);
+      if (selected && parseInt(selected.value) === q.correct) {
+        correctCount++;
+      }
+    });
+
+    if (correctCount === task.questions.length) {
+      resultDiv.textContent = '✅ Все ответы верны!';
+      resultDiv.className = 'result-message correct';
+    } else {
+      resultDiv.textContent = `❌ Правильно ${correctCount} из ${task.questions.length}`;
+      resultDiv.className = 'result-message incorrect';
+    }
+    resultDiv.style.display = 'block';
+  });
+
+  container.appendChild(checkBtn);
+  container.appendChild(resultDiv);
+}
