@@ -64,40 +64,16 @@ const songsDataFromExternal = [
     },
     "lyrics": [
       {
-        "time": "0:08",
+        "time": "0:18",
         "text": "¿Qué horas son, mi corazón?"
       },
       {
-        "time": "0:11",
+        "time": "0:21",
         "text": "Te lo dije bien clarito"
       },
       {
-        "time": "0:14",
+        "time": "0:34",
         "text": "Permanece a la escucha"
-      },
-      {
-        "time": "0:17",
-        "text": "Permanece a la escucha"
-      },
-      {
-        "time": "0:20",
-        "text": "Doce de la noche en La Habana, Cuba"
-      },
-      {
-        "time": "0:23",
-        "text": "Once de la noche en San Salvador, El Salvador"
-      },
-      {
-        "time": "0:26",
-        "text": "Once de la noche en Managua, Nicaragua"
-      },
-      {
-        "time": "0:29",
-        "text": "Me gustan los aviones, me gustas tú"
-      },
-      {
-        "time": "0:32",
-        "text": "Me gusta viajar, me gustas tú"
       }
     ],
     "pdf": "",
