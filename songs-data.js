@@ -189,151 +189,33 @@ const songsDataFromExternal = [
           "es": "audirovanie"
         },
         "instruction": {
-          "ru": "Прослушай песню и найди все формы глагола \"gustar\". Выпиши их.\n",
-          "es": " "
+          "ru": "послушай первый куплет, выбери три слова на букву а",
+          "es": "если нет таких то спляши"
+        },
+        "type": "flashcards",
+        "flashcards": [
+          {
+            "es": "casa",
+            "ru": "дом",
+            "example": "estoy casa",
+            "example_translation": "я дома",
+            "transcription": ""
+          }
+        ]
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
         },
         "type": "listening",
-        "content": "Прослушай песню и найди все формы глагола \"gustar\". Выпиши их.",
-        "wordBank": [
-          "gusta",
-          "gustan",
-          "gustas",
-          "gustamos"
-        ],
-        "answer": "gusta, gustan, gustas, gustamos"
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "скачажи что тебе нравится",
-          "es": ""
-        },
-        "type": "speaking",
         "content": "",
         "wordBank": [],
         "answer": ""
-      },
-      {
-        "title": {
-          "ru": "читаем",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "прочитать любую статью про густар",
-          "es": ""
-        },
-        "type": "reading",
-        "content": "",
-        "wordBank": [],
-        "answer": ""
-      },
-      {
-        "title": {
-          "ru": "письмо",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "выпиши слово гутсра пять раз",
-          "es": ""
-        },
-        "type": "writing",
-        "content": "",
-        "wordBank": [],
-        "answer": ""
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "",
-          "es": ""
-        },
-        "type": "gapfill",
-        "text": "Yo ___ (ir) a la playa. Tú ___ (bailar) muy bien.",
-        "answers": [
-          "voy",
-          "bailas"
-        ],
-        "options": [
-          [
-            "voy",
-            "vas",
-            "va"
-          ],
-          [
-            "bailo",
-            "bailas",
-            "baila"
-          ]
-        ]
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "пройди викторину",
-          "es": ""
-        },
-        "type": "quiz",
-        "questions": [
-          {
-            "question": "Кто здесь?",
-            "options": [
-              "собака",
-              "кошка"
-            ],
-            "correct": 0
-          },
-          {
-            "question": "Сколько будет 2 + 2?",
-            "options": [
-              "3",
-              "4",
-              "5"
-            ],
-            "correct": 1
-          }
-        ]
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "найди пары",
-          "es": ""
-        },
-        "type": "match",
-        "pairs": [
-          {
-            "left": "casa",
-            "right": "дом"
-          },
-          {
-            "left": "perro",
-            "right": "собака"
-          },
-          {
-            "left": "gato",
-            "right": "кот"
-          },
-          {
-            "left": "sol",
-            "right": "солнце"
-          },
-          {
-            "left": "luna",
-            "right": "луна"
-          }
-        ]
       }
     ]
   },
@@ -428,7 +310,6 @@ const songsDataFromExternal = [
       "note": ""
     },
     "lyrics": [],
-    "pdf": "",
     "analysis": [],
     "tasks": []
   },
@@ -993,8 +874,8 @@ const songsDataFromExternal = [
     "pdf": "",
     "analysis": [],
     "tasks": []
-      },
-    {
+  },
+  {
     "id": 8,
     "title": {
       "ru": "Тестовые карточки",
@@ -1003,8 +884,12 @@ const songsDataFromExternal = [
     "artist": "Demo",
     "youtubeId": "dQw4w9WgXcQ",
     "cover": "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-    "level": ["A1"],
-    "themes": ["образовательные"],
+    "level": [
+      "A1"
+    ],
+    "themes": [
+      "образовательные"
+    ],
     "grammar": [],
     "vocabulary": [],
     "culture": {
@@ -1015,15 +900,23 @@ const songsDataFromExternal = [
       "age": "all",
       "containsOtherLanguages": false,
       "profanity": "none",
+      "sensitiveTopics": [],
       "note": "Тестовая песня для карточек"
     },
     "lyrics": [
-      {"time": "", "text": "Это тестовая песня для проверки карточек."},
-      {"time": "", "text": "Здесь нет настоящего текста."}
+      {
+        "time": "",
+        "text": "Это тестовая песня для проверки карточек."
+      },
+      {
+        "time": "",
+        "text": "Здесь нет настоящего текста."
+      }
     ],
+    "pdf": "",
+    "analysis": [],
     "tasks": [
       {
-        "type": "flashcards",
         "title": {
           "ru": "Словарь к песне",
           "es": "Vocabulario de la canción"
@@ -1032,41 +925,42 @@ const songsDataFromExternal = [
           "ru": "Изучи слова из песни. Нажимай на карточки, чтобы увидеть перевод.",
           "es": "Estudia las palabras de la canción. Haz clic en las tarjetas para ver la traducción."
         },
+        "type": "flashcards",
         "flashcards": [
           {
             "es": "viajar",
             "ru": "путешествовать",
             "example": "Me gusta viajar",
             "example_translation": "Мне нравится путешествовать",
-            "transcription": "[bjaˈxaɾ]"
+            "transcription": ""
           },
           {
             "es": "soñar",
             "ru": "мечтать",
             "example": "Sueño con viajar",
             "example_translation": "Я мечтаю путешествовать",
-            "transcription": "[soˈɲaɾ]"
+            "transcription": ""
           },
           {
             "es": "correr",
             "ru": "бегать",
             "example": "Corro por el parque",
             "example_translation": "Я бегаю по парку",
-            "transcription": "[koˈreɾ]"
+            "transcription": ""
           },
           {
             "es": "volver",
             "ru": "возвращаться",
             "example": "Vuelvo a casa",
             "example_translation": "Я возвращаюсь домой",
-            "transcription": "[bolˈβeɾ]"
+            "transcription": ""
           },
           {
             "es": "moto",
             "ru": "мотоцикл",
             "example": "Mi moto es rápida",
             "example_translation": "Мой мотоцикл быстрый",
-            "transcription": "[ˈmoto]"
+            "transcription": ""
           }
         ]
       }
