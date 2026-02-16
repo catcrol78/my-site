@@ -58,13 +58,13 @@ function onYouTubeIframeAPIReady() {
   if (document.getElementById('video-iframe')) {
     initPlayer();
     // Если через 2 секунды плеер не создался, ставим src вручную (запасной вариант)
-setTimeout(() => {
-  const iframe = $('video-iframe');
-  if (iframe && !iframe.src && song.youtubeId) {
-    console.log("YouTube API не сработал, устанавливаем src вручную");
-    iframe.src = `https://www.youtube.com/embed/${song.youtubeId}`;
-  }
-}, 2000);
+    setTimeout(() => {
+      const iframe = $('video-iframe');
+      if (iframe && !iframe.src && currentSong && currentSong.youtubeId) {
+        console.log("YouTube API не сработал, устанавливаем src вручную");
+        iframe.src = `https://www.youtube.com/embed/${currentSong.youtubeId}`;
+      }
+    }, 2000);
   } else {
     // Если iframe ещё не загружен, подождём немного
     setTimeout(onYouTubeIframeAPIReady, 100);
@@ -256,6 +256,7 @@ function renderSong(song) {
     }, 2000);
   }
 }
+
 function setupTabs() {
   const tabs = document.querySelectorAll('.detail-tab');
   const panels = document.querySelectorAll('.detail-panel');
@@ -785,4 +786,3 @@ function showToast(message, duration = 3000) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
-
