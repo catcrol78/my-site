@@ -30,13 +30,13 @@ const songId = parseInt(urlParams.get('id'));
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM загружен, ищем песню с ID:", songId);
   
-  // Проверяем наличие данных
-  if (typeof window.songsDataFromExternal === 'undefined') {
+  // Проверяем наличие данных (без window, напрямую)
+  if (typeof songsDataFromExternal === 'undefined') {
     showError('Данные не загружены. Файл songs-data.js не найден или содержит ошибку.');
     return;
   }
   
-  const song = window.songsDataFromExternal.find(s => s.id === songId);
+  const song = songsDataFromExternal.find(s => s.id === songId);
   
   if (!song) {
     showError(`Песня с ID ${songId} не найдена в базе.`);
@@ -121,6 +121,7 @@ function renderBadges(song) {
   badgesDiv.innerHTML = badges.join('');
 }
 
+// ===== Отрисовка заданий =====
 function renderTasks(tasks) {
   const container = $('tasks-container');
   if (!tasks || !tasks.length) {
@@ -168,6 +169,7 @@ function renderTasks(tasks) {
   });
 }
 
+// Задание по умолчанию (простой текст)
 function renderDefault(container, task) {
   if (task.content) {
     const p = document.createElement('p');
@@ -183,8 +185,10 @@ function renderDefault(container, task) {
   }
 }
 
+// Заполнение пропусков
 function renderGapFill(container, task) {
   if (!task.text) return;
+
   const text = task.text;
   const parts = text.split('___');
   const answers = task.answers || [];
@@ -266,8 +270,10 @@ function renderGapFill(container, task) {
   }
 }
 
+// Викторина с выбором ответа
 function renderQuiz(container, task) {
   if (!task.questions) return;
+
   const form = document.createElement('div');
   form.className = 'quiz-form';
 
