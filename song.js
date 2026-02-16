@@ -83,8 +83,10 @@ function renderSong(song) {
   // Лексика (обычная)
   renderVocabulary(song.vocabulary);
   
-  // Карточки-перевёртыши
-  renderFlashcards(song.flashcards || song.vocabulary_cards);
+  // Карточки-перевёртыши: ищем задание с типом flashcards
+  const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
+  const flashcards = flashcardTask ? flashcardTask.flashcards : null;
+  renderFlashcards(flashcards);
   
   // Бейджи
   renderBadges(song);
@@ -162,6 +164,17 @@ function renderFlashcards(flashcards) {
   const resetBtn = $('flashcards-reset');
   const progressFill = $('flashcards-progress-fill');
   const progressText = $('flashcards-progress-text');
+  const badge = $('#flashcards-count');
+  
+  // Обновляем счётчик на вкладке
+  if (badge) {
+    if (flashcards && flashcards.length) {
+      badge.textContent = flashcards.length;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
   
   if (!flashcards || !flashcards.length) {
     if (emptyDiv) emptyDiv.style.display = 'block';
