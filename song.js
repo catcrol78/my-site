@@ -89,6 +89,10 @@ function onPlayerStateChange(event) {
 }
 
 function startSyncInterval() {
+  // Запускаем интервал только если у песни есть временные метки
+  if (!currentSong || !hasTimestamps(currentSong)) {
+    return;
+  }
   if (syncInterval) clearInterval(syncInterval);
   syncInterval = setInterval(() => {
     if (player && player.getCurrentTime && currentSong) {
@@ -103,6 +107,11 @@ function stopSyncInterval() {
     clearInterval(syncInterval);
     syncInterval = null;
   }
+}
+
+// Проверяет, есть ли у песни хотя бы одна строка с временной меткой
+function hasTimestamps(song) {
+  return song.lyrics && song.lyrics.some(line => line.time && line.time.toString().trim() !== '');
 }
 
 // Преобразование времени из формата "мм:сс" или "мм:сс.сс" в миллисекунды
@@ -124,11 +133,14 @@ function highlightCurrentLyric(timeMs) {
   const lyrics = currentSong.lyrics;
   if (!lyrics || !lyrics.length) return;
 
-  // Находим индекс последней строки, время которой <= текущему
+  // Находим индекс последней строки с временем, которое <= текущему
   let activeIndex = -1;
   for (let i = 0; i < lyrics.length; i++) {
-    const lyricTime = parseTimeToMs(lyrics[i].time);
-    if (lyricTime <= timeMs) {
+    const lineTime = parseTimeToMs(lyrics[i].time);
+    // Пропускаем строки без времени – они не участвуют в синхронизации
+    if (lineTime === 0 || isNaN(lineTime)) continue;
+    
+    if (lineTime <= timeMs) {
       activeIndex = i;
     } else {
       break; // строки идут по порядку, дальше можно не искать
@@ -140,13 +152,12 @@ function highlightCurrentLyric(timeMs) {
     line.classList.remove('active');
   });
 
-  // Добавляем класс active найденной строке
+  // Добавляем класс active найденной строке (если есть)
   if (activeIndex >= 0) {
     const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
     if (activeLine) {
       activeLine.classList.add('active');
-      // Плавно прокручиваем к активной строке (если нужно)
-      activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Не прокручиваем автоматически, чтобы страница не прыгала
     }
   }
 }
@@ -158,6 +169,11 @@ function makeLyricsClickable() {
       const index = line.dataset.index;
       if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
         const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
+        // Если у строки нет времени, клик ничего не делает
+        if (timeMs === 0 || isNaN(timeMs)) {
+          showToast('У этой строки нет временной метки', 1500);
+          return;
+        }
         if (player && player.seekTo) {
           player.seekTo(timeMs / 1000, true); // seekTo принимает секунды
           player.playVideo(); // можно сразу запустить воспроизведение
@@ -190,16 +206,16 @@ function renderSong(song) {
   $('song-title').textContent = safeText(song.title);
   $('song-artist').textContent = song.artist || '';
   
-  // Видео (iframe уже есть в HTML, его src будет установлен через API)
-  // Но для случая, если API не загрузится, оставим fallback
-  if (song.youtubeId) {
-    // Можно сразу установить src, но API перезапишет его при инициализации
-    // Для красоты оставим, но если API не загрузится, видео всё равно будет работать
-    $('video-iframe').src = `https://www.youtube.com/embed/${song.youtubeId}?enablejsapi=1`;
-  }
+  // НЕ устанавливаем src вручную – YouTube API сделает это сам
+  // Просто убедимся, что iframe есть и имеет id
   
   // Текст песни
   renderLyrics(song.lyrics);
+  
+  // Проверяем наличие временных меток
+  if (!hasTimestamps(song)) {
+    console.log("У этой песни нет временных меток, синхронизация отключена");
+  }
   
   // Задания
   renderTasks(song.tasks);
