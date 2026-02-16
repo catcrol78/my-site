@@ -1,6 +1,5 @@
 // song.js - с поддержкой интерактивных заданий
-
-console.log("🎵 song.js загружен (интерактивная версия)");
+console.log("🎵 song.js загружен");
 
 const $ = id => document.getElementById(id);
 
@@ -31,22 +30,40 @@ const songId = parseInt(urlParams.get('id'));
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM загружен, ищем песню с ID:", songId);
   
-  if (!window.songsDataFromExternal) {
-    alert('Ошибка: данные не загружены!');
+  // Проверяем наличие данных
+  if (typeof window.songsDataFromExternal === 'undefined') {
+    showError('Данные не загружены. Файл songs-data.js не найден или содержит ошибку.');
     return;
   }
   
   const song = window.songsDataFromExternal.find(s => s.id === songId);
   
   if (!song) {
-    $('not-found').style.display = 'block';
-    hideLoader();
+    showError(`Песня с ID ${songId} не найдена в базе.`);
     return;
   }
   
   console.log("Песня найдена:", song);
   renderSong(song);
 });
+
+function showError(message) {
+  hideLoader();
+  const notFoundDiv = $('not-found');
+  if (notFoundDiv) {
+    notFoundDiv.style.display = 'block';
+    notFoundDiv.innerHTML = `
+      <i class="fas fa-exclamation-triangle" style="font-size: 60px; color: #ef4444; margin-bottom: 20px;"></i>
+      <h2>Ошибка</h2>
+      <p>${message}</p>
+      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+        <i class="fas fa-arrow-left"></i> Вернуться в каталог
+      </a>
+    `;
+  } else {
+    alert(message);
+  }
+}
 
 function renderSong(song) {
   // Заголовок и исполнитель
@@ -104,7 +121,6 @@ function renderBadges(song) {
   badgesDiv.innerHTML = badges.join('');
 }
 
-// ===== Отрисовка заданий =====
 function renderTasks(tasks) {
   const container = $('tasks-container');
   if (!tasks || !tasks.length) {
@@ -118,7 +134,6 @@ function renderTasks(tasks) {
     taskDiv.className = 'task-block';
     taskDiv.dataset.taskIndex = index;
 
-    // Заголовок и тип
     const header = document.createElement('div');
     header.className = 'task-header';
     header.innerHTML = `
@@ -127,7 +142,6 @@ function renderTasks(tasks) {
     `;
     taskDiv.appendChild(header);
 
-    // Инструкция
     if (task.instruction) {
       const instr = document.createElement('div');
       instr.className = 'task-instruction';
@@ -135,7 +149,6 @@ function renderTasks(tasks) {
       taskDiv.appendChild(instr);
     }
 
-    // Контент в зависимости от типа
     const contentDiv = document.createElement('div');
     contentDiv.className = 'task-content';
 
@@ -155,7 +168,6 @@ function renderTasks(tasks) {
   });
 }
 
-// Задание по умолчанию (простой текст)
 function renderDefault(container, task) {
   if (task.content) {
     const p = document.createElement('p');
@@ -171,10 +183,8 @@ function renderDefault(container, task) {
   }
 }
 
-// Заполнение пропусков
 function renderGapFill(container, task) {
   if (!task.text) return;
-
   const text = task.text;
   const parts = text.split('___');
   const answers = task.answers || [];
@@ -184,26 +194,21 @@ function renderGapFill(container, task) {
   form.className = 'gap-fill-form';
 
   parts.forEach((part, idx) => {
-    // Добавляем текст перед пропуском
     if (part) {
       const span = document.createElement('span');
       span.textContent = part;
       form.appendChild(span);
     }
 
-    // Добавляем поле для ввода, если это не последний элемент
     if (idx < parts.length - 1) {
       if (options[idx] && Array.isArray(options[idx])) {
-        // Выпадающий список с вариантами
         const select = document.createElement('select');
         select.className = 'gap-select';
         select.dataset.index = idx;
-        
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
         defaultOption.textContent = '— выберите —';
         select.appendChild(defaultOption);
-        
         options[idx].forEach(opt => {
           const option = document.createElement('option');
           option.value = opt;
@@ -212,7 +217,6 @@ function renderGapFill(container, task) {
         });
         form.appendChild(select);
       } else {
-        // Простое текстовое поле
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'gap-input';
@@ -225,12 +229,10 @@ function renderGapFill(container, task) {
 
   container.appendChild(form);
 
-  // Кнопка проверки
   if (answers && answers.length) {
     const checkBtn = document.createElement('button');
     checkBtn.className = 'check-btn';
     checkBtn.textContent = 'Проверить';
-    
     const resultDiv = document.createElement('div');
     resultDiv.className = 'result-message';
     resultDiv.style.display = 'none';
@@ -238,7 +240,6 @@ function renderGapFill(container, task) {
     checkBtn.addEventListener('click', () => {
       const inputs = form.querySelectorAll('input.gap-input, select.gap-select');
       let correctCount = 0;
-      
       inputs.forEach((input, i) => {
         const userAnswer = input.value.trim().toLowerCase();
         const correct = answers[i].toLowerCase();
@@ -265,10 +266,8 @@ function renderGapFill(container, task) {
   }
 }
 
-// Викторина с выбором ответа
 function renderQuiz(container, task) {
   if (!task.questions) return;
-
   const form = document.createElement('div');
   form.className = 'quiz-form';
 
@@ -280,12 +279,10 @@ function renderQuiz(container, task) {
     q.options.forEach((opt, optIdx) => {
       const label = document.createElement('label');
       label.className = 'quiz-option';
-      
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = `q_${qIdx}`;
       radio.value = optIdx;
-      
       label.appendChild(radio);
       label.appendChild(document.createTextNode(' ' + opt));
       questionDiv.appendChild(label);
@@ -296,11 +293,9 @@ function renderQuiz(container, task) {
 
   container.appendChild(form);
 
-  // Кнопка проверки
   const checkBtn = document.createElement('button');
   checkBtn.className = 'check-btn';
   checkBtn.textContent = 'Проверить';
-
   const resultDiv = document.createElement('div');
   resultDiv.className = 'result-message';
   resultDiv.style.display = 'none';
