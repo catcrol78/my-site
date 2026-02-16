@@ -993,5 +993,83 @@ const songsDataFromExternal = [
     "pdf": "",
     "analysis": [],
     "tasks": []
+      }
+    {
+    "id": 8,
+    "title": {
+      "ru": "Тестовые карточки",
+      "es": "Tarjetas de prueba"
+    },
+    "artist": "Demo",
+    "youtubeId": "dQw4w9WgXcQ",
+    "cover": "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+    "level": ["A1"],
+    "themes": ["образовательные"],
+    "grammar": [],
+    "vocabulary": [],
+    "culture": {
+      "tags": [],
+      "items": []
+    },
+    "restrictions": {
+      "age": "all",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "note": "Тестовая песня для карточек"
+    },
+    "lyrics": [
+      {"time": "", "text": "Это тестовая песня для проверки карточек."},
+      {"time": "", "text": "Здесь нет настоящего текста."}
+    ],
+    "tasks": [
+      {
+        "type": "flashcards",
+        "title": {
+          "ru": "Словарь к песне",
+          "es": "Vocabulario de la canción"
+        },
+        "instruction": {
+          "ru": "Изучи слова из песни. Нажимай на карточки, чтобы увидеть перевод.",
+          "es": "Estudia las palabras de la canción. Haz clic en las tarjetas para ver la traducción."
+        },
+        "flashcards": [
+          {
+            "es": "viajar",
+            "ru": "путешествовать",
+            "example": "Me gusta viajar",
+            "example_translation": "Мне нравится путешествовать",
+            "transcription": "[bjaˈxaɾ]"
+          },
+          {
+            "es": "soñar",
+            "ru": "мечтать",
+            "example": "Sueño con viajar",
+            "example_translation": "Я мечтаю путешествовать",
+            "transcription": "[soˈɲaɾ]"
+          },
+          {
+            "es": "correr",
+            "ru": "бегать",
+            "example": "Corro por el parque",
+            "example_translation": "Я бегаю по парку",
+            "transcription": "[koˈreɾ]"
+          },
+          {
+            "es": "volver",
+            "ru": "возвращаться",
+            "example": "Vuelvo a casa",
+            "example_translation": "Я возвращаюсь домой",
+            "transcription": "[bolˈβeɾ]"
+          },
+          {
+            "es": "moto",
+            "ru": "мотоцикл",
+            "example": "Mi moto es rápida",
+            "example_translation": "Мой мотоцикл быстрый",
+            "transcription": "[ˈmoto]"
+          }
+        ]
+      }
+    ]
   }
 ];
