@@ -1,5 +1,5 @@
-// song.js — ЧИСТАЯ ВЕРСИЯ (Без прыгающего окна)
-console.log("🎵 song.js загружен (Clean Version)");
+// song.js — Финальная версия с карточками и без лишних вкладок
+console.log("🎵 song.js загружен (Final Version)");
 
 // ===== Глобальные переменные =====
 let ytIframe = null;
@@ -78,13 +78,15 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
- 
+  
+  // Убраны вызовы renderGrammar, renderCulture, renderRestrictions
+
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
 
   const contentEl = $('song-content');
-  if (contentEl) contentEl.style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
+  if (contentEl) contentEl.style.display = ''; // Показываем контент
 
   hideLoader();
   setupTabs();
@@ -134,50 +136,6 @@ function renderVocabulary(vocab) {
   container.innerHTML = vocab.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
 }
 
-function renderGrammar(grammar) {
-  const container = $('#grammar-list');
-  if (!container) return;
-  if (!grammar || !grammar.length) {
-    container.innerHTML = '<li class="muted">Нет данных</li>';
-    return;
-  }
-  container.innerHTML = grammar.map(item => `<li>${escapeHtml(item)}</li>`).join('');
-}
-
-function renderCulture(culture) {
-  const container = $('#culture-list');
-  if (!container) return;
-  if (!culture || (!culture.items?.length && !culture.tags?.length)) {
-    container.innerHTML = '<li class="muted">Нет данных</li>';
-    return;
-  }
-  let html = '';
-  if (culture.tags?.length) {
-    html += `<li><strong>Теги:</strong> ${culture.tags.map(t => escapeHtml(t)).join(', ')}</li>`;
-  }
-  if (culture.items?.length) {
-    culture.items.forEach(item => html += `<li>${escapeHtml(item)}</li>`);
-  }
-  container.innerHTML = html;
-}
-
-function renderRestrictions(restrictions) {
-  const container = $('#restrictions-list');
-  if (!container) return;
-  if (!restrictions) {
-    container.innerHTML = '<li class="muted">Нет ограничений</li>';
-    return;
-  }
-  let html = '';
-  if (restrictions.age) html += `<li>Возраст: ${restrictions.age}</li>`;
-  if (restrictions.containsOtherLanguages) html += '<li>Содержит другие языки</li>';
-  if (restrictions.profanity && restrictions.profanity !== 'none') {
-    html += `<li>Ненормативная лексика: ${restrictions.profanity}</li>`;
-  }
-  if (restrictions.note) html += `<li>Примечание: ${restrictions.note}</li>`;
-  container.innerHTML = html || '<li class="muted">Нет ограничений</li>';
-}
-
 function renderBadges(song) {
   const badgesDiv = $('song-badges');
   if (!badgesDiv) return;
@@ -196,7 +154,7 @@ function renderTasks(tasks) {
     return;
   }
   tasks.forEach((task, index) => {
-    if (task.type === 'flashcards') return;
+    if (task.type === 'flashcards') return; // flashcards обрабатываются отдельно
     const taskDiv = document.createElement('div');
     taskDiv.className = 'task-block';
     const header = document.createElement('div');
@@ -316,33 +274,64 @@ function renderFlashcards(flashcards) {
   if (!flashcards || !flashcards.length) {
     if (emptyDiv) emptyDiv.style.display = 'block';
     if (container) container.innerHTML = '';
+    if (counter) counter.textContent = '0/0';
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
     return;
   }
+
   if (emptyDiv) emptyDiv.style.display = 'none';
-  
-  let idx = 0;
-  const update = () => {
-    if (!container) return;
-    const card = flashcards[idx];
+
+  let currentIndex = 0;
+
+  function updateCard() {
+    if (!container || !flashcards.length) return;
+    const card = flashcards[currentIndex];
     container.innerHTML = `
       <div class="flashcard">
-        <div class="flashcard-front"><div class="word">${escapeHtml(card.es||card.word)}</div></div>
-        <div class="flashcard-back"><div class="translation">${escapeHtml(card.ru||card.translation)}</div></div>
+        <div class="flashcard-front">
+          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
+          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
+        </div>
+        <div class="flashcard-back">
+          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
+          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
+        </div>
       </div>`;
+
     const flashcardEl = container.querySelector('.flashcard');
     if (flashcardEl) {
-      flashcardEl.onclick = function() { this.classList.toggle('flipped'); };
+      flashcardEl.onclick = function () {
+        this.classList.toggle('flipped');
+      };
     }
-    if (counter) counter.textContent = `${idx+1}/${flashcards.length}`;
-  };
-  update();
+
+    if (counter) counter.textContent = `${currentIndex + 1}/${flashcards.length}`;
+
+    if (prevBtn) prevBtn.disabled = currentIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
+  }
 
   if (prevBtn) {
-    prevBtn.onclick = () => { if(idx > 0) { idx--; update(); } };
+    prevBtn.onclick = () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCard();
+      }
+    };
   }
+
   if (nextBtn) {
-    nextBtn.onclick = () => { if(idx < flashcards.length-1) { idx++; update(); } };
+    nextBtn.onclick = () => {
+      if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        updateCard();
+      }
+    };
   }
+
+  updateCard();
 }
 
 function initPlayerPostMessage() {
