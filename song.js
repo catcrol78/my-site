@@ -6,6 +6,7 @@ let player;                // объект YouTube плеера
 let syncInterval;          // интервал для синхронизации
 let currentSong = null;    // объект текущей песни
 let ytApiReady = false;    // флаг готовности YouTube API
+let playerReadyTimeout;    // таймер для проверки готовности плеера
 
 // ===== Вспомогательные функции =====
 const $ = id => document.getElementById(id);
@@ -665,13 +666,34 @@ function initPlayer() {
     events: {
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange,
-      'onError': onPlayerError   // <-- ДОБАВЛЕНО
+      'onError': onPlayerError
     }
   });
+
+  // Таймер для обнаружения проблем с загрузкой плеера
+  playerReadyTimeout = setTimeout(() => {
+    if (!player || !player.getPlayerState) {
+      console.error("❌ Плеер не инициализировался в течение 5 секунд");
+      showFallbackLink();
+    } else {
+      // Проверим состояние плеера
+      try {
+        const state = player.getPlayerState();
+        if (state === -1) { // -1 означает не начато
+          console.log("⚠️ Плеер в состоянии -1 (не готов)");
+          showFallbackLink();
+        }
+      } catch (e) {
+        console.error("Ошибка при проверке состояния плеера:", e);
+        showFallbackLink();
+      }
+    }
+  }, 5000);
 }
 
 function onPlayerReady(event) {
   console.log("▶️ Плеер готов, запускаем синхронизацию");
+  clearTimeout(playerReadyTimeout); // отменяем таймер
   startSyncInterval();
 }
 
@@ -679,15 +701,9 @@ function onPlayerStateChange(event) {
   console.log("🔄 Состояние плеера:", event.data);
 }
 
-// НОВАЯ ФУНКЦИЯ для обработки ошибок
 function onPlayerError(event) {
   console.error("❌ Ошибка плеера, код:", event.data);
-  // Коды ошибок YouTube:
-  // 2 – неверный ID видео
-  // 5 – ошибка воспроизведения HTML5
-  // 100 – видео не найдено (удалено или приватное)
-  // 101 – встраивание запрещено владельцем
-  // 150 – другое (часто то же, что и 101)
+  clearTimeout(playerReadyTimeout);
   let message = "Не удалось загрузить видео. ";
   switch (event.data) {
     case 2: message += "Неверный ID видео."; break;
@@ -698,6 +714,28 @@ function onPlayerError(event) {
     default: message += "Неизвестная ошибка.";
   }
   showToast(message, 5000);
+  showFallbackLink();
+}
+
+// Показать ссылку на YouTube, если плеер не работает
+function showFallbackLink() {
+  const videoContainer = document.querySelector('.video-container');
+  if (!videoContainer) return;
+  
+  // Проверим, не добавлена ли уже ссылка
+  if (document.querySelector('.youtube-fallback-link')) return;
+  
+  const fallbackDiv = document.createElement('div');
+  fallbackDiv.className = 'youtube-fallback-link';
+  fallbackDiv.style.marginTop = '10px';
+  fallbackDiv.style.textAlign = 'center';
+  fallbackDiv.innerHTML = `
+    <p style="color: #ef4444; margin-bottom: 5px;">⚠️ Видео не загружается через плеер</p>
+    <a href="https://www.youtube.com/watch?v=${currentSong.youtubeId}" target="_blank" class="open-youtube" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #ff0000; color: white; border-radius: 30px; text-decoration: none;">
+      <i class="fab fa-youtube"></i> Открыть на YouTube
+    </a>
+  `;
+  videoContainer.appendChild(fallbackDiv);
 }
 
 function startSyncInterval() {
