@@ -114,33 +114,6 @@ const songsDataFromExternal = [
       },
       {
         "title": {
-          "ru": "Квизлет",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "выучи слова",
-          "es": ""
-        },
-        "type": "flashcards",
-        "flashcards": [
-          {
-            "es": "dolor",
-            "ru": "боль",
-            "example": "пример",
-            "example_translation": "перевод примера",
-            "transcription": ""
-          },
-          {
-            "es": "cambio",
-            "ru": "мелочь",
-            "example": "пример",
-            "example_translation": "перевод примера",
-            "transcription": ""
-          }
-        ]
-      },
-      {
-        "title": {
           "ru": "",
           "es": ""
         },
