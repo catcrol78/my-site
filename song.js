@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
   currentSong = song;
   renderSong(song);
 
-  const lyricsContainer = document.getElementById('lyrics-content'); // Следим за скроллом внутри блока текста
+  const lyricsContainer = document.getElementById('lyrics-content');
   if (lyricsContainer) {
     lyricsContainer.addEventListener('scroll', () => {
       isUserScrolling = true;
@@ -70,18 +70,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderSong(song) {
-  $('song-title').textContent = safeText(song.title);
-  $('song-artist').textContent = song.artist || '';
+  const titleEl = $('song-title');
+  if (titleEl) titleEl.textContent = safeText(song.title);
+  const artistEl = $('song-artist');
+  if (artistEl) artistEl.textContent = song.artist || '';
+
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
   renderGrammar(song.grammar);
   renderCulture(song.culture);
   renderRestrictions(song.restrictions);
+
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
-  $('song-content').style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
+
+  const contentEl = $('song-content');
+  if (contentEl) contentEl.style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
+
   hideLoader();
   setupTabs();
   if (song.youtubeId) initPlayerPostMessage();
@@ -90,6 +97,8 @@ function renderSong(song) {
 function setupTabs() {
   const tabs = document.querySelectorAll('.detail-tab');
   const panels = document.querySelectorAll('.detail-panel');
+  if (!tabs.length || !panels.length) return;
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const tabName = tab.dataset.tab;
@@ -105,7 +114,11 @@ function setupTabs() {
 
 function renderLyrics(lyrics) {
   const container = $('lyrics-content');
-  if (!lyrics || !lyrics.length) { container.innerHTML = '<p class="muted">Текст пока не добавлен</p>'; return; }
+  if (!container) return;
+  if (!lyrics || !lyrics.length) {
+    container.innerHTML = '<p class="muted">Текст пока не добавлен</p>';
+    return;
+  }
   let html = '';
   lyrics.forEach((line, index) => {
     html += `<p class="lyric-line" data-index="${index}" data-time="${line.time || ''}">${escapeHtml(line.text)}</p>`;
@@ -116,12 +129,17 @@ function renderLyrics(lyrics) {
 
 function renderVocabulary(vocab) {
   const container = $('vocab-content');
-  if (!vocab || !vocab.length) { container.innerHTML = '<p class="muted">Лексика пока не добавлена</p>'; return; }
+  if (!container) return;
+  if (!vocab || !vocab.length) {
+    container.innerHTML = '<p class="muted">Лексика пока не добавлена</p>';
+    return;
+  }
   container.innerHTML = vocab.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
 }
 
 function renderGrammar(grammar) {
   const container = $('#grammar-list');
+  if (!container) return;
   if (!grammar || !grammar.length) {
     container.innerHTML = '<li class="muted">Нет данных</li>';
     return;
@@ -131,6 +149,7 @@ function renderGrammar(grammar) {
 
 function renderCulture(culture) {
   const container = $('#culture-list');
+  if (!container) return;
   if (!culture || (!culture.items?.length && !culture.tags?.length)) {
     container.innerHTML = '<li class="muted">Нет данных</li>';
     return;
@@ -147,6 +166,7 @@ function renderCulture(culture) {
 
 function renderRestrictions(restrictions) {
   const container = $('#restrictions-list');
+  if (!container) return;
   if (!restrictions) {
     container.innerHTML = '<li class="muted">Нет ограничений</li>';
     return;
@@ -163,6 +183,7 @@ function renderRestrictions(restrictions) {
 
 function renderBadges(song) {
   const badgesDiv = $('song-badges');
+  if (!badgesDiv) return;
   const badges = [];
   if (song.level) badges.push(`<span class="badge"><i class="fas fa-signal"></i> ${song.level.join(', ')}</span>`);
   if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`));
@@ -171,8 +192,12 @@ function renderBadges(song) {
 
 function renderTasks(tasks) {
   const container = $('tasks-container');
+  if (!container) return;
   container.innerHTML = '';
-  if (!tasks || !tasks.length) { container.innerHTML = '<p class="muted">Заданий нет</p>'; return; }
+  if (!tasks || !tasks.length) {
+    container.innerHTML = '<p class="muted">Заданий нет</p>';
+    return;
+  }
   tasks.forEach((task, index) => {
     if (task.type === 'flashcards') return;
     const taskDiv = document.createElement('div');
@@ -286,22 +311,41 @@ function renderMatchTask(container, task) {
 
 function renderFlashcards(flashcards) {
   const container = $('flashcard-wrapper');
-  if (!flashcards || !flashcards.length) { if($('flashcards-empty')) $('flashcards-empty').style.display='block'; return; }
-  if($('flashcards-empty')) $('flashcards-empty').style.display='none';
+  const emptyDiv = $('flashcards-empty');
+  const counter = $('flashcards-counter');
+  const prevBtn = $('flashcards-prev');
+  const nextBtn = $('flashcards-next');
+
+  if (!flashcards || !flashcards.length) {
+    if (emptyDiv) emptyDiv.style.display = 'block';
+    if (container) container.innerHTML = '';
+    return;
+  }
+  if (emptyDiv) emptyDiv.style.display = 'none';
+  
   let idx = 0;
   const update = () => {
+    if (!container) return;
     const card = flashcards[idx];
     container.innerHTML = `
       <div class="flashcard">
         <div class="flashcard-front"><div class="word">${escapeHtml(card.es||card.word)}</div></div>
         <div class="flashcard-back"><div class="translation">${escapeHtml(card.ru||card.translation)}</div></div>
       </div>`;
-    container.querySelector('.flashcard').onclick = function() { this.classList.toggle('flipped'); };
-    if($('flashcards-counter')) $('flashcards-counter').textContent = `${idx+1}/${flashcards.length}`;
+    const flashcardEl = container.querySelector('.flashcard');
+    if (flashcardEl) {
+      flashcardEl.onclick = function() { this.classList.toggle('flipped'); };
+    }
+    if (counter) counter.textContent = `${idx+1}/${flashcards.length}`;
   };
   update();
-  if($('flashcards-prev')) $('flashcards-prev').onclick = () => { if(idx>0){idx--;update();} };
-  if($('flashcards-next')) $('flashcards-next').onclick = () => { if(idx<flashcards.length-1){idx++;update();} };
+
+  if (prevBtn) {
+    prevBtn.onclick = () => { if(idx > 0) { idx--; update(); } };
+  }
+  if (nextBtn) {
+    nextBtn.onclick = () => { if(idx < flashcards.length-1) { idx++; update(); } };
+  }
 }
 
 function initPlayerPostMessage() {
