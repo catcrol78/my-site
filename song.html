@@ -4,37 +4,147 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Песня | Каталог испанских песен</title>
+  
+  <!-- Подключаем основной файл стилей -->
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Шрифты и иконки -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
   <!-- YouTube Iframe API -->
   <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Локальные стили для красоты элементов (кнопок, заголовков), 
+       чтобы не писать их внутри тегов. Сетка (Grid) управляется из style.css -->
+  <style>
+    /* Контейнер страницы */
+    .song-page-container {
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+
+    /* Кнопка "Назад" */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 30px;
+      text-decoration: none;
+      color: #0f172a;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .back-link:hover {
+      background: #f8fafc;
+      transform: translateX(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* Оформление блока с видео и заголовком */
+    .song-header {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+      /* Отступ снизу нужен только для мобильных. 
+         На ПК он убирается через style.css */
+      margin-bottom: 24px; 
+    }
+
+    /* Типографика заголовка */
+    .song-title-text {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .song-artist-text {
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      color: #64748b;
+    }
+    .badges-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    /* Адаптивный контейнер для видео */
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* Соотношение 16:9 */
+      height: 0;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Блок "Не найдено" */
+    .not-found-container {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .not-found-icon {
+      font-size: 60px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
+  
+  <!-- Загрузчик -->
   <div class="loader" id="loader">
     <div class="spinner"></div>
   </div>
   
-  <main class="song-page" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
-    <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+  <!-- Основной контент -->
+  <!-- Класс container берется из style.css для ограничения ширины -->
+  <main class="container song-page-container">
+    
+    <!-- Кнопка назад -->
+    <a href="index.html" class="back-link">
       <i class="fas fa-arrow-left"></i> Вернуться к каталогу
     </a>
 
+    <!-- 
+       ГЛАВНЫЙ КОНТЕЙНЕР ПЕСНИ 
+       Здесь нет style="display: block", мы управляем этим из JS и CSS.
+       На ПК здесь включится Grid (видео слева, текст справа).
+    -->
     <div id="song-content" style="display: none;">
-      <!-- Шапка песни -->
-      <div class="song-header" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
-        <h1 id="song-title" style="margin: 0 0 8px 0; font-size: 32px;"></h1>
-        <p id="song-artist" style="margin: 0 0 20px 0; font-size: 18px; color: #64748b;"></p>
+      
+      <!-- 1. ЛЕВАЯ КОЛОНКА (на ПК): Шапка и Видео -->
+      <div class="song-header">
+        <h1 id="song-title" class="song-title-text"></h1>
+        <p id="song-artist" class="song-artist-text"></p>
         
-        <div id="song-badges" class="badges-section" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+        <div id="song-badges" class="badges-section"></div>
 
-        <!-- Видео -->
-        <div class="video-container" style="margin-bottom: 20px;">
-          <iframe id="video-iframe" width="100%" height="400" frameborder="0" allowfullscreen style="border-radius: 16px;"></iframe>
+        <div class="video-container">
+          <iframe id="video-iframe" allowfullscreen></iframe>
         </div>
-      </div> <!-- Закрываем шапку песни -->
+      </div>
 
-      <!-- Вкладки -->
+      <!-- 2. ПРАВАЯ КОЛОНКА (на ПК): Вкладки -->
+      <!-- В style.css прописано grid-area: tabs для этого класса -->
       <div class="detail-tabs" role="tablist" aria-label="Разделы песни">
         <button class="detail-tab active" type="button" data-tab="lyrics" role="tab" aria-selected="true">
           <i class="fas fa-file-alt"></i> <span data-i18n="tabLyrics">Текст</span>
@@ -61,8 +171,10 @@
         </button>
       </div>
 
-      <!-- Панели с контентом -->
+      <!-- 3. ПРАВАЯ КОЛОНКА (на ПК): Контент вкладок -->
+      <!-- В style.css прописано grid-area: content для этого класса -->
       <div class="detail-panels">
+        
         <!-- Панель текста -->
         <div class="detail-panel active" data-panel="lyrics">
           <div class="panel-card">
@@ -126,7 +238,7 @@
             
             <div class="flashcards-container">
               <div class="flashcard-wrapper" id="flashcard-wrapper">
-                <!-- Карточка будет создаваться динамически -->
+                <!-- Карточка будет создаваться JS -->
               </div>
               
               <div class="flashcards-controls">
@@ -152,18 +264,19 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div> <!-- Конец detail-panels -->
+    </div> <!-- Конец song-content -->
 
-    <!-- Сообщение об ошибке -->
-    <div id="not-found" style="display: none; text-align: center; padding: 60px 20px;">
-      <i class="fas fa-music" style="font-size: 60px; color: #64748b; margin-bottom: 20px;"></i>
+    <!-- Сообщение об ошибке (если песня не найдена) -->
+    <div id="not-found" class="not-found-container">
+      <i class="fas fa-music not-found-icon"></i>
       <h2>Песня не найдена</h2>
       <p>К сожалению, запрошенная песня отсутствует в каталоге.</p>
-      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+      <a href="index.html" class="back-link" style="margin-top: 20px;">
         <i class="fas fa-arrow-left"></i> Вернуться в каталог
       </a>
     </div>
+
   </main>
 
   <script src="songs-data.js"></script>
