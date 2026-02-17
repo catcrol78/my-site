@@ -47,51 +47,51 @@ const songsDataFromExternal = [
     },
     "lyrics": [
       {
-        "time": "",
+        "time": "0:15",
         "text": "Juraría que no se bien lo que quiero"
       },
       {
-        "time": "",
+        "time": "0:20",
         "text": "Pero se que moriría si me quedo en la mitad"
       },
       {
-        "time": "",
+        "time": "0:25",
         "text": "Por eso vuelo a otros senderos"
       },
       {
-        "time": "",
+        "time": "0:30",
         "text": "Para conocer el mundo de verdad"
       },
       {
-        "time": "",
+        "time": "0:35",
         "text": "Aún no es tarde pero así me estoy sintiendo"
       },
       {
-        "time": "",
+        "time": "0:40",
         "text": "why aparecen tantos miedos que no me dejan pensa"
       },
       {
-        "time": "",
+        "time": "0:45",
         "text": "are why tengo sueños de amores nuevos"
       },
       {
-        "time": "",
+        "time": "0:50",
         "text": "why me cuesta imaginar lo que vendrá"
       },
       {
-        "time": "",
+        "time": "0:54",
         "text": "Cambio dolor por libertad"
       },
       {
-        "time": "",
+        "time": "1:00",
         "text": "Cambio heridas por un sueño Que me ayude a continua"
       },
       {
-        "time": "",
+        "time": "1:05",
         "text": "are Cambio dolor, felicidad"
       },
       {
-        "time": "",
+        "time": "1:10",
         "text": "Que la suerte sea suerte why no algo que no he de alcanzar..."
       }
     ],
@@ -111,6 +111,33 @@ const songsDataFromExternal = [
         "content": "три раза послушать",
         "wordBank": [],
         "answer": ""
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "flashcards",
+        "flashcards": [
+          {
+            "es": "dolor",
+            "ru": "боль",
+            "example": "",
+            "example_translation": "",
+            "transcription": "dolor"
+          },
+          {
+            "es": "cambio",
+            "ru": "мелочь",
+            "example": "",
+            "example_translation": "",
+            "transcription": "dolor"
+          }
+        ]
       }
     ]
   },
