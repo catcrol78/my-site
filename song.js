@@ -270,9 +270,10 @@ function renderFlashcards(flashcards) {
   const counter = $('flashcards-counter');
   const prevBtn = $('flashcards-prev');
   const nextBtn = $('flashcards-next');
-  const progressFill = $('#flashcards-progress-fill');
-  const progressText = $('#flashcards-progress-text');
-  const resetBtn = $('#flashcards-reset');
+  // ИСПРАВЛЕНО: убраны решётки перед ID
+  const progressFill = $('flashcards-progress-fill');
+  const progressText = $('flashcards-progress-text');
+  const resetBtn = $('flashcards-reset');
 
   if (!flashcards || !flashcards.length) {
     if (emptyDiv) emptyDiv.style.display = 'block';
