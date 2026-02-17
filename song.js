@@ -75,10 +75,13 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
+  renderGrammar(song.grammar);
+  renderCulture(song.culture);
+  renderRestrictions(song.restrictions);
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
- $('song-content').style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
+  $('song-content').style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
   hideLoader();
   setupTabs();
   if (song.youtubeId) initPlayerPostMessage();
@@ -115,6 +118,47 @@ function renderVocabulary(vocab) {
   const container = $('vocab-content');
   if (!vocab || !vocab.length) { container.innerHTML = '<p class="muted">Лексика пока не добавлена</p>'; return; }
   container.innerHTML = vocab.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+}
+
+function renderGrammar(grammar) {
+  const container = $('#grammar-list');
+  if (!grammar || !grammar.length) {
+    container.innerHTML = '<li class="muted">Нет данных</li>';
+    return;
+  }
+  container.innerHTML = grammar.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+}
+
+function renderCulture(culture) {
+  const container = $('#culture-list');
+  if (!culture || (!culture.items?.length && !culture.tags?.length)) {
+    container.innerHTML = '<li class="muted">Нет данных</li>';
+    return;
+  }
+  let html = '';
+  if (culture.tags?.length) {
+    html += `<li><strong>Теги:</strong> ${culture.tags.map(t => escapeHtml(t)).join(', ')}</li>`;
+  }
+  if (culture.items?.length) {
+    culture.items.forEach(item => html += `<li>${escapeHtml(item)}</li>`);
+  }
+  container.innerHTML = html;
+}
+
+function renderRestrictions(restrictions) {
+  const container = $('#restrictions-list');
+  if (!restrictions) {
+    container.innerHTML = '<li class="muted">Нет ограничений</li>';
+    return;
+  }
+  let html = '';
+  if (restrictions.age) html += `<li>Возраст: ${restrictions.age}</li>`;
+  if (restrictions.containsOtherLanguages) html += '<li>Содержит другие языки</li>';
+  if (restrictions.profanity && restrictions.profanity !== 'none') {
+    html += `<li>Ненормативная лексика: ${restrictions.profanity}</li>`;
+  }
+  if (restrictions.note) html += `<li>Примечание: ${restrictions.note}</li>`;
+  container.innerHTML = html || '<li class="muted">Нет ограничений</li>';
 }
 
 function renderBadges(song) {
@@ -319,4 +363,3 @@ function makeLyricsClickable() {
     };
   });
 }
-
