@@ -341,7 +341,7 @@ const songsDataFromExternal = [
     "id": 2,
     "title": {
       "ru": "танцуем",
-      "es": "Bailando"
+      "es": "ПРОВЕРКАААА"
     },
     "artist": "Enrique Iglesias",
     "youtubeId": "yv-DcNTOMp4",
