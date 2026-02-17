@@ -100,58 +100,16 @@ const songsDataFromExternal = [
     "tasks": [
       {
         "title": {
-          "ru": "",
+          "ru": "Аудирование",
           "es": ""
         },
         "instruction": {
-          "ru": "",
-          "es": ""
-        },
-        "type": "flashcards",
-        "flashcards": [
-          {
-            "es": "слово",
-            "ru": "перевод",
-            "example": "пример",
-            "example_translation": "перевод примера",
-            "transcription": ""
-          }
-        ]
-      },
-      {
-        "title": {
-          "ru": "Викторина",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "отгадать",
-          "es": ""
-        },
-        "type": "quiz",
-        "questions": {
-          "question": "789",
-          "options": [
-            "56",
-            "1454"
-          ],
-          "correct": 1
-        }
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "спеть",
+          "ru": "Послушать песню",
           "es": ""
         },
         "type": "listening",
-        "content": "спеттт",
-        "wordBank": [
-          "спет",
-          "спет"
-        ],
+        "content": "три раза послушать",
+        "wordBank": [],
         "answer": ""
       }
     ]
