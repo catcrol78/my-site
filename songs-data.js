@@ -514,6 +514,26 @@ const songsDataFromExternal = [
         "content": "",
         "wordBank": [],
         "answer": ""
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "flashcards",
+        "flashcards": [
+          {
+            "es": "слово",
+            "ru": "перевод",
+            "example": "пример",
+            "example_translation": "перевод примера",
+            "transcription": ""
+          }
+        ]
       }
     ]
   },
