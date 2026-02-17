@@ -290,6 +290,28 @@ const songsDataFromExternal = [
         ],
         "answer": "праивльный ответ "
       }
+      "liveTasks": [
+  {
+    "type": "word-catch",
+    "time": 35,
+    "correct": "corazón",
+    "options": ["corazón", "cabeza", "canción"]
+  },
+  {
+    "type": "translate",
+    "time": 50,
+    "word": "corazón",
+    "correct": "сердце",
+    "options": ["голова", "сердце", "песня"]
+  },
+  {
+    "type": "gapfill",
+    "time": 70,
+    "correct": "corazón",
+    "options": ["corazón", "cabeza", "canción"],
+    "line": "Me duele el ___"
+  }
+]
     ]
   }
 ];
