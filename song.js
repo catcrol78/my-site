@@ -270,15 +270,123 @@ function renderFlashcards(flashcards) {
   const counter = $('flashcards-counter');
   const prevBtn = $('flashcards-prev');
   const nextBtn = $('flashcards-next');
+  const progressFill = $('#flashcards-progress-fill');
+  const progressText = $('#flashcards-progress-text');
+  const resetBtn = $('#flashcards-reset');
 
   if (!flashcards || !flashcards.length) {
     if (emptyDiv) emptyDiv.style.display = 'block';
     if (container) container.innerHTML = '';
     if (counter) counter.textContent = '0/0';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressText) progressText.textContent = '0/0';
     if (prevBtn) prevBtn.disabled = true;
     if (nextBtn) nextBtn.disabled = true;
     return;
   }
+
+  if (emptyDiv) emptyDiv.style.display = 'none';
+
+  let currentIndex = 0;
+  // Массив для отметки выученных карточек
+  let learned = new Array(flashcards.length).fill(false);
+
+  // Функция обновления прогресс-бара
+  function updateProgress() {
+    if (!progressFill || !progressText) return;
+    const learnedCount = learned.filter(v => v).length;
+    const percent = (learnedCount / flashcards.length) * 100;
+    progressFill.style.width = `${percent}%`;
+    progressText.textContent = `${learnedCount}/${flashcards.length}`;
+  }
+
+  // Функция обновления карточки и кнопок
+  function updateCard() {
+    if (!container || !flashcards.length) return;
+    const card = flashcards[currentIndex];
+    const isLearned = learned[currentIndex];
+
+    container.innerHTML = `
+      <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}">
+        <div class="flashcard-front">
+          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
+          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
+          ${isLearned ? '<div class="learned-stamp"><i class="fas fa-check-circle"></i> Выучено</div>' : ''}
+        </div>
+        <div class="flashcard-back">
+          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
+          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
+        </div>
+      </div>
+      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 10px;">
+        <button class="flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}" style="min-width: 120px;">
+          <i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i>
+          ${isLearned ? 'Не выучено' : '✓ Знаю'}
+        </button>
+      </div>`;
+
+    // Обработчик переворота карточки
+    const flashcardEl = container.querySelector('.flashcard');
+    if (flashcardEl) {
+      flashcardEl.onclick = function (e) {
+        // Игнорируем клик, если кликнули на кнопку внутри
+        if (e.target.closest('button')) return;
+        this.classList.toggle('flipped');
+      };
+    }
+
+    // Обработчик кнопки "Знаю"/"Не выучено"
+    const toggleBtn = container.querySelector('.learn-toggle');
+    if (toggleBtn) {
+      toggleBtn.onclick = (e) => {
+        e.stopPropagation(); // Не переворачивать карточку
+        learned[currentIndex] = !learned[currentIndex];
+        updateProgress();
+        updateCard(); // перерисовать карточку с обновлённым статусом
+      };
+    }
+
+    // Обновляем счётчик
+    if (counter) counter.textContent = `${currentIndex + 1}/${flashcards.length}`;
+
+    // Обновляем состояние кнопок навигации
+    if (prevBtn) prevBtn.disabled = currentIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
+  }
+
+  // Обработчики навигации
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCard();
+      }
+    };
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        updateCard();
+      }
+    };
+  }
+
+  // Сброс прогресса
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      learned.fill(false);
+      updateProgress();
+      updateCard(); // обновить текущую карточку (снимется пометка)
+    };
+  }
+
+  // Инициализация
+  updateProgress();
+  updateCard();
+}
 
   if (emptyDiv) emptyDiv.style.display = 'none';
 
@@ -393,4 +501,5 @@ function makeLyricsClickable() {
     };
   });
 }
+
 
