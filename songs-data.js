@@ -3,28 +3,25 @@ const songsDataFromExternal = [
   {
     "id": 6,
     "title": {
-      "ru": " проверка Песня1",
-      "es": "песня1 исп"
+      "ru": "Дикий ангел",
+      "es": "Cambio Dolor"
     },
-    "artist": "исполнитель1",
+    "artist": "Natalia Oreiro",
     "youtubeId": "G6OYDUomYwI",
     "cover": "https://img.youtube.com/vi/G6OYDUomYwI/mqdefault.jpg",
     "level": [
-      "A1"
+      "A2"
     ],
     "themes": [
       "тема1",
       "тема11",
       "тема111"
     ],
-    "grammar": [
-      "грамматика1",
-      "грамматика11"
-    ],
+    "grammar": [],
     "vocabulary": [
-      "лексика1",
-      "лексика11",
-      "лексика111"
+      "Любовь",
+      "Песня",
+      "милагрос"
     ],
     "culture": {
       "tags": [
@@ -42,7 +39,7 @@ const songsDataFromExternal = [
       ]
     },
     "restrictions": {
-      "age": "16+",
+      "age": "all",
       "containsOtherLanguages": false,
       "profanity": "none",
       "sensitiveTopics": [],
@@ -51,87 +48,51 @@ const songsDataFromExternal = [
     "lyrics": [
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "Juraría que no se bien lo que quiero"
       },
       {
         "time": "",
-        "text": "вторая строчка"
+        "text": "Pero se que moriría si me quedo en la mitad"
       },
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "Por eso vuelo a otros senderos"
       },
       {
         "time": "",
-        "text": "вторая строчка"
+        "text": "Para conocer el mundo de verdad"
       },
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "Aún no es tarde pero así me estoy sintiendo"
       },
       {
         "time": "",
-        "text": "вторая строчка"
+        "text": "why aparecen tantos miedos que no me dejan pensa"
       },
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "are why tengo sueños de amores nuevos"
       },
       {
         "time": "",
-        "text": "вторая строчка"
+        "text": "why me cuesta imaginar lo que vendrá"
       },
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "Cambio dolor por libertad"
       },
       {
         "time": "",
-        "text": "вторая строчка"
+        "text": "Cambio heridas por un sueño Que me ayude a continua"
       },
       {
         "time": "",
-        "text": "первая строчка"
+        "text": "are Cambio dolor, felicidad"
       },
       {
         "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчкапервая строчка"
-      },
-      {
-        "time": "",
-        "text": "вторая строчка"
+        "text": "Que la suerte sea suerte why no algo que no he de alcanzar..."
       }
     ],
     "pdf": "",
@@ -159,24 +120,39 @@ const songsDataFromExternal = [
       },
       {
         "title": {
+          "ru": "Викторина",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "отгадать",
+          "es": ""
+        },
+        "type": "quiz",
+        "questions": {
+          "question": "789",
+          "options": [
+            "56",
+            "1454"
+          ],
+          "correct": 1
+        }
+      },
+      {
+        "title": {
           "ru": "",
           "es": ""
         },
         "instruction": {
-          "ru": "",
+          "ru": "спеть",
           "es": ""
         },
-        "type": "match",
-        "pairs": [
-          {
-            "left": "слово1",
-            "right": "перевод1"
-          },
-          {
-            "left": "слово2",
-            "right": "перевод2"
-          }
-        ]
+        "type": "listening",
+        "content": "спеттт",
+        "wordBank": [
+          "спет",
+          "спет"
+        ],
+        "answer": ""
       }
     ]
   },
