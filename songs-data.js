@@ -341,9 +341,9 @@ const songsDataFromExternal = [
     "id": 2,
     "title": {
       "ru": "танцуем",
-      "es": "ПРОВЕРКАААА"
+      "es": "Песня для проверки 1"
     },
-    "artist": "Enrique Iglesias",
+    "artist": "Исполнитель 1",
     "youtubeId": "yv-DcNTOMp4",
     "cover": "https://img.youtube.com/vi/yv-DcNTOMp4/mqdefault.jpg",
     "level": [
@@ -355,77 +355,37 @@ const songsDataFromExternal = [
       "cuerpo"
     ],
     "grammar": [
-      "Герундий",
-      "использование se",
-      "ir + герундий"
+      "грамматика 1",
+      "грамматика2",
+      "грамматика3"
     ],
     "vocabulary": [
-      "mirar",
-      "respiración",
-      "corazón",
-      "palpitar",
-      "silencio",
-      "palabra",
-      "noche",
-      "sol",
-      "bailar",
-      "cuerpo",
-      "vacío",
-      "subir",
-      "bajar",
-      "fuego",
-      "dentro",
-      "enloquecer",
-      "saturar",
-      "física",
-      "química",
-      "anatomía",
-      "cerveza",
-      "tequila",
-      "boca",
-      "melodía",
-      "color",
-      "fantasía",
-      "filosofía",
-      "cabeza",
-      "querer",
-      "estar",
-      "vivir",
-      "tener",
-      "besar",
-      "contigo",
-      "loco",
-      "notar",
-      "llevar",
-      "dimensión",
-      "latido",
-      "acelerar",
-      "ironía",
-      "destino",
-      "poder",
-      "tocar",
-      "abrazar",
-      "sentir",
-      "magia",
-      "olor",
-      "amor",
-      "dolor"
+      "лексика1",
+      "лексика2",
+      "лексика3"
     ],
     "culture": {
       "tags": [
         "holidays",
+        "traditions",
+        "geography",
+        "cities",
+        "neighborhoods",
+        "food",
         "music"
       ],
       "items": [
-        "не написали"
+        "культура1",
+        "культура2",
+        "культура3"
       ]
     },
     "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
+      "age": "12+",
+      "containsOtherLanguages": true,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": ""
+      "note": "Ограничение проверка"
     },
     "lyrics": [
       {
@@ -498,6 +458,14 @@ const songsDataFromExternal = [
           {
             "left": "nada",
             "right": "нчиего"
+          },
+          {
+            "left": "casa",
+            "right": "дом"
+          },
+          {
+            "left": "nada",
+            "right": "нчиего"
           }
         ]
       },
@@ -527,10 +495,10 @@ const songsDataFromExternal = [
         "type": "flashcards",
         "flashcards": [
           {
-            "es": "слово",
-            "ru": "перевод",
-            "example": "пример",
-            "example_translation": "перевод примера",
+            "es": "слово1",
+            "ru": "перевод1",
+            "example": "пример1",
+            "example_translation": "перевод примера1",
             "transcription": ""
           }
         ]
@@ -549,30 +517,27 @@ const songsDataFromExternal = [
     "level": [
       "A1"
     ],
-    "themes": [],
-    "grammar": [],
+    "themes": [
+      "чучи1",
+      "чучи2",
+      "чучи3"
+    ],
+    "grammar": [
+      "конкретика1",
+      "конкретика2"
+    ],
     "vocabulary": [
-      "Cambio",
-      "Dolor",
-      "Libertad",
-      "Sueños",
-      "Heridas",
-      "Miedo",
-      "Amor",
-      "Corazón",
-      "Vivir",
-      "Volver",
-      "Sentir",
-      "Locura",
-      "Alas",
-      "Difícil",
-      "Tropezar"
+      "лексика1",
+      "лексика2"
     ],
     "culture": {
       "tags": [
         "music"
       ],
-      "items": []
+      "items": [
+        "КОнкретика 2",
+        "конкретика3"
+      ]
     },
     "restrictions": {
       "age": "16+",
