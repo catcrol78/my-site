@@ -78,7 +78,7 @@ function renderSong(song) {
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
-  $('song-content').style.display = 'block';
+ $('song-content').style.display = ''; // Убираем 'none', позволяя CSS управлять отображением
   hideLoader();
   setupTabs();
   if (song.youtubeId) initPlayerPostMessage();
@@ -319,3 +319,4 @@ function makeLyricsClickable() {
     };
   });
 }
+
