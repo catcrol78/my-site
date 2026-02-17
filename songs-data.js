@@ -178,6 +178,33 @@ const songsDataFromExternal = [
             "dfd"
           ]
         ]
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "flashcards",
+        "flashcards": [
+          {
+            "es": "слово",
+            "ru": "перевод",
+            "example": "пример",
+            "example_translation": "перевод примера",
+            "transcription": ""
+          },
+          {
+            "es": "слово1",
+            "ru": "перевод",
+            "example": "пример",
+            "example_translation": "перевод примера",
+            "transcription": ""
+          }
+        ]
       }
     ]
   },
