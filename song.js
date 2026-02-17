@@ -388,60 +388,6 @@ function renderFlashcards(flashcards) {
   updateCard();
 }
 
-  if (emptyDiv) emptyDiv.style.display = 'none';
-
-  let currentIndex = 0;
-
-  function updateCard() {
-    if (!container || !flashcards.length) return;
-    const card = flashcards[currentIndex];
-    container.innerHTML = `
-      <div class="flashcard">
-        <div class="flashcard-front">
-          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
-          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
-        </div>
-        <div class="flashcard-back">
-          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
-          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
-          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
-        </div>
-      </div>`;
-
-    const flashcardEl = container.querySelector('.flashcard');
-    if (flashcardEl) {
-      flashcardEl.onclick = function () {
-        this.classList.toggle('flipped');
-      };
-    }
-
-    if (counter) counter.textContent = `${currentIndex + 1}/${flashcards.length}`;
-
-    if (prevBtn) prevBtn.disabled = currentIndex === 0;
-    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
-  }
-
-  if (prevBtn) {
-    prevBtn.onclick = () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCard();
-      }
-    };
-  }
-
-  if (nextBtn) {
-    nextBtn.onclick = () => {
-      if (currentIndex < flashcards.length - 1) {
-        currentIndex++;
-        updateCard();
-      }
-    };
-  }
-
-  updateCard();
-}
-
 function initPlayerPostMessage() {
   if (!currentSong || !currentSong.youtubeId) return;
   ytIframe = document.getElementById('video-iframe');
@@ -501,5 +447,3 @@ function makeLyricsClickable() {
     };
   });
 }
-
-
