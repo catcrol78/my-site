@@ -1,58 +1,170 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Песня</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Песня | Каталог испанских песен</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- YouTube Iframe API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
-
 <body>
-  <div class="container">
-    <a class="back-link" href="index.html">← Назад</a>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+  
+  <main class="song-page" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+      <i class="fas fa-arrow-left"></i> Вернуться к каталогу
+    </a>
 
-    <h1 id="song-title">Загрузка...</h1>
-    <div id="song-artist" class="subtitle"></div>
+    <div id="song-content" style="display: none;">
+      <!-- Шапка песни -->
+      <div class="song-header" style="background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <h1 id="song-title" style="margin: 0 0 8px 0; font-size: 32px;"></h1>
+        <p id="song-artist" style="margin: 0 0 20px 0; font-size: 18px; color: #64748b;"></p>
+        
+        <div id="song-badges" class="badges-section" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
 
-    <div class="tags" id="song-tags"></div>
+        <!-- Видео -->
+        <div class="video-container" style="margin-bottom: 20px;">
+          <iframe id="video-iframe" width="100%" height="400" frameborder="0" allowfullscreen style="border-radius: 16px;"></iframe>
+        </div>
+      </div> <!-- Закрываем шапку песни -->
 
-    <div class="video-card">
-      <!-- ВАЖНО: iframe без iframe_api.js. src выставит song.js -->
-      <iframe
-        id="video-iframe"
-        width="100%"
-        height="400"
-        frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen
-        style="border-radius:16px;"
-      ></iframe>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="lyrics">Текст</button>
-      <button class="tab" data-tab="grammar">Грамматика</button>
-      <button class="tab" data-tab="tasks">Задания</button>
-      <button class="tab" data-tab="vocab">Лексика</button>
-      <button class="tab" data-tab="culture">Культура</button>
-      <button class="tab" data-tab="limits">Ограничения</button>
-      <button class="tab" data-tab="cards">Карточки</button>
-    </div>
-
-    <div id="tab-content">
-      <div id="tab-lyrics" class="tab-panel active">
-        <h2>Текст песни</h2>
-        <div id="lyrics-container"></div>
+      <!-- Вкладки -->
+      <div class="detail-tabs" role="tablist" aria-label="Разделы песни">
+        <button class="detail-tab active" type="button" data-tab="lyrics" role="tab" aria-selected="true">
+          <i class="fas fa-file-alt"></i> <span data-i18n="tabLyrics">Текст</span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="grammar" role="tab" aria-selected="false">
+          <i class="fas fa-book"></i> <span data-i18n="tabGrammar">Грамматика</span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="tasks" role="tab" aria-selected="false">
+          <i class="fas fa-tasks"></i> <span data-i18n="tabTasks">Задания</span>
+          <span class="tab-badge" id="tasks-count-badge" style="display:none;"></span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="vocab" role="tab" aria-selected="false">
+          <i class="fas fa-language"></i> <span data-i18n="tabVocab">Лексика</span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="culture" role="tab" aria-selected="false">
+          <i class="fas fa-globe"></i> <span data-i18n="tabCulture">Культура</span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="restr" role="tab" aria-selected="false">
+          <i class="fas fa-exclamation-triangle"></i> <span data-i18n="tabRestrictions">Ограничения</span>
+        </button>
+        <button class="detail-tab" type="button" data-tab="flashcards" role="tab" aria-selected="false">
+          <i class="fas fa-layer-group"></i> <span data-i18n="tabFlashcards">Карточки</span>
+          <span class="tab-badge" id="flashcards-count" style="display:none;"></span>
+        </button>
       </div>
 
-      <div id="tab-grammar" class="tab-panel"><h2>Грамматика</h2><div id="grammar-container"></div></div>
-      <div id="tab-tasks" class="tab-panel"><h2>Задания</h2><div id="tasks-container"></div></div>
-      <div id="tab-vocab" class="tab-panel"><h2>Лексика</h2><div id="vocab-container"></div></div>
-      <div id="tab-culture" class="tab-panel"><h2>Культура</h2><div id="culture-container"></div></div>
-      <div id="tab-limits" class="tab-panel"><h2>Ограничения</h2><div id="limits-container"></div></div>
-      <div id="tab-cards" class="tab-panel"><h2>Карточки</h2><div id="cards-container"></div></div>
+      <!-- Панели с контентом -->
+      <div class="detail-panels">
+        <!-- Панель текста -->
+        <div class="detail-panel active" data-panel="lyrics">
+          <div class="panel-card">
+            <h3><i class="fas fa-file-alt"></i> <span data-i18n="lyricsHeader">Текст песни</span></h3>
+            <div id="lyrics-content" class="lyrics-text"></div>
+          </div>
+        </div>
+
+        <!-- Панель грамматики -->
+        <div class="detail-panel" data-panel="grammar">
+          <div class="panel-card">
+            <h3><i class="fas fa-book"></i> <span data-i18n="grammarHeader">Грамматика</span></h3>
+            <ul class="simple-list" id="grammar-list"></ul>
+          </div>
+        </div>
+
+        <!-- Панель заданий -->
+        <div class="detail-panel" data-panel="tasks">
+          <div class="panel-card">
+            <h3><i class="fas fa-tasks"></i> <span data-i18n="tasksHeader">Задания</span></h3>
+            <div id="tasks-container"></div>
+          </div>
+        </div>
+
+        <!-- Панель лексики -->
+        <div class="detail-panel" data-panel="vocab">
+          <div class="panel-card">
+            <h3><i class="fas fa-language"></i> <span data-i18n="vocabHeader">Лексика</span></h3>
+            <div id="vocab-content" class="chips-wrap"></div>
+          </div>
+        </div>
+
+        <!-- Панель культуры -->
+        <div class="detail-panel" data-panel="culture">
+          <div class="panel-card">
+            <h3><i class="fas fa-globe"></i> <span data-i18n="cultureHeader">Культура</span></h3>
+            <ul class="simple-list" id="culture-list"></ul>
+          </div>
+        </div>
+
+        <!-- Панель ограничений -->
+        <div class="detail-panel" data-panel="restr">
+          <div class="panel-card">
+            <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="restrHeader">Ограничения</span></h3>
+            <ul class="simple-list" id="restrictions-list"></ul>
+          </div>
+        </div>
+
+        <!-- Панель карточек -->
+        <div class="detail-panel" data-panel="flashcards">
+          <div class="panel-card">
+            <div class="flashcards-header">
+              <h3><i class="fas fa-layer-group"></i> <span data-i18n="flashcardsTitle">Словарь в карточках</span></h3>
+              <div class="flashcards-progress">
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" id="flashcards-progress-fill" style="width: 0%"></div>
+                </div>
+                <span class="progress-text" id="flashcards-progress-text">0/0</span>
+              </div>
+            </div>
+            
+            <div class="flashcards-container">
+              <div class="flashcard-wrapper" id="flashcard-wrapper">
+                <!-- Карточка будет создаваться динамически -->
+              </div>
+              
+              <div class="flashcards-controls">
+                <button class="flashcards-nav-btn" id="flashcards-prev" disabled>
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="flashcards-counter" id="flashcards-counter">1 / 0</span>
+                <button class="flashcards-nav-btn" id="flashcards-next" disabled>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              
+              <div class="flashcards-actions">
+                <button class="flashcards-btn" id="flashcards-reset">
+                  <i class="fas fa-redo-alt"></i> <span data-i18n="reset">Сбросить прогресс</span>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Пустое состояние -->
+            <div id="flashcards-empty" style="display: none; text-align: center; padding: 40px 0;">
+              <p class="muted">Для этой песни пока нет карточек</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- Сообщение об ошибке -->
+    <div id="not-found" style="display: none; text-align: center; padding: 60px 20px;">
+      <i class="fas fa-music" style="font-size: 60px; color: #64748b; margin-bottom: 20px;"></i>
+      <h2>Песня не найдена</h2>
+      <p>К сожалению, запрошенная песня отсутствует в каталоге.</p>
+      <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 10px 16px; background: white; border: 1px solid #e5e7eb; border-radius: 30px; text-decoration: none; color: #0f172a;">
+        <i class="fas fa-arrow-left"></i> Вернуться в каталог
+      </a>
+    </div>
+  </main>
 
   <script src="songs-data.js"></script>
   <script src="song.js"></script>
