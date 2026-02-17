@@ -1,12 +1,28 @@
-// song.js — полная версия с поддержкой карточек, заданий и синхронизацией текста с YouTube
-console.log("🎵 song.js загружен (исправленная версия)");
+// song.js — полная версия с поддержкой карточек, заданий и синхронизацией через iframe+postMessage (CSP-safe)
+console.log("🎵 song.js загружен (гибридная версия)");
 
 // ===== Глобальные переменные =====
-let player;                // объект YouTube плеера
-let syncInterval;          // интервал для синхронизации
-let currentSong = null;    // объект текущей песни
-let ytApiReady = false;    // флаг готовности YouTube API
-let playerReadyTimeout;    // таймер для проверки готовности плеера
+let ytIframe = null;           // элемент iframe
+let ytLastTime = 0;            // последнее полученное время (секунды)
+let syncInterval;              // интервал для синхронизации
+let currentSong = null;        // объект текущей песни
+let ytReady = false;           // флаг, что хотя бы одно сообщение получено
+let ytFallbackTimer;           // таймер для показа fallback-ссылки
+
+// Эмуляция объекта player для совместимости с остальным кодом
+const player = {
+  getCurrentTime: () => ytLastTime,
+  seekTo: (seconds, allowSeekAhead) => {
+    if (ytIframe && ytIframe.contentWindow) {
+      ytPost({ event: 'command', func: 'seekTo', args: [seconds, allowSeekAhead] });
+    }
+  },
+  playVideo: () => {
+    if (ytIframe && ytIframe.contentWindow) {
+      ytPost({ event: 'command', func: 'playVideo', args: [] });
+    }
+  }
+};
 
 // ===== Вспомогательные функции =====
 const $ = id => document.getElementById(id);
@@ -110,13 +126,9 @@ function renderSong(song) {
   hideLoader();
   setupTabs();
   
-  // Инициализация YouTube плеера (если API уже готов)
+  // Инициализация YouTube плеера через iframe+postMessage
   if (song.youtubeId) {
-    if (ytApiReady) {
-      initPlayer();
-    } else {
-      console.log("⏳ Ожидаем загрузку YouTube API...");
-    }
+    initPlayerPostMessage();
   }
 }
 
@@ -186,6 +198,7 @@ function renderBadges(song) {
 }
 
 // ===== Отрисовка заданий =====
+// (полностью идентично предыдущей версии, без изменений)
 function renderTasks(tasks) {
   const container = $('tasks-container');
   if (!tasks || !tasks.length) {
@@ -236,7 +249,7 @@ function renderTasks(tasks) {
   });
 }
 
-// Задание по умолчанию (простой текст)
+// Задание по умолчанию
 function renderDefault(container, task) {
   if (task.content) {
     const p = document.createElement('p');
@@ -644,87 +657,75 @@ function renderFlashcards(flashcards) {
   }
 }
 
-// ===== YouTube API и синхронизация =====
+// ===== YouTube через iframe + postMessage =====
 
-// Глобальная функция, вызываемая API при готовности
-window.onYouTubeIframeAPIReady = function() {
-  console.log("✅ YouTube API готов");
-  ytApiReady = true;
-  if (currentSong && currentSong.youtubeId) {
-    initPlayer();
-  }
-};
+// Отправка команд в iframe
+function ytPost(obj) {
+  if (!ytIframe || !ytIframe.contentWindow) return;
+  ytIframe.contentWindow.postMessage(JSON.stringify(obj), '*');
+}
 
-// Инициализация плеера
-function initPlayer() {
-  // Защита от повторного создания
-  if (player || !currentSong || !currentSong.youtubeId) return;
-  
-  console.log("🎬 Создаём плеер для ID:", currentSong.youtubeId);
-  player = new YT.Player('video-iframe', {
-    videoId: currentSong.youtubeId,
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange,
-      'onError': onPlayerError
-    }
-  });
+// Инициализация плеера (вместо YT.Player)
+function initPlayerPostMessage() {
+  if (!currentSong || !currentSong.youtubeId) return;
 
-  // Таймер для обнаружения проблем с загрузкой плеера
-  playerReadyTimeout = setTimeout(() => {
-    if (!player || !player.getPlayerState) {
-      console.error("❌ Плеер не инициализировался в течение 5 секунд");
-      showFallbackLink();
-    } else {
-      // Проверим состояние плеера
-      try {
-        const state = player.getPlayerState();
-        if (state === -1) { // -1 означает не начато
-          console.log("⚠️ Плеер в состоянии -1 (не готов)");
-          showFallbackLink();
-        }
-      } catch (e) {
-        console.error("Ошибка при проверке состояния плеера:", e);
+  ytIframe = document.getElementById('video-iframe');
+  if (!ytIframe) return;
+
+  const origin = encodeURIComponent(window.location.origin);
+  const videoId = encodeURIComponent(currentSong.youtubeId);
+
+  // Устанавливаем src с enablejsapi=1 для получения событий
+  ytIframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${origin}&playsinline=1&rel=0`;
+
+  // Как только iframe загрузился, начинаем слушать
+  ytIframe.addEventListener('load', () => {
+    console.log('📺 iframe загружен, запускаем синхронизацию');
+    // Отправляем команду "listening", чтобы YouTube начал присылать информацию
+    ytPost({ event: 'listening', id: 'yt1' });
+
+    // Запускаем синхронизацию (даже если видео ещё не играет, будем получать currentTime)
+    startSyncInterval();
+
+    // Таймер для fallback: если через 5 секунд не пришло ни одного сообщения с временем,
+    // вероятно, видео не загружается (запрет встраивания)
+    ytFallbackTimer = setTimeout(() => {
+      if (ytLastTime === 0) {
+        console.warn('⚠️ Нет сообщений от YouTube, возможно, видео не встраивается');
         showFallbackLink();
       }
-    }
-  }, 5000);
+    }, 5000);
+  });
 }
 
-function onPlayerReady(event) {
-  console.log("▶️ Плеер готов, запускаем синхронизацию");
-  clearTimeout(playerReadyTimeout); // отменяем таймер
-  startSyncInterval();
-}
+// Принимаем сообщения от YouTube
+window.addEventListener('message', (e) => {
+  if (!e || !e.data) return;
 
-function onPlayerStateChange(event) {
-  console.log("🔄 Состояние плеера:", event.data);
-}
-
-function onPlayerError(event) {
-  console.error("❌ Ошибка плеера, код:", event.data);
-  clearTimeout(playerReadyTimeout);
-  let message = "Не удалось загрузить видео. ";
-  switch (event.data) {
-    case 2: message += "Неверный ID видео."; break;
-    case 5: message += "Ошибка воспроизведения HTML5."; break;
-    case 100: message += "Видео не найдено (возможно, удалено)."; break;
-    case 101:
-    case 150: message += "Встраивание этого видео запрещено владельцем."; break;
-    default: message += "Неизвестная ошибка.";
+  let data;
+  try {
+    data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+  } catch {
+    return;
   }
-  showToast(message, 5000);
-  showFallbackLink();
-}
 
-// Показать ссылку на YouTube, если плеер не работает
+  // Нас интересует infoDelivery с currentTime
+  if (data && data.event === 'infoDelivery' && data.info && typeof data.info.currentTime === 'number') {
+    ytLastTime = data.info.currentTime;
+    // Если таймер fallback ещё активен и мы получили время, отменяем его
+    if (ytFallbackTimer) {
+      clearTimeout(ytFallbackTimer);
+      ytFallbackTimer = null;
+    }
+  }
+});
+
+// Показать fallback-ссылку, если видео не загружается
 function showFallbackLink() {
   const videoContainer = document.querySelector('.video-container');
   if (!videoContainer) return;
-  
-  // Проверим, не добавлена ли уже ссылка
   if (document.querySelector('.youtube-fallback-link')) return;
-  
+
   const fallbackDiv = document.createElement('div');
   fallbackDiv.className = 'youtube-fallback-link';
   fallbackDiv.style.marginTop = '10px';
@@ -738,26 +739,23 @@ function showFallbackLink() {
   videoContainer.appendChild(fallbackDiv);
 }
 
+// Запуск интервала синхронизации
 function startSyncInterval() {
-  // Останавливаем предыдущий интервал, если был
   if (syncInterval) clearInterval(syncInterval);
-  
-  // Запускаем новый интервал только если у песни есть таймкоды
   if (!currentSong || !hasTimestamps(currentSong)) {
     console.log("⏸️ У этой песни нет таймкодов, синхронизация не запущена");
     return;
   }
-  
   console.log("⏱️ Запуск интервала синхронизации");
   syncInterval = setInterval(() => {
     if (player && player.getCurrentTime && currentSong) {
       const currentTimeSec = player.getCurrentTime();
-      highlightCurrentLyric(currentTimeSec * 1000); // переводим в миллисекунды
+      highlightCurrentLyric(currentTimeSec * 1000);
     }
-  }, 100); // проверяем каждые 100 мс
+  }, 100);
 }
 
-// Проверяет, есть ли у песни хотя бы одна строка с временной меткой
+// Проверка наличия таймкодов
 function hasTimestamps(song) {
   if (!song.lyrics) return false;
   const has = song.lyrics.some(line => line.time && line.time.toString().trim() !== '');
@@ -765,12 +763,10 @@ function hasTimestamps(song) {
   return has;
 }
 
-// Преобразование времени из формата "мм:сс" или "мм:сс.сс" в миллисекунды
+// Парсинг времени в миллисекунды
 function parseTimeToMs(time) {
   if (!time) return 0;
-  if (typeof time === 'number') return time * 1000; // если уже число (секунды)
-  
-  // Поддержка форматов: "1:23", "1:23.45", "1:23,45"
+  if (typeof time === 'number') return time * 1000;
   const parts = time.split(':');
   if (parts.length === 2) {
     const minutes = parseInt(parts[0]);
@@ -780,31 +776,26 @@ function parseTimeToMs(time) {
   return 0;
 }
 
-// Подсветка текущей строки по времени
+// Подсветка текущей строки
 function highlightCurrentLyric(timeMs) {
   const lyrics = currentSong.lyrics;
   if (!lyrics || !lyrics.length) return;
 
-  // Находим индекс последней строки с временем, которое <= текущему
   let activeIndex = -1;
   for (let i = 0; i < lyrics.length; i++) {
     const lineTime = parseTimeToMs(lyrics[i].time);
-    // Пропускаем строки без времени
     if (lineTime === 0 || isNaN(lineTime)) continue;
-    
     if (lineTime <= timeMs) {
       activeIndex = i;
     } else {
-      break; // строки идут по порядку, дальше можно не искать
+      break;
     }
   }
 
-  // Убираем класс active у всех строк
   document.querySelectorAll('.lyric-line').forEach(line => {
     line.classList.remove('active');
   });
 
-  // Добавляем класс active найденной строке
   if (activeIndex >= 0) {
     const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
     if (activeLine) {
@@ -820,16 +811,17 @@ function makeLyricsClickable() {
       const index = line.dataset.index;
       if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
         const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
-        // Если у строки нет времени, клик ничего не делает
         if (timeMs === 0 || isNaN(timeMs)) {
           showToast('У этой строки нет временной метки', 1500);
           return;
         }
         if (player && player.seekTo) {
-          player.seekTo(timeMs / 1000, true); // seekTo принимает секунды
-          player.playVideo(); // можно сразу запустить воспроизведение
+          player.seekTo(timeMs / 1000, true);
+          player.playVideo();
         } else {
-          showToast('Видео ещё не загружено', 1500);
+          if (confirm('Видео не загружается. Открыть его на YouTube?')) {
+            window.open(`https://www.youtube.com/watch?v=${currentSong.youtubeId}`, '_blank');
+          }
         }
       }
     });
