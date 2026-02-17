@@ -1063,59 +1063,64 @@ body{
     width: 100%;
   }
 }
-/* ===== НОВЫЕ СТИЛИ (Sticky Player & Karaoke) ===== */
+/* ===== НОВЫЙ "УМНЫЙ" ПЛЕЕР (Плавающее окошко) ===== */
 
-/* 1. Липкая шапка с плеером */
-@media (min-width: 981px) {
-  .song-header {
-    position: sticky;
-    top: 80px; /* Отступ от верхнего меню */
-    z-index: 50;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    /* Добавляем тень, чтобы отделить от фона */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* 2. Улучшенная подсветка караоке */
-.lyric-line {
-  padding: 8px 12px;
-  border-radius: 8px;
+/* 1. Контейнер для видео */
+.video-container {
   transition: all 0.3s ease;
-  cursor: pointer;
-  border-left: 3px solid transparent;
+  position: relative;
+  z-index: 1000;
 }
 
-.lyric-line:hover {
-  background-color: rgba(31, 111, 235, 0.05);
+/* 2. Когда класс .floating активен (добавляется JS) */
+body.video-floating .video-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px; /* Ширина плавающего окна */
+  height: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  border-radius: 12px;
+  border: 2px solid #fff;
+  background: #000;
 }
 
-.lyric-line.active {
-  background-color: rgba(31, 111, 235, 0.15); /* Цвет фона активной строки */
-  font-weight: 700;
-  color: var(--accent);
-  border-left-color: var(--accent); /* Синяя полоска слева */
-  transform: scale(1.02); /* Легкое увеличение */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-/* 3. Плавная прокрутка для блока с текстом */
-.lyrics-text {
-  scroll-behavior: smooth;
-  max-height: 80vh; /* Ограничиваем высоту, если нужно */
-  overflow-y: auto;
-  padding-right: 5px; /* Чтобы скроллбар не перекрывал текст */
-}
-
-/* Скроллбар для текста (красивый) */
-.lyrics-text::-webkit-scrollbar {
-  width: 6px;
-}
-.lyrics-text::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-.lyrics-text::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+/* 3. Уменьшаем iframe внутри плавающего окна */
+body.video-floating .video-container iframe {
+  height: 169px; /* Соотношение 16:9 для ширины 300px */
   border-radius: 10px;
+}
+
+/* 4. Кнопка закрытия плавающего окна (появится при наведении) */
+.close-floating-video {
+  display: none;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+body.video-floating .video-container:hover .close-floating-video {
+  display: block;
+}
+
+/* 5. Мобильная адаптация (на телефонах плавающее окно может мешать, скрываем или делаем меньше) */
+@media (max-width: 768px) {
+  body.video-floating .video-container {
+    width: 200px;
+    bottom: 70px; /* Выше кнопок навигации */
+    right: 10px;
+  }
+  body.video-floating .video-container iframe {
+    height: 113px;
+  }
 }
