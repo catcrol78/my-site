@@ -1,10 +1,10 @@
-// admin.js – полная версия с поддержкой карточек-перевёртышей
+// admin.js – полная версия с поддержкой карточек-перевёртышей и игры Whac-a-Word
 // Возможности:
 // - загрузка песен из localStorage и songs-data.js
 // - редактирование песен (клик по строке или кнопка ✏️)
 // - сохранение (добавление/обновление) в localStorage
 // - экспорт в songs-data.js (одна кнопка)
-// - поддержка типов заданий: gapfill, quiz, match, flashcards и др.
+// - поддержка типов заданий: gapfill, quiz, match, flashcards, whackaword и др.
 // - динамические поля для каждого типа задания
 
 // ===== Вспомогательные функции =====
@@ -187,6 +187,7 @@ function createTaskEditor(index, taskData = null) {
           <option value="quiz" ${taskData?.type === 'quiz' ? 'selected' : ''}>Викторина</option>
           <option value="match" ${taskData?.type === 'match' ? 'selected' : ''}>Сопоставление</option>
           <option value="flashcards" ${taskData?.type === 'flashcards' ? 'selected' : ''}>Карточки-перевёртыши</option>
+          <option value="whackaword" ${taskData?.type === 'whackaword' ? 'selected' : ''}>Whac-a-Word (игра)</option>
         </select>
       </div>
       <div class="admin-field">
@@ -234,9 +235,7 @@ function updateExtraFields(wrap, type, taskData) {
 
   switch (type) {
     case 'flashcards':
-      // Для карточек-перевёртышей
       const cards = taskData?.flashcards || taskData?.cards || [];
-      
       extraHtml = `
         <div class="admin-field" style="grid-column: span 2;">
           <label>Карточки для словаря (каждая карточка с новой строки в формате: испанское | перевод | пример | перевод примера)</label>
@@ -289,8 +288,33 @@ function updateExtraFields(wrap, type, taskData) {
       `;
       break;
 
+    case 'whackaword':
+      const words = taskData?.words || [];
+      const wordsText = words.map(w => `${w.text} | ${w.correct}`).join('\n');
+      extraHtml = `
+        <div class="admin-field" style="grid-column: span 2;">
+          <label>Слова для игры (каждое слово с новой строки в формате: слово | true/false)</label>
+          <textarea data-field="whackawordWords" rows="8" placeholder="corazón | true&#10;cabeza | false&#10;canción | false">${wordsText}</textarea>
+          <small>true — правильное слово (за него даются очки), false — неправильное (штраф)</small>
+        </div>
+        <div class="admin-field">
+          <label>Лимит времени (секунд)</label>
+          <input type="number" data-field="whackawordTimeLimit" value="${taskData?.timeLimit || 30}" min="5" max="120" />
+        </div>
+        <div class="admin-field">
+          <label>Целевой счёт (сколько правильных нужно)</label>
+          <input type="number" data-field="whackawordTargetScore" value="${taskData?.targetScore || 5}" min="1" max="50" />
+        </div>
+        <div class="admin-field">
+          <label>Старт в песне (секунда, с которой запускать видео, опционально)</label>
+          <input type="number" data-field="whackawordMusicStart" value="${taskData?.musicStartTime || 0}" min="0" step="1" />
+          <small>Если указано, видео начнётся с этого момента при старте игры</small>
+        </div>
+      `;
+      break;
+
     default:
-      // Для обычных типов (listening, speaking...) используем стандартные поля
+      // Для обычных типов (listening, speaking...)
       extraHtml = `
         <div class="admin-field" style="grid-column: span 2;">
           <label>Контент (текст задания)</label>
@@ -329,7 +353,6 @@ function collectTaskData(wrap) {
     case 'flashcards':
       const cardsText = wrap.querySelector('[data-field="flashcardsData"]')?.value || '';
       const transcription = wrap.querySelector('[data-field="flashcardsTranscription"]')?.value || '';
-      
       const cards = cardsText.split('\n').map(line => {
         const parts = line.split('|').map(s => s.trim());
         return {
@@ -337,10 +360,9 @@ function collectTaskData(wrap) {
           ru: parts[1] || '',
           example: parts[2] || '',
           example_translation: parts[3] || '',
-          transcription: transcription // общая транскрипция для всех или можно сделать для каждой
+          transcription: transcription
         };
       }).filter(card => card.es || card.ru);
-      
       task.flashcards = cards;
       break;
 
@@ -348,7 +370,6 @@ function collectTaskData(wrap) {
       task.text = wrap.querySelector('[data-field="gapText"]')?.value || '';
       const answersStr = wrap.querySelector('[data-field="gapAnswers"]')?.value || '';
       task.answers = answersStr.split(',').map(s => s.trim()).filter(Boolean);
-      
       const optionsStr = wrap.querySelector('[data-field="gapOptions"]')?.value || '';
       if (optionsStr) {
         task.options = optionsStr.split('|').map(part => 
@@ -376,6 +397,20 @@ function collectTaskData(wrap) {
         }
         return null;
       }).filter(Boolean);
+      break;
+
+    case 'whackaword':
+      const wordsText = wrap.querySelector('[data-field="whackawordWords"]')?.value || '';
+      task.words = wordsText.split('\n').map(line => {
+        const parts = line.split('|').map(s => s.trim());
+        if (parts.length === 2) {
+          return { text: parts[0], correct: parts[1] === 'true' };
+        }
+        return null;
+      }).filter(Boolean);
+      task.timeLimit = parseInt(wrap.querySelector('[data-field="whackawordTimeLimit"]')?.value) || 30;
+      task.targetScore = parseInt(wrap.querySelector('[data-field="whackawordTargetScore"]')?.value) || 5;
+      task.musicStartTime = parseInt(wrap.querySelector('[data-field="whackawordMusicStart"]')?.value) || 0;
       break;
 
     default:
