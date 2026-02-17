@@ -138,6 +138,73 @@ const songsDataFromExternal = [
             "transcription": ""
           }
         ]
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "match",
+        "pairs": [
+          {
+            "left": "каса1",
+            "right": "дом"
+          },
+          {
+            "left": "каса5",
+            "right": "дом"
+          },
+          {
+            "left": "каса8",
+            "right": "дом"
+          }
+        ]
+      },
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "эту",
+          "es": ""
+        },
+        "type": "grammar",
+        "content": "выучить\n",
+        "wordBank": [],
+        "answer": ""
+      },
+      {
+        "title": {
+          "ru": "заполни пропуски",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "вставь пропущ",
+          "es": ""
+        },
+        "type": "gapfill",
+        "text": "вавав ___ овлаовло ___ваолоалво",
+        "answers": [
+          "вывы",
+          "ывыа"
+        ],
+        "options": [
+          [
+            "вывы",
+            "ывывы",
+            "в"
+          ],
+          [
+            "gkfjgkf",
+            "dfkd",
+            "dfd"
+          ]
+        ]
       }
     ]
   },
