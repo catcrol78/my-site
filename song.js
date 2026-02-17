@@ -1,5 +1,5 @@
-// song.js — Финальная версия с карточками и без лишних вкладок
-console.log("🎵 song.js загружен (Final Version)");
+// song.js — с поддержкой живых заданий (live tasks)
+console.log("🎵 song.js загружен (с живыми заданиями)");
 
 // ===== Глобальные переменные =====
 let ytIframe = null;
@@ -8,6 +8,11 @@ let syncInterval;
 let currentSong = null;
 let isUserScrolling = false;
 let scrollTimeout;
+
+// Для живых заданий
+let liveTasks = [];
+let completedLiveTasks = new Set();
+let livePopup = null;
 
 const player = {
   getCurrentTime: () => ytLastTime,
@@ -78,8 +83,10 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
-  
-  // Убраны вызовы renderGrammar, renderCulture, renderRestrictions
+
+  // Живые задания
+  liveTasks = song.liveTasks || [];
+  completedLiveTasks.clear();
 
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
@@ -270,7 +277,6 @@ function renderFlashcards(flashcards) {
   const counter = $('flashcards-counter');
   const prevBtn = $('flashcards-prev');
   const nextBtn = $('flashcards-next');
-  // ИСПРАВЛЕНО: убраны решётки перед ID
   const progressFill = $('flashcards-progress-fill');
   const progressText = $('flashcards-progress-text');
   const resetBtn = $('flashcards-reset');
@@ -289,10 +295,8 @@ function renderFlashcards(flashcards) {
   if (emptyDiv) emptyDiv.style.display = 'none';
 
   let currentIndex = 0;
-  // Массив для отметки выученных карточек
   let learned = new Array(flashcards.length).fill(false);
 
-  // Функция обновления прогресс-бара
   function updateProgress() {
     if (!progressFill || !progressText) return;
     const learnedCount = learned.filter(v => v).length;
@@ -301,7 +305,6 @@ function renderFlashcards(flashcards) {
     progressText.textContent = `${learnedCount}/${flashcards.length}`;
   }
 
-  // Функция обновления карточки и кнопок
   function updateCard() {
     if (!container || !flashcards.length) return;
     const card = flashcards[currentIndex];
@@ -327,36 +330,29 @@ function renderFlashcards(flashcards) {
         </button>
       </div>`;
 
-    // Обработчик переворота карточки
     const flashcardEl = container.querySelector('.flashcard');
     if (flashcardEl) {
       flashcardEl.onclick = function (e) {
-        // Игнорируем клик, если кликнули на кнопку внутри
         if (e.target.closest('button')) return;
         this.classList.toggle('flipped');
       };
     }
 
-    // Обработчик кнопки "Знаю"/"Не выучено"
     const toggleBtn = container.querySelector('.learn-toggle');
     if (toggleBtn) {
       toggleBtn.onclick = (e) => {
-        e.stopPropagation(); // Не переворачивать карточку
+        e.stopPropagation();
         learned[currentIndex] = !learned[currentIndex];
         updateProgress();
-        updateCard(); // перерисовать карточку с обновлённым статусом
+        updateCard();
       };
     }
 
-    // Обновляем счётчик
     if (counter) counter.textContent = `${currentIndex + 1}/${flashcards.length}`;
-
-    // Обновляем состояние кнопок навигации
     if (prevBtn) prevBtn.disabled = currentIndex === 0;
     if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
   }
 
-  // Обработчики навигации
   if (prevBtn) {
     prevBtn.onclick = () => {
       if (currentIndex > 0) {
@@ -375,19 +371,97 @@ function renderFlashcards(flashcards) {
     };
   }
 
-  // Сброс прогресса
   if (resetBtn) {
     resetBtn.onclick = () => {
       learned.fill(false);
       updateProgress();
-      updateCard(); // обновить текущую карточку (снимется пометка)
+      updateCard();
     };
   }
 
-  // Инициализация
   updateProgress();
   updateCard();
 }
+
+// ===== Живые задания =====
+function checkLiveTasks(currentTime) {
+  if (!liveTasks.length) return;
+  const taskIndex = liveTasks.findIndex((t, idx) => 
+    t.time <= currentTime && !completedLiveTasks.has(idx)
+  );
+  if (taskIndex === -1) return;
+
+  const task = liveTasks[taskIndex];
+  completedLiveTasks.add(taskIndex);
+  showLiveTaskPopup(task);
+}
+
+function showLiveTaskPopup(task) {
+  if (livePopup) livePopup.remove();
+
+  const popup = document.createElement('div');
+  popup.className = 'live-task-popup';
+  popup.setAttribute('role', 'dialog');
+
+  let content = '';
+  if (task.type === 'word-catch') {
+    content = `
+      <h3>Какое слово ты услышал?</h3>
+      <div class="live-options">
+        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
+      </div>
+    `;
+  } else if (task.type === 'translate') {
+    content = `
+      <h3>Перевод слова "${task.word}":</h3>
+      <div class="live-options">
+        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
+      </div>
+    `;
+  } else if (task.type === 'gapfill') {
+    content = `
+      <h3>Вставь пропущенное слово:</h3>
+      <p class="gap-line">${task.line.replace('___', '______')}</p>
+      <div class="live-options">
+        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
+      </div>
+    `;
+  }
+
+  popup.innerHTML = `
+    <div class="live-task-content">
+      ${content}
+      <button class="live-close-btn">✕</button>
+    </div>
+  `;
+
+  popup.querySelectorAll('.live-option').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const selected = e.target.dataset.value;
+      const isCorrect = (selected === task.correct);
+      showFeedback(isCorrect, task.correct);
+      popup.remove();
+      livePopup = null;
+    });
+  });
+
+  popup.querySelector('.live-close-btn').addEventListener('click', () => {
+    popup.remove();
+    livePopup = null;
+  });
+
+  document.body.appendChild(popup);
+  livePopup = popup;
+}
+
+function showFeedback(isCorrect, correctAnswer) {
+  const feedback = document.createElement('div');
+  feedback.className = `live-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+  feedback.textContent = isCorrect ? '✅ Верно!' : `❌ Неверно. Правильный ответ: ${correctAnswer}`;
+  document.body.appendChild(feedback);
+  setTimeout(() => feedback.remove(), 2000);
+}
+// ===== Конец живых заданий =====
 
 function initPlayerPostMessage() {
   if (!currentSong || !currentSong.youtubeId) return;
@@ -412,7 +486,10 @@ window.addEventListener('message', (e) => {
 function startSyncInterval() {
   if (syncInterval) clearInterval(syncInterval);
   if (!currentSong.lyrics) return;
-  syncInterval = setInterval(() => highlightCurrentLyric(ytLastTime * 1000), 200);
+  syncInterval = setInterval(() => {
+    highlightCurrentLyric(ytLastTime * 1000);
+    checkLiveTasks(ytLastTime); // проверка живых заданий
+  }, 200);
 }
 
 function parseTimeToMs(time) {
