@@ -1,12 +1,14 @@
-// song.js - с поддержкой карточек-перевёртышей (flashcards) и синхронизацией текста с видео
-console.log("🎵 song.js загружен (с карточками и синхронизацией)");
+// song.js — полная версия с поддержкой карточек, заданий и синхронизацией текста с YouTube
+console.log("🎵 song.js загружен (исправленная версия)");
 
+// ===== Глобальные переменные =====
+let player;                // объект YouTube плеера
+let syncInterval;          // интервал для синхронизации
+let currentSong = null;    // объект текущей песни
+let ytApiReady = false;    // флаг готовности YouTube API
+
+// ===== Вспомогательные функции =====
 const $ = id => document.getElementById(id);
-
-// Глобальные переменные для YouTube плеера
-let player;
-let syncInterval;
-let currentSong = null; // будет хранить объект текущей песни
 
 function hideLoader() {
   const loader = document.getElementById('loader');
@@ -28,12 +30,21 @@ function escapeHtml(str) {
     .replaceAll("'", '&#039;');
 }
 
-// Получаем ID из URL
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ===== Получение ID песни из URL =====
 const urlParams = new URLSearchParams(window.location.search);
 const songId = parseInt(urlParams.get('id'));
 
+// ===== Загрузка данных и отрисовка =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log("DOM загружен, ищем песню с ID:", songId);
+  console.log("📅 DOM загружен, ищем песню с ID:", songId);
   
   if (typeof songsDataFromExternal === 'undefined') {
     showError('Данные не загружены. Файл songs-data.js не найден или содержит ошибку.');
@@ -47,143 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  console.log("Песня найдена:", song);
-  currentSong = song; // сохраняем для доступа из функций синхронизации
+  console.log("✅ Песня найдена:", song);
+  currentSong = song;
   renderSong(song);
 });
 
-// Функция вызывается автоматически, когда YouTube Iframe API готов
-function onYouTubeIframeAPIReady() {
-  // Плеер будет инициализирован, только если данные уже загружены
-  if (document.getElementById('video-iframe') && currentSong) {
-    initPlayer();
-  } else {
-    // Если iframe ещё не загружен или нет данных, подождём немного
-    setTimeout(onYouTubeIframeAPIReady, 100);
-  }
-}
-
-function initPlayer() {
-  // Защита от повторного создания
-  if (player || !currentSong || !currentSong.youtubeId) return;
-  
-  player = new YT.Player('video-iframe', {
-    videoId: currentSong.youtubeId,
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
-}
-
-function onPlayerReady(event) {
-  console.log("YouTube плеер готов");
-  startSyncInterval();
-}
-
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.PLAYING) {
-    startSyncInterval();
-  } else {
-    stopSyncInterval();
-  }
-}
-
-function startSyncInterval() {
-  // Запускаем интервал только если у песни есть временные метки
-  if (!currentSong || !hasTimestamps(currentSong)) {
-    return;
-  }
-  if (syncInterval) clearInterval(syncInterval);
-  syncInterval = setInterval(() => {
-    if (player && player.getCurrentTime && currentSong) {
-      const currentTimeSec = player.getCurrentTime();
-      highlightCurrentLyric(currentTimeSec * 1000); // переводим в миллисекунды
-    }
-  }, 100); // проверяем каждые 100 мс
-}
-
-function stopSyncInterval() {
-  if (syncInterval) {
-    clearInterval(syncInterval);
-    syncInterval = null;
-  }
-}
-
-// Проверяет, есть ли у песни хотя бы одна строка с временной меткой
-function hasTimestamps(song) {
-  return song.lyrics && song.lyrics.some(line => line.time && line.time.toString().trim() !== '');
-}
-
-// Преобразование времени из формата "мм:сс" или "мм:сс.сс" в миллисекунды
-function parseTimeToMs(time) {
-  if (!time) return 0;
-  if (typeof time === 'number') return time * 1000; // если уже число (секунды)
-  
-  const parts = time.split(':');
-  if (parts.length === 2) {
-    const minutes = parseInt(parts[0]);
-    const seconds = parseFloat(parts[1]);
-    return (minutes * 60 + seconds) * 1000;
-  }
-  return 0;
-}
-
-// Подсветка текущей строки по времени
-function highlightCurrentLyric(timeMs) {
-  const lyrics = currentSong.lyrics;
-  if (!lyrics || !lyrics.length) return;
-
-  // Находим индекс последней строки с временем, которое <= текущему
-  let activeIndex = -1;
-  for (let i = 0; i < lyrics.length; i++) {
-    const lineTime = parseTimeToMs(lyrics[i].time);
-    // Пропускаем строки без времени – они не участвуют в синхронизации
-    if (lineTime === 0 || isNaN(lineTime)) continue;
-    
-    if (lineTime <= timeMs) {
-      activeIndex = i;
-    } else {
-      break; // строки идут по порядку, дальше можно не искать
-    }
-  }
-
-  // Убираем класс active у всех строк
-  document.querySelectorAll('.lyric-line').forEach(line => {
-    line.classList.remove('active');
-  });
-
-  // Добавляем класс active найденной строке (если есть)
-  if (activeIndex >= 0) {
-    const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
-    if (activeLine) {
-      activeLine.classList.add('active');
-      // Не прокручиваем автоматически, чтобы страница не прыгала
-    }
-  }
-}
-
-// Делаем строки кликабельными для перемотки
-function makeLyricsClickable() {
-  document.querySelectorAll('.lyric-line').forEach(line => {
-    line.addEventListener('click', () => {
-      const index = line.dataset.index;
-      if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
-        const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
-        // Если у строки нет времени, клик ничего не делает
-        if (timeMs === 0 || isNaN(timeMs)) {
-          showToast('У этой строки нет временной метки', 1500);
-          return;
-        }
-        if (player && player.seekTo) {
-          player.seekTo(timeMs / 1000, true); // seekTo принимает секунды
-          player.playVideo(); // можно сразу запустить воспроизведение
-        }
-      }
-    });
-  });
-}
-
+// ===== Функция для отображения ошибки =====
 function showError(message) {
   hideLoader();
   const notFoundDiv = $('not-found');
@@ -202,17 +82,13 @@ function showError(message) {
   }
 }
 
+// ===== Отрисовка страницы песни =====
 function renderSong(song) {
   $('song-title').textContent = safeText(song.title);
   $('song-artist').textContent = song.artist || '';
   
   // Текст песни
   renderLyrics(song.lyrics);
-  
-  // Проверяем наличие временных меток
-  if (!hasTimestamps(song)) {
-    console.log("У этой песни нет временных меток, синхронизация отключена");
-  }
   
   // Задания
   renderTasks(song.tasks);
@@ -233,23 +109,18 @@ function renderSong(song) {
   hideLoader();
   setupTabs();
   
-  // Работа с видео
+  // Инициализация YouTube плеера (если API уже готов)
   if (song.youtubeId) {
-    // Пытаемся использовать API (если уже готов)
-    if (window.YT && YT.Player) {
+    if (ytApiReady) {
       initPlayer();
+    } else {
+      console.log("⏳ Ожидаем загрузки YouTube API...");
+      // Если API ещё не загрузился, он вызовет initPlayer после готовности
     }
-    // Запасной вариант: если через 3 секунды плеер не создан, ставим src вручную
-    setTimeout(() => {
-      const iframe = $('video-iframe');
-      if (iframe && !player && !iframe.src) {
-        console.log("YouTube API не сработал, устанавливаем src вручную");
-        iframe.src = `https://www.youtube.com/embed/${song.youtubeId}`;
-      }
-    }, 3000);
   }
 }
 
+// ===== Настройка вкладок =====
 function setupTabs() {
   const tabs = document.querySelectorAll('.detail-tab');
   const panels = document.querySelectorAll('.detail-panel');
@@ -263,9 +134,7 @@ function setupTabs() {
         t.setAttribute('aria-selected', 'false');
       });
       
-      panels.forEach(p => {
-        p.classList.remove('active');
-      });
+      panels.forEach(p => p.classList.remove('active'));
       
       tab.classList.add('active');
       tab.setAttribute('aria-selected', 'true');
@@ -276,6 +145,7 @@ function setupTabs() {
   });
 }
 
+// ===== Отрисовка текста песни =====
 function renderLyrics(lyrics) {
   const container = $('lyrics-content');
   if (!lyrics || !lyrics.length) {
@@ -289,10 +159,11 @@ function renderLyrics(lyrics) {
   });
   container.innerHTML = html;
   
-  // После добавления строк в DOM делаем их кликабельными
+  // После добавления строк делаем их кликабельными для перемотки
   setTimeout(makeLyricsClickable, 100);
 }
 
+// ===== Отрисовка лексики =====
 function renderVocabulary(vocab) {
   const container = $('vocab-content');
   if (!vocab || !vocab.length) {
@@ -304,6 +175,7 @@ function renderVocabulary(vocab) {
   ).join('');
 }
 
+// ===== Отрисовка бейджей (уровень, темы, грамматика) =====
 function renderBadges(song) {
   const badgesDiv = $('song-badges');
   const badges = [];
@@ -311,177 +183,6 @@ function renderBadges(song) {
   if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`));
   if (song.grammar) song.grammar.forEach(g => badges.push(`<span class="badge"><i class="fas fa-language"></i> ${escapeHtml(g)}</span>`));
   badgesDiv.innerHTML = badges.join('');
-}
-
-// ===== Карточки-перевёртыши =====
-function renderFlashcards(flashcards) {
-  const container = $('flashcard-wrapper');
-  const emptyDiv = $('flashcards-empty');
-  const counterSpan = $('flashcards-counter');
-  const prevBtn = $('flashcards-prev');
-  const nextBtn = $('flashcards-next');
-  const resetBtn = $('flashcards-reset');
-  const progressFill = $('flashcards-progress-fill');
-  const progressText = $('flashcards-progress-text');
-  const badge = $('#flashcards-count');
-  
-  // Обновляем счётчик на вкладке
-  if (badge) {
-    if (flashcards && flashcards.length) {
-      badge.textContent = flashcards.length;
-      badge.style.display = 'inline-flex';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-  
-  if (!flashcards || !flashcards.length) {
-    if (emptyDiv) emptyDiv.style.display = 'block';
-    if (container) container.innerHTML = '';
-    if (counterSpan) counterSpan.textContent = '0 / 0';
-    if (progressFill) progressFill.style.width = '0%';
-    if (progressText) progressText.textContent = '0/0';
-    return;
-  }
-  
-  if (emptyDiv) emptyDiv.style.display = 'none';
-  
-  // Состояние
-  let currentIndex = 0;
-  let learnedCards = loadProgress(songId, flashcards.length);
-  
-  // Обновляем интерфейс
-  updateCard();
-  updateProgress();
-  
-  // Обработчики
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCard();
-      }
-    });
-  }
-  
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < flashcards.length - 1) {
-        currentIndex++;
-        updateCard();
-      }
-    });
-  }
-  
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (confirm('Сбросить прогресс по всем карточкам?')) {
-        learnedCards = new Set();
-        saveProgress(songId, learnedCards);
-        updateCard();
-        updateProgress();
-        showToast('Прогресс сброшен');
-      }
-    });
-  }
-  
-  // Функция обновления карточки
-  function updateCard() {
-    const card = flashcards[currentIndex];
-    
-    // Проверяем, выучена ли карточка
-    const isLearned = learnedCards.has(currentIndex);
-    
-    // Генерируем HTML карточки
-    container.innerHTML = `
-      <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}" data-index="${currentIndex}">
-        <div class="flashcard-front">
-          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
-          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
-          ${isLearned ? '<div class="learned-stamp"><i class="fas fa-check"></i> Выучено</div>' : ''}
-        </div>
-        <div class="flashcard-back">
-          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
-          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
-          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
-          ${!isLearned ? `
-            <button class="flashcards-btn mark-learned" data-index="${currentIndex}">
-              <i class="fas fa-check"></i> Я выучил(а)
-            </button>
-          ` : `
-            <div class="learned-badge">
-              <i class="fas fa-check-circle"></i> Выучено
-            </div>
-          `}
-        </div>
-      </div>
-    `;
-    
-    // Добавляем обработчик переворота
-    const flashcard = container.querySelector('.flashcard');
-    if (flashcard) {
-      flashcard.addEventListener('click', (e) => {
-        // Не переворачиваем, если клик по кнопке
-        if (e.target.closest('.mark-learned')) return;
-        flashcard.classList.toggle('flipped');
-      });
-    }
-    
-    // Обработчик кнопки "Я выучил(а)"
-    const markBtn = container.querySelector('.mark-learned');
-    if (markBtn) {
-      markBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(markBtn.dataset.index);
-        learnedCards.add(idx);
-        saveProgress(songId, learnedCards);
-        updateCard();
-        updateProgress();
-        showToast('🎉 Отлично! Слово добавлено в выученные');
-      });
-    }
-    
-    // Обновляем счётчик
-    if (counterSpan) {
-      counterSpan.textContent = `${currentIndex + 1} / ${flashcards.length}`;
-    }
-    
-    // Обновляем состояние кнопок навигации
-    if (prevBtn) prevBtn.disabled = currentIndex === 0;
-    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
-  }
-  
-  // Функция обновления прогресс-бара
-  function updateProgress() {
-    const percent = Math.round((learnedCards.size / flashcards.length) * 100);
-    if (progressFill) progressFill.style.width = `${percent}%`;
-    if (progressText) progressText.textContent = `${learnedCards.size}/${flashcards.length}`;
-  }
-  
-  // Загрузка прогресса из localStorage
-  function loadProgress(songId, total) {
-    const key = `flashcards_${songId}`;
-    try {
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        const data = JSON.parse(saved);
-        return new Set(data.learned || []);
-      }
-    } catch (e) {
-      console.error('Ошибка загрузки прогресса:', e);
-    }
-    return new Set();
-  }
-  
-  // Сохранение прогресса в localStorage
-  function saveProgress(songId, learnedSet) {
-    const key = `flashcards_${songId}`;
-    const data = {
-      learned: Array.from(learnedSet),
-      updated: new Date().toISOString()
-    };
-    localStorage.setItem(key, JSON.stringify(data));
-  }
 }
 
 // ===== Отрисовка заданий =====
@@ -772,10 +473,308 @@ function renderMatchTask(container, task) {
   container.appendChild(grid);
 }
 
-function showToast(message, duration = 3000) {
-  const toast = document.getElementById('toast');
-  if (!toast) return;
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), duration);
+// ===== Карточки-перевёртыши =====
+function renderFlashcards(flashcards) {
+  const container = $('flashcard-wrapper');
+  const emptyDiv = $('flashcards-empty');
+  const counterSpan = $('flashcards-counter');
+  const prevBtn = $('flashcards-prev');
+  const nextBtn = $('flashcards-next');
+  const resetBtn = $('flashcards-reset');
+  const progressFill = $('flashcards-progress-fill');
+  const progressText = $('flashcards-progress-text');
+  const badge = $('#flashcards-count');
+  
+  // Обновляем счётчик на вкладке
+  if (badge) {
+    if (flashcards && flashcards.length) {
+      badge.textContent = flashcards.length;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+  
+  if (!flashcards || !flashcards.length) {
+    if (emptyDiv) emptyDiv.style.display = 'block';
+    if (container) container.innerHTML = '';
+    if (counterSpan) counterSpan.textContent = '0 / 0';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressText) progressText.textContent = '0/0';
+    return;
+  }
+  
+  if (emptyDiv) emptyDiv.style.display = 'none';
+  
+  // Состояние
+  let currentIndex = 0;
+  let learnedCards = loadProgress(songId, flashcards.length);
+  
+  // Обновляем интерфейс
+  updateCard();
+  updateProgress();
+  
+  // Обработчики
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCard();
+      }
+    });
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < flashcards.length - 1) {
+        currentIndex++;
+        updateCard();
+      }
+    });
+  }
+  
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Сбросить прогресс по всем карточкам?')) {
+        learnedCards = new Set();
+        saveProgress(songId, learnedCards);
+        updateCard();
+        updateProgress();
+        showToast('Прогресс сброшен');
+      }
+    });
+  }
+  
+  // Функция обновления карточки
+  function updateCard() {
+    const card = flashcards[currentIndex];
+    
+    // Проверяем, выучена ли карточка
+    const isLearned = learnedCards.has(currentIndex);
+    
+    // Генерируем HTML карточки
+    container.innerHTML = `
+      <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}" data-index="${currentIndex}">
+        <div class="flashcard-front">
+          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
+          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
+          ${isLearned ? '<div class="learned-stamp"><i class="fas fa-check"></i> Выучено</div>' : ''}
+        </div>
+        <div class="flashcard-back">
+          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
+          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
+          ${!isLearned ? `
+            <button class="flashcards-btn mark-learned" data-index="${currentIndex}">
+              <i class="fas fa-check"></i> Я выучил(а)
+            </button>
+          ` : `
+            <div class="learned-badge">
+              <i class="fas fa-check-circle"></i> Выучено
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+    
+    // Добавляем обработчик переворота
+    const flashcard = container.querySelector('.flashcard');
+    if (flashcard) {
+      flashcard.addEventListener('click', (e) => {
+        // Не переворачиваем, если клик по кнопке
+        if (e.target.closest('.mark-learned')) return;
+        flashcard.classList.toggle('flipped');
+      });
+    }
+    
+    // Обработчик кнопки "Я выучил(а)"
+    const markBtn = container.querySelector('.mark-learned');
+    if (markBtn) {
+      markBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(markBtn.dataset.index);
+        learnedCards.add(idx);
+        saveProgress(songId, learnedCards);
+        updateCard();
+        updateProgress();
+        showToast('🎉 Отлично! Слово добавлено в выученные');
+      });
+    }
+    
+    // Обновляем счётчик
+    if (counterSpan) {
+      counterSpan.textContent = `${currentIndex + 1} / ${flashcards.length}`;
+    }
+    
+    // Обновляем состояние кнопок навигации
+    if (prevBtn) prevBtn.disabled = currentIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
+  }
+  
+  // Функция обновления прогресс-бара
+  function updateProgress() {
+    const percent = Math.round((learnedCards.size / flashcards.length) * 100);
+    if (progressFill) progressFill.style.width = `${percent}%`;
+    if (progressText) progressText.textContent = `${learnedCards.size}/${flashcards.length}`;
+  }
+  
+  // Загрузка прогресса из localStorage
+  function loadProgress(songId, total) {
+    const key = `flashcards_${songId}`;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const data = JSON.parse(saved);
+        return new Set(data.learned || []);
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки прогресса:', e);
+    }
+    return new Set();
+  }
+  
+  // Сохранение прогресса в localStorage
+  function saveProgress(songId, learnedSet) {
+    const key = `flashcards_${songId}`;
+    const data = {
+      learned: Array.from(learnedSet),
+      updated: new Date().toISOString()
+    };
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+}
+
+// ===== YouTube API и синхронизация =====
+
+// Глобальная функция, вызываемая API при готовности
+window.onYouTubeIframeAPIReady = function() {
+  console.log("✅ YouTube API готов");
+  ytApiReady = true;
+  if (currentSong && currentSong.youtubeId) {
+    initPlayer();
+  }
+};
+
+// Инициализация плеера
+function initPlayer() {
+  // Защита от повторного создания
+  if (player || !currentSong || !currentSong.youtubeId) return;
+  
+  console.log("🎬 Создаём плеер для ID:", currentSong.youtubeId);
+  player = new YT.Player('video-iframe', {
+    videoId: currentSong.youtubeId,
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
+
+function onPlayerReady(event) {
+  console.log("▶️ Плеер готов, запускаем синхронизацию");
+  // Запускаем интервал один раз (он будет работать всё время)
+  startSyncInterval();
+}
+
+function onPlayerStateChange(event) {
+  // Можно использовать для отладки
+  console.log("🔄 Состояние плеера:", event.data);
+}
+
+function startSyncInterval() {
+  // Останавливаем предыдущий интервал, если был
+  if (syncInterval) clearInterval(syncInterval);
+  
+  // Запускаем новый интервал только если у песни есть таймкоды
+  if (!currentSong || !hasTimestamps(currentSong)) {
+    console.log("⏸️ У этой песни нет таймкодов, синхронизация не запущена");
+    return;
+  }
+  
+  console.log("⏱️ Запуск интервала синхронизации");
+  syncInterval = setInterval(() => {
+    if (player && player.getCurrentTime && currentSong) {
+      const currentTimeSec = player.getCurrentTime();
+      highlightCurrentLyric(currentTimeSec * 1000); // переводим в миллисекунды
+    }
+  }, 100); // проверяем каждые 100 мс
+}
+
+// Проверяет, есть ли у песни хотя бы одна строка с временной меткой
+function hasTimestamps(song) {
+  if (!song.lyrics) return false;
+  const has = song.lyrics.some(line => line.time && line.time.toString().trim() !== '');
+  console.log("⏲️ Наличие таймкодов:", has);
+  return has;
+}
+
+// Преобразование времени из формата "мм:сс" или "мм:сс.сс" в миллисекунды
+function parseTimeToMs(time) {
+  if (!time) return 0;
+  if (typeof time === 'number') return time * 1000; // если уже число (секунды)
+  
+  // Поддержка форматов: "1:23", "1:23.45", "1:23,45"
+  const parts = time.split(':');
+  if (parts.length === 2) {
+    const minutes = parseInt(parts[0]);
+    const seconds = parseFloat(parts[1].replace(',', '.'));
+    return (minutes * 60 + seconds) * 1000;
+  }
+  return 0;
+}
+
+// Подсветка текущей строки по времени
+function highlightCurrentLyric(timeMs) {
+  const lyrics = currentSong.lyrics;
+  if (!lyrics || !lyrics.length) return;
+
+  // Находим индекс последней строки с временем, которое <= текущему
+  let activeIndex = -1;
+  for (let i = 0; i < lyrics.length; i++) {
+    const lineTime = parseTimeToMs(lyrics[i].time);
+    // Пропускаем строки без времени
+    if (lineTime === 0 || isNaN(lineTime)) continue;
+    
+    if (lineTime <= timeMs) {
+      activeIndex = i;
+    } else {
+      break; // строки идут по порядку, дальше можно не искать
+    }
+  }
+
+  // Убираем класс active у всех строк
+  document.querySelectorAll('.lyric-line').forEach(line => {
+    line.classList.remove('active');
+  });
+
+  // Добавляем класс active найденной строке
+  if (activeIndex >= 0) {
+    const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
+    if (activeLine) {
+      activeLine.classList.add('active');
+    }
+  }
+}
+
+// Делаем строки кликабельными для перемотки
+function makeLyricsClickable() {
+  document.querySelectorAll('.lyric-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const index = line.dataset.index;
+      if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
+        const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
+        // Если у строки нет времени, клик ничего не делает
+        if (timeMs === 0 || isNaN(timeMs)) {
+          showToast('У этой строки нет временной метки', 1500);
+          return;
+        }
+        if (player && player.seekTo) {
+          player.seekTo(timeMs / 1000, true); // seekTo принимает секунды
+          player.playVideo(); // можно сразу запустить воспроизведение
+        } else {
+          showToast('Видео ещё не загружено', 1500);
+        }
+      }
+    });
+  });
 }
