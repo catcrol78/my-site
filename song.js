@@ -1,5 +1,5 @@
-// song.js — полная версия с поддержкой карточек, заданий и синхронизацией через iframe+postMessage (CSP-safe)
-console.log("🎵 song.js загружен (гибридная версия)");
+// song.js — ИСПРАВЛЕННАЯ ВЕРСИЯ (Fix: YouTube Origin, Flashcards duplicate, Auto-scroll)
+console.log("🎵 song.js загружен (v2.0 fixed)");
 
 // ===== Глобальные переменные =====
 let ytIframe = null;           // элемент iframe
@@ -8,8 +8,10 @@ let syncInterval;              // интервал для синхронизац
 let currentSong = null;        // объект текущей песни
 let ytReady = false;           // флаг, что хотя бы одно сообщение получено
 let ytFallbackTimer;           // таймер для показа fallback-ссылки
+let isUserScrolling = false;   // флаг: скроллит ли пользователь сам
+let scrollTimeout;             // таймер сброса флага скролла
 
-// Эмуляция объекта player для совместимости с остальным кодом
+// Эмуляция объекта player для совместимости
 const player = {
   getCurrentTime: () => ytLastTime,
   seekTo: (seconds, allowSeekAhead) => {
@@ -78,6 +80,18 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("✅ Песня найдена:", song);
   currentSong = song;
   renderSong(song);
+
+  // Отслеживаем скролл пользователя, чтобы не мешать авто-скроллу
+  const lyricsContainer = document.getElementById('lyrics-content');
+  if (lyricsContainer) {
+    lyricsContainer.addEventListener('scroll', () => {
+      isUserScrolling = true;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+      }, 2000); // Через 2 сек после остановки скролла снова включаем авто-скролл
+    });
+  }
 });
 
 // ===== Функция для отображения ошибки =====
@@ -198,7 +212,6 @@ function renderBadges(song) {
 }
 
 // ===== Отрисовка заданий =====
-// (полностью идентично предыдущей версии, без изменений)
 function renderTasks(tasks) {
   const container = $('tasks-container');
   if (!tasks || !tasks.length) {
@@ -208,6 +221,9 @@ function renderTasks(tasks) {
 
   container.innerHTML = '';
   tasks.forEach((task, index) => {
+    // ИСПРАВЛЕНИЕ: Пропускаем карточки, так как они в отдельной вкладке
+    if (task.type === 'flashcards') return; 
+
     const taskDiv = document.createElement('div');
     taskDiv.className = 'task-block';
     taskDiv.dataset.taskIndex = index;
@@ -247,6 +263,11 @@ function renderTasks(tasks) {
     taskDiv.appendChild(contentDiv);
     container.appendChild(taskDiv);
   });
+  
+  // Если после фильтрации задач не осталось
+  if (container.children.length === 0) {
+    container.innerHTML = '<p class="muted">Для этой песни доступны только карточки (см. вкладку Карточки)</p>';
+  }
 }
 
 // Задание по умолчанию
@@ -672,11 +693,16 @@ function initPlayerPostMessage() {
   ytIframe = document.getElementById('video-iframe');
   if (!ytIframe) return;
 
-  const origin = encodeURIComponent(window.location.origin);
+  // ИСПРАВЛЕНИЕ: Безопасное определение origin для локального тестирования
+  let origin = window.location.origin;
+  if (!origin || origin === 'null' || origin === 'file://') {
+      origin = 'https://www.youtube.com'; // Фолбэк для локальных файлов
+  }
+  const encodedOrigin = encodeURIComponent(origin);
   const videoId = encodeURIComponent(currentSong.youtubeId);
 
   // Устанавливаем src с enablejsapi=1 для получения событий
-  ytIframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${origin}&playsinline=1&rel=0`;
+  ytIframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodedOrigin}&playsinline=1&rel=0`;
 
   // Как только iframe загрузился, начинаем слушать
   ytIframe.addEventListener('load', () => {
@@ -763,20 +789,25 @@ function hasTimestamps(song) {
   return has;
 }
 
-// Парсинг времени в миллисекунды
+// Парсинг времени в миллисекунды (ИСПРАВЛЕН: более надежный парсинг)
 function parseTimeToMs(time) {
   if (!time) return 0;
   if (typeof time === 'number') return time * 1000;
-  const parts = time.split(':');
+  const str = time.toString().trim();
+  const parts = str.split(':');
+  
   if (parts.length === 2) {
-    const minutes = parseInt(parts[0]);
+    const minutes = parseInt(parts[0], 10);
+    // Заменяем запятую на точку, если она есть
     const seconds = parseFloat(parts[1].replace(',', '.'));
+    
+    if (isNaN(minutes) || isNaN(seconds)) return 0;
     return (minutes * 60 + seconds) * 1000;
   }
   return 0;
 }
 
-// Подсветка текущей строки
+// Подсветка текущей строки + АВТОСКРОЛЛ
 function highlightCurrentLyric(timeMs) {
   const lyrics = currentSong.lyrics;
   if (!lyrics || !lyrics.length) return;
@@ -784,7 +815,7 @@ function highlightCurrentLyric(timeMs) {
   let activeIndex = -1;
   for (let i = 0; i < lyrics.length; i++) {
     const lineTime = parseTimeToMs(lyrics[i].time);
-    if (lineTime === 0 || isNaN(lineTime)) continue;
+    if (lineTime === 0 && i > 0) continue; // Пропускаем строки без времени, если это не начало
     if (lineTime <= timeMs) {
       activeIndex = i;
     } else {
@@ -792,14 +823,23 @@ function highlightCurrentLyric(timeMs) {
     }
   }
 
-  document.querySelectorAll('.lyric-line').forEach(line => {
-    line.classList.remove('active');
-  });
+  // Если строка изменилась
+  const currentActive = document.querySelector('.lyric-line.active');
+  const newActive = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
 
-  if (activeIndex >= 0) {
-    const activeLine = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
-    if (activeLine) {
-      activeLine.classList.add('active');
+  if (currentActive !== newActive) {
+    if (currentActive) currentActive.classList.remove('active');
+    
+    if (newActive) {
+      newActive.classList.add('active');
+      
+      // АВТОСКРОЛЛ: Если пользователь не скроллит сам, крутим к строке
+      if (!isUserScrolling) {
+        newActive.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
     }
   }
 }
@@ -811,17 +851,16 @@ function makeLyricsClickable() {
       const index = line.dataset.index;
       if (index && currentSong && currentSong.lyrics && currentSong.lyrics[index]) {
         const timeMs = parseTimeToMs(currentSong.lyrics[index].time);
-        if (timeMs === 0 || isNaN(timeMs)) {
-          showToast('У этой строки нет временной метки', 1500);
-          return;
+        if (timeMs === 0 && index > 0) { // Игнорируем строки без времени (кроме 0)
+           // Можно попробовать найти ближайшее время выше
+           return;
         }
+        
         if (player && player.seekTo) {
           player.seekTo(timeMs / 1000, true);
           player.playVideo();
         } else {
-          if (confirm('Видео не загружается. Открыть его на YouTube?')) {
-            window.open(`https://www.youtube.com/watch?v=${currentSong.youtubeId}`, '_blank');
-          }
+          showToast('Плеер не готов', 1000);
         }
       }
     });
