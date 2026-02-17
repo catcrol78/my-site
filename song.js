@@ -78,10 +78,7 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
-  renderGrammar(song.grammar);
-  renderCulture(song.culture);
-  renderRestrictions(song.restrictions);
-
+ 
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
@@ -407,3 +404,4 @@ function makeLyricsClickable() {
     };
   });
 }
+
