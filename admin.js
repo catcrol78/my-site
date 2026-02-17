@@ -617,11 +617,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("btnExportSetJs").addEventListener("click", () => {
-    const set = loadSet();
-    if (!set.length) return alert("Общий набор пустой.");
-    const merged = mergeSongs(getExternalSongs(), set);
-    downloadText("songs-data.js", exportSongsDataJs(merged), "application/javascript;charset=utf-8");
-    showToast(`Экспортировано ${merged.length} песен`);
+  const set = loadSet();
+  if (!set.length) return alert("Общий набор пустой.");
+  downloadText("songs-data.js", exportSongsDataJs(set), "application/javascript;charset=utf-8");
+  showToast(`Экспортировано ${set.length} песен`);
   });
 
   document.getElementById("btnClear").addEventListener("click", () => {
