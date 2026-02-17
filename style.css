@@ -1065,67 +1065,46 @@ body{
 }
 /* ===== СПЛИТ-ЭКРАН (ВИДЕО СЛЕВА, ТЕКСТ СПРАВА) ===== */
 
-/* На больших экранах (компьютеры, планшеты) */
+/* На больших экранах */
 @media (min-width: 981px) {
   
-  /* Делим основной контейнер на 2 колонки */
   #song-content {
     display: grid;
-    grid-template-columns: 450px 1fr; /* Левая колонка 450px, правая - остальное */
+    /* Левая колонка 450px, правая - всё остальное */
+    grid-template-columns: 450px 1fr; 
     grid-template-areas: 
       "video tabs"
       "video content";
     gap: 24px;
-    align-items: start; /* Выравнивание по верху */
+    align-items: start;
   }
 
-  /* Левая колонка: Видео и заголовок */
+  /* Левая колонка: Видео и инфо */
   .song-header {
     grid-area: video;
-    position: sticky; /* Липкое позиционирование */
-    top: 20px;       /* Отступ сверху */
+    position: sticky;
+    top: 80px; /* Отступ сверху, чтобы не прилипало к меню */
     height: fit-content;
-    z-index: 10;
-    /* Убираем лишние отступы, чтобы было компактно */
+    z-index: 5;
+    /* Убираем отступ снизу на ПК, так как блоки стоят рядом */
     margin-bottom: 0 !important; 
   }
 
-  /* Правая колонка: Вкладки */
+  /* Правая колонка: Вкладки (липкие) */
   .detail-tabs {
     grid-area: tabs;
     position: sticky;
-    top: 0;
-    z-index: 9;
-    background: var(--bg); /* Чтобы текст не просвечивал при скролле под меню */
+    top: 60px; /* Чуть ниже основного меню */
+    z-index: 4;
+    background: var(--bg);
     padding-top: 10px;
     padding-bottom: 10px;
+    margin-top: 0;
   }
 
-  /* Правая колонка: Контент (текст, задания) */
+  /* Правая колонка: Контент */
   .detail-panels {
     grid-area: content;
-    min-width: 0; /* Фикс для переполнения Grid */
+    min-width: 0;
   }
-  
-  /* Увеличиваем высоту скролла для текста, так как теперь места больше */
-  .lyrics-text {
-    max-height: 70vh;
-  }
-}
-
-/* Стили подсветки караоке (оставляем, они хорошие) */
-.lyric-line {
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border-left: 3px solid transparent;
-}
-.lyric-line:hover { background-color: rgba(31, 111, 235, 0.05); }
-.lyric-line.active {
-  background-color: rgba(31, 111, 235, 0.15);
-  font-weight: 700;
-  color: var(--accent);
-  border-left-color: var(--accent);
-  transform: scale(1.02);
 }
