@@ -1063,64 +1063,69 @@ body{
     width: 100%;
   }
 }
-/* ===== НОВЫЙ "УМНЫЙ" ПЛЕЕР (Плавающее окошко) ===== */
+/* ===== СПЛИТ-ЭКРАН (ВИДЕО СЛЕВА, ТЕКСТ СПРАВА) ===== */
 
-/* 1. Контейнер для видео */
-.video-container {
+/* На больших экранах (компьютеры, планшеты) */
+@media (min-width: 981px) {
+  
+  /* Делим основной контейнер на 2 колонки */
+  #song-content {
+    display: grid;
+    grid-template-columns: 450px 1fr; /* Левая колонка 450px, правая - остальное */
+    grid-template-areas: 
+      "video tabs"
+      "video content";
+    gap: 24px;
+    align-items: start; /* Выравнивание по верху */
+  }
+
+  /* Левая колонка: Видео и заголовок */
+  .song-header {
+    grid-area: video;
+    position: sticky; /* Липкое позиционирование */
+    top: 20px;       /* Отступ сверху */
+    height: fit-content;
+    z-index: 10;
+    /* Убираем лишние отступы, чтобы было компактно */
+    margin-bottom: 0 !important; 
+  }
+
+  /* Правая колонка: Вкладки */
+  .detail-tabs {
+    grid-area: tabs;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    background: var(--bg); /* Чтобы текст не просвечивал при скролле под меню */
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /* Правая колонка: Контент (текст, задания) */
+  .detail-panels {
+    grid-area: content;
+    min-width: 0; /* Фикс для переполнения Grid */
+  }
+  
+  /* Увеличиваем высоту скролла для текста, так как теперь места больше */
+  .lyrics-text {
+    max-height: 70vh;
+  }
+}
+
+/* Стили подсветки караоке (оставляем, они хорошие) */
+.lyric-line {
+  padding: 8px 12px;
+  border-radius: 8px;
   transition: all 0.3s ease;
-  position: relative;
-  z-index: 1000;
-}
-
-/* 2. Когда класс .floating активен (добавляется JS) */
-body.video-floating .video-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 300px; /* Ширина плавающего окна */
-  height: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  border-radius: 12px;
-  border: 2px solid #fff;
-  background: #000;
-}
-
-/* 3. Уменьшаем iframe внутри плавающего окна */
-body.video-floating .video-container iframe {
-  height: 169px; /* Соотношение 16:9 для ширины 300px */
-  border-radius: 10px;
-}
-
-/* 4. Кнопка закрытия плавающего окна (появится при наведении) */
-.close-floating-video {
-  display: none;
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 24px;
-  height: 24px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 24px;
-  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-left: 3px solid transparent;
 }
-
-body.video-floating .video-container:hover .close-floating-video {
-  display: block;
-}
-
-/* 5. Мобильная адаптация (на телефонах плавающее окно может мешать, скрываем или делаем меньше) */
-@media (max-width: 768px) {
-  body.video-floating .video-container {
-    width: 200px;
-    bottom: 70px; /* Выше кнопок навигации */
-    right: 10px;
-  }
-  body.video-floating .video-container iframe {
-    height: 113px;
-  }
+.lyric-line:hover { background-color: rgba(31, 111, 235, 0.05); }
+.lyric-line.active {
+  background-color: rgba(31, 111, 235, 0.15);
+  font-weight: 700;
+  color: var(--accent);
+  border-left-color: var(--accent);
+  transform: scale(1.02);
 }
