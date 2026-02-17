@@ -1063,3 +1063,59 @@ body{
     width: 100%;
   }
 }
+/* ===== НОВЫЕ СТИЛИ (Sticky Player & Karaoke) ===== */
+
+/* 1. Липкая шапка с плеером */
+@media (min-width: 981px) {
+  .song-header {
+    position: sticky;
+    top: 80px; /* Отступ от верхнего меню */
+    z-index: 50;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    /* Добавляем тень, чтобы отделить от фона */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 2. Улучшенная подсветка караоке */
+.lyric-line {
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.lyric-line:hover {
+  background-color: rgba(31, 111, 235, 0.05);
+}
+
+.lyric-line.active {
+  background-color: rgba(31, 111, 235, 0.15); /* Цвет фона активной строки */
+  font-weight: 700;
+  color: var(--accent);
+  border-left-color: var(--accent); /* Синяя полоска слева */
+  transform: scale(1.02); /* Легкое увеличение */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* 3. Плавная прокрутка для блока с текстом */
+.lyrics-text {
+  scroll-behavior: smooth;
+  max-height: 80vh; /* Ограничиваем высоту, если нужно */
+  overflow-y: auto;
+  padding-right: 5px; /* Чтобы скроллбар не перекрывал текст */
+}
+
+/* Скроллбар для текста (красивый) */
+.lyrics-text::-webkit-scrollbar {
+  width: 6px;
+}
+.lyrics-text::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.lyrics-text::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
