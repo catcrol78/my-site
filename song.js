@@ -92,6 +92,36 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 2000); // Через 2 сек после остановки скролла снова включаем авто-скролл
     });
   }
+   // ЛОГИКА ПЛАВАЮЩЕГО ВИДЕО
+  const videoContainer = document.querySelector('.video-container');
+  const sentinel = document.createElement('div'); // Невидимый элемент-маркер
+  sentinel.id = 'video-sentinel';
+  
+  if (videoContainer) {
+    // Вставляем маркер перед видео
+    videoContainer.parentNode.insertBefore(sentinel, videoContainer);
+    
+    // Создаем кнопку закрытия
+    const closeBtn = document.createElement('div');
+    closeBtn.className = 'close-floating-video';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.onclick = (e) => {
+      e.stopPropagation();
+      document.body.classList.remove('video-floating');
+    };
+    videoContainer.appendChild(closeBtn);
+
+    // Наблюдатель: если маркер ушел за верх экрана -> включаем плавающий режим
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting && window.scrollY > 200) {
+        document.body.classList.add('video-floating');
+      } else {
+        document.body.classList.remove('video-floating');
+      }
+    }, { threshold: 0 });
+
+    observer.observe(sentinel);
+  }
 });
 
 // ===== Функция для отображения ошибки =====
@@ -866,3 +896,4 @@ function makeLyricsClickable() {
     });
   });
 }
+
