@@ -456,7 +456,7 @@
         <textarea id="lyrics" placeholder="0:00 | Intro&#10;0:15 | primera estrofa..." rows="6"></textarea>
       </div>
 
-      <!-- ===== БЛОК 7: Задания ===== -->
+           <!-- ===== БЛОК 7: Задания ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <h4 class="section-title"><i class="fas fa-tasks"></i> Задания <span class="pill" id="tasksCount">0</span></h4>
@@ -464,7 +464,17 @@
         </div>
         <div id="tasksContainer"></div>
       </div>
+
+      <!-- ===== БЛОК 8: Живые задания (по времени) ===== -->
+      <div style="grid-column: span 2; margin-top: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h4 class="section-title"><i class="fas fa-clock"></i> Живые задания (по времени) <span class="pill" id="liveTasksCount">0</span></h4>
+          <button class="admin-btn" id="btnAddLiveTask" type="button"><i class="fas fa-plus-circle"></i> Добавить</button>
+        </div>
+        <div id="liveTasksContainer"></div>
+      </div>
     </form>
+    <!-- конец формы -->
 
     <!-- Список песен (набор) -->
     <div class="set-section">
