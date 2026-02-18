@@ -257,18 +257,97 @@ function renderQuiz(container, task) {
 
 function renderMatchTask(container, task) {
   if (!task.pairs) return;
-  const grid = document.createElement('div'); grid.className = 'match-grid';
-  const lCol = document.createElement('div'); lCol.className = 'match-column';
-  const rCol = document.createElement('div'); rCol.className = 'match-column';
-  let sel = null; const matched = new Set();
-  task.pairs.forEach((p, i) => {
-    const l = document.createElement('div'); l.className = 'match-item'; l.textContent = p.left; l.dataset.id = i;
-    l.onclick = () => { if(matched.has(i))return; if(sel===l){l.classList.remove('selected');sel=null;}else{document.querySelectorAll('.match-item.selected').forEach(e=>e.classList.remove('selected'));l.classList.add('selected');sel=l;} };
-    const r = document.createElement('div'); r.className = 'match-item'; r.textContent = p.right; r.dataset.id = i;
-    r.onclick = () => { if(matched.has(i))return; if(sel && sel.dataset.id===String(i)){ sel.classList.add('matched','s');sel.classList.remove('selected');r.classList.add('matched');matched.add(i);sel=null; } };
-    lCol.appendChild(l); rCol.appendChild(r);
+
+  // Создаём массивы левых и правых элементов с сохранением индекса пары
+  const leftItems = task.pairs.map((p, idx) => ({ text: p.left, id: idx }));
+  const rightItems = task.pairs.map((p, idx) => ({ text: p.right, id: idx }));
+
+  // Функция перемешивания (Fisher-Yates)
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Перемешиваем обе колонки независимо
+  shuffle(leftItems);
+  shuffle(rightItems);
+
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+
+  const lCol = document.createElement('div');
+  lCol.className = 'match-column';
+
+  const rCol = document.createElement('div');
+  rCol.className = 'match-column';
+
+  let selectedId = null;          // ID выделенного левого элемента
+  const matched = new Set();      // Множество уже сопоставленных ID
+
+  // Заполняем левую колонку
+  leftItems.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = item.text;
+    el.dataset.id = item.id;
+    el.dataset.side = 'left';
+
+    el.onclick = () => {
+      if (matched.has(item.id)) return; // уже сопоставлено
+
+      if (selectedId === item.id) {
+        // Снимаем выделение
+        el.classList.remove('selected');
+        selectedId = null;
+      } else {
+        // Убираем выделение со всех и выделяем текущий
+        document.querySelectorAll('.match-item.selected').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedId = item.id;
+      }
+    };
+
+    lCol.appendChild(el);
   });
-  grid.appendChild(lCol); grid.appendChild(rCol); container.appendChild(grid);
+
+  // Заполняем правую колонку
+  rightItems.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = item.text;
+    el.dataset.id = item.id;
+    el.dataset.side = 'right';
+
+    el.onclick = () => {
+      if (matched.has(item.id)) return; // уже сопоставлено
+
+      if (selectedId !== null && selectedId === item.id) {
+        // Правильное сопоставление
+        const leftEl = document.querySelector(`.match-item[data-id="${item.id}"][data-side="left"]`);
+        if (leftEl) {
+          leftEl.classList.add('matched');
+          leftEl.classList.remove('selected');
+        }
+        el.classList.add('matched');
+        matched.add(item.id);
+        selectedId = null; // сбрасываем выделение
+      } else {
+        // Неправильное сопоставление – можно добавить визуальную подсказку
+        // Например, кратковременно покрасить в красный
+        el.style.backgroundColor = '#fee2e2';
+        setTimeout(() => el.style.backgroundColor = '', 300);
+      }
+    };
+
+    rCol.appendChild(el);
+  });
+
+  grid.appendChild(lCol);
+  grid.appendChild(rCol);
+  container.appendChild(grid);
 }
 
 function renderFlashcards(flashcards) {
@@ -525,3 +604,4 @@ function makeLyricsClickable() {
     };
   });
 }
+
