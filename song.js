@@ -1,5 +1,5 @@
-// song.js — с поддержкой живых заданий (live tasks)
-console.log("🎵 song.js загружен (с живыми заданиями)");
+// song.js — с поддержкой переключателей и переводов
+console.log("🎵 song.js загружен (с переключателями)");
 
 // ===== Глобальные переменные =====
 let ytIframe = null;
@@ -13,6 +13,11 @@ let scrollTimeout;
 let liveTasks = [];
 let completedLiveTasks = new Set();
 let livePopup = null;
+
+// Состояния функций
+let liveTasksEnabled = true;
+let lyricsHighlightEnabled = true;
+let translationsVisible = false;
 
 const player = {
   getCurrentTime: () => ytLastTime,
@@ -72,6 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
       scrollTimeout = setTimeout(() => isUserScrolling = false, 2000);
     });
   }
+
+  // Переключатели
+  const toggleLive = document.getElementById('toggle-live');
+  if (toggleLive) {
+    toggleLive.addEventListener('change', (e) => toggleLiveTasks(e.target.checked));
+  }
+
+  const toggleHighlight = document.getElementById('toggle-highlight');
+  if (toggleHighlight) {
+    toggleHighlight.addEventListener('change', (e) => toggleLyricsHighlight(e.target.checked));
+  }
+
+  const toggleTrans = document.getElementById('toggle-translations');
+  if (toggleTrans) {
+    toggleTrans.addEventListener('change', (e) => toggleTranslations(e.target.checked));
+  }
 });
 
 function renderSong(song) {
@@ -84,7 +105,6 @@ function renderSong(song) {
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
 
-  // Живые задания
   liveTasks = song.liveTasks || [];
   completedLiveTasks.clear();
 
@@ -93,7 +113,7 @@ function renderSong(song) {
   renderBadges(song);
 
   const contentEl = $('song-content');
-  if (contentEl) contentEl.style.display = ''; // Показываем контент
+  if (contentEl) contentEl.style.display = '';
 
   hideLoader();
   setupTabs();
@@ -127,7 +147,12 @@ function renderLyrics(lyrics) {
   }
   let html = '';
   lyrics.forEach((line, index) => {
+    html += `<div class="lyric-block">`;
     html += `<p class="lyric-line" data-index="${index}" data-time="${line.time || ''}">${escapeHtml(line.text)}</p>`;
+    if (line.translation) {
+      html += `<p class="lyric-translation" style="display: ${translationsVisible ? 'block' : 'none'};">${escapeHtml(line.translation)}</p>`;
+    }
+    html += `</div>`;
   });
   container.innerHTML = html;
   setTimeout(makeLyricsClickable, 100);
@@ -161,7 +186,7 @@ function renderTasks(tasks) {
     return;
   }
   tasks.forEach((task, index) => {
-    if (task.type === 'flashcards') return; // flashcards обрабатываются отдельно
+    if (task.type === 'flashcards') return;
     const taskDiv = document.createElement('div');
     taskDiv.className = 'task-block';
     const header = document.createElement('div');
@@ -258,11 +283,9 @@ function renderQuiz(container, task) {
 function renderMatchTask(container, task) {
   if (!task.pairs) return;
 
-  // Создаём массивы левых и правых элементов с сохранением индекса пары
   const leftItems = task.pairs.map((p, idx) => ({ text: p.left, id: idx }));
   const rightItems = task.pairs.map((p, idx) => ({ text: p.right, id: idx }));
 
-  // Функция перемешивания (Fisher-Yates)
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -271,7 +294,6 @@ function renderMatchTask(container, task) {
     return array;
   }
 
-  // Перемешиваем обе колонки независимо
   shuffle(leftItems);
   shuffle(rightItems);
 
@@ -284,10 +306,9 @@ function renderMatchTask(container, task) {
   const rCol = document.createElement('div');
   rCol.className = 'match-column';
 
-  let selectedId = null;          // ID выделенного левого элемента
-  const matched = new Set();      // Множество уже сопоставленных ID
+  let selectedId = null;
+  const matched = new Set();
 
-  // Заполняем левую колонку
   leftItems.forEach(item => {
     const el = document.createElement('div');
     el.className = 'match-item';
@@ -296,14 +317,11 @@ function renderMatchTask(container, task) {
     el.dataset.side = 'left';
 
     el.onclick = () => {
-      if (matched.has(item.id)) return; // уже сопоставлено
-
+      if (matched.has(item.id)) return;
       if (selectedId === item.id) {
-        // Снимаем выделение
         el.classList.remove('selected');
         selectedId = null;
       } else {
-        // Убираем выделение со всех и выделяем текущий
         document.querySelectorAll('.match-item.selected').forEach(e => e.classList.remove('selected'));
         el.classList.add('selected');
         selectedId = item.id;
@@ -313,7 +331,6 @@ function renderMatchTask(container, task) {
     lCol.appendChild(el);
   });
 
-  // Заполняем правую колонку
   rightItems.forEach(item => {
     const el = document.createElement('div');
     el.className = 'match-item';
@@ -322,10 +339,8 @@ function renderMatchTask(container, task) {
     el.dataset.side = 'right';
 
     el.onclick = () => {
-      if (matched.has(item.id)) return; // уже сопоставлено
-
+      if (matched.has(item.id)) return;
       if (selectedId !== null && selectedId === item.id) {
-        // Правильное сопоставление
         const leftEl = document.querySelector(`.match-item[data-id="${item.id}"][data-side="left"]`);
         if (leftEl) {
           leftEl.classList.add('matched');
@@ -333,10 +348,8 @@ function renderMatchTask(container, task) {
         }
         el.classList.add('matched');
         matched.add(item.id);
-        selectedId = null; // сбрасываем выделение
+        selectedId = null;
       } else {
-        // Неправильное сопоставление – можно добавить визуальную подсказку
-        // Например, кратковременно покрасить в красный
         el.style.backgroundColor = '#fee2e2';
         setTimeout(() => el.style.backgroundColor = '', 300);
       }
@@ -464,6 +477,7 @@ function renderFlashcards(flashcards) {
 
 // ===== Живые задания =====
 function checkLiveTasks(currentTime) {
+  if (!liveTasksEnabled) return;
   if (!liveTasks.length) return;
   const taskIndex = liveTasks.findIndex((t, idx) => 
     t.time <= currentTime && !completedLiveTasks.has(idx)
@@ -542,6 +556,30 @@ function showFeedback(isCorrect, correctAnswer) {
 }
 // ===== Конец живых заданий =====
 
+// ===== Управление функциями =====
+function toggleLiveTasks(enable) {
+  liveTasksEnabled = enable;
+  showToast(enable ? 'Живые задания включены' : 'Живые задания отключены');
+}
+
+function toggleLyricsHighlight(enable) {
+  lyricsHighlightEnabled = enable;
+  if (!enable) {
+    document.querySelectorAll('.lyric-line.active').forEach(el => el.classList.remove('active'));
+  }
+  showToast(enable ? 'Подсветка текста включена' : 'Подсветка текста отключена');
+}
+
+function toggleTranslations(show) {
+  translationsVisible = show;
+  const transEls = document.querySelectorAll('.lyric-translation');
+  transEls.forEach(el => {
+    el.style.display = show ? 'block' : 'none';
+  });
+  showToast(show ? 'Переводы показаны' : 'Переводы скрыты');
+}
+// ===== Конец управления =====
+
 function initPlayerPostMessage() {
   if (!currentSong || !currentSong.youtubeId) return;
   ytIframe = document.getElementById('video-iframe');
@@ -567,7 +605,7 @@ function startSyncInterval() {
   if (!currentSong.lyrics) return;
   syncInterval = setInterval(() => {
     highlightCurrentLyric(ytLastTime * 1000);
-    checkLiveTasks(ytLastTime); // проверка живых заданий
+    checkLiveTasks(ytLastTime);
   }, 200);
 }
 
@@ -579,6 +617,7 @@ function parseTimeToMs(time) {
 }
 
 function highlightCurrentLyric(timeMs) {
+  if (!lyricsHighlightEnabled) return;
   if (!currentSong.lyrics) return;
   let activeIndex = -1;
   for (let i = 0; i < currentSong.lyrics.length; i++) {
@@ -604,4 +643,3 @@ function makeLyricsClickable() {
     };
   });
 }
-
