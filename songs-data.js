@@ -1,31 +1,43 @@
 // Автосгенерировано из admin.html
-// Обновлённая структура: поддержка разных видеопровайдеров (youtube / kinescope)
 const songsDataFromExternal = [
   {
-    "id": 6,
+    "id": 1,
     "title": {
-      "ru": "Дикий ангел",
-      "es": "Cambio Dolor"
+      "ru": "мне нравишься ты",
+      "es": "Me gustas tú"
     },
-    "artist": "Natalia Oreiro",
-    "video": {
-      "provider": "youtube",
-      "id": "G6OYDUomYwI"
-    },
-    "cover": "https://img.youtube.com/vi/G6OYDUomYwI/mqdefault.jpg",
+    "artist": "Manu Chao",
+    "youtubeId": "rs6Y4kZ8qtw",
+    "cover": "https://img.youtube.com/vi/rs6Y4kZ8qtw/mqdefault.jpg",
     "level": [
-      "A2"
+      "A1"
     ],
     "themes": [
-      "тема1",
-      "тема11",
-      "тема111"
+      "naturaleza",
+      "tiempo atmosférico"
     ],
-    "grammar": [],
+    "grammar": [
+      "gustar"
+    ],
     "vocabulary": [
-      "Любовь",
-      "Песня",
-      "милагрос"
+      "viajar",
+      "soñar",
+      "correr",
+      "volver",
+      "moto",
+      "viento",
+      "lluvia",
+      "montaña",
+      "noche",
+      "cena",
+      "vecino",
+      "cocina",
+      "guitarra",
+      "canela",
+      "fuego",
+      "avión",
+      "mañana",
+      "¿qué voy a hacer?"
     ],
     "culture": {
       "tags": [
@@ -33,82 +45,35 @@ const songsDataFromExternal = [
         "traditions",
         "geography",
         "cities",
-        "neighborhoods",
         "food",
         "music"
       ],
       "items": [
-        "конкретика1",
-        "конкретика11"
+        "La Habana",
+        "Guatemala",
+        "La Coruña",
+        "Malasaña (район в Мадриде)"
       ]
     },
     "restrictions": {
-      "age": "all",
-      "containsOtherLanguages": false,
+      "age": "16+",
+      "containsOtherLanguages": true,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": "есть ограничения"
+      "note": "Есть части на французском языке"
     },
     "lyrics": [
       {
-        "time": "0:15",
-        "text": "Juraría que no se bien lo que quiero",
-        "translation": "Я поклялся бы, что не знаю точно, чего хочу"
+        "time": "0:18",
+        "text": "¿Qué horas son, mi corazón?"
       },
       {
-        "time": "0:20",
-        "text": "Pero se que moriría si me quedo en la mitad",
-        "translation": "Но я знаю, что умер бы, если останусь на полпути"
+        "time": "0:21",
+        "text": "Te lo dije bien clarito"
       },
       {
-        "time": "0:25",
-        "text": "Por eso vuelo a otros senderos",
-        "translation": "Поэтому я лечу по другим тропам"
-      },
-      {
-        "time": "0:30",
-        "text": "Para conocer el mundo de verdad",
-        "translation": "Чтобы познать мир по-настоящему"
-      },
-      {
-        "time": "0:35",
-        "text": "Aún no es tarde pero así me estoy sintiendo",
-        "translation": "Еще не поздно, но я чувствую именно так"
-      },
-      {
-        "time": "0:40",
-        "text": "why aparecen tantos miedos que no me dejan pensa",
-        "translation": "И появляется так много страхов, которые не дают мне думать"
-      },
-      {
-        "time": "0:45",
-        "text": "are why tengo sueños de amores nuevos",
-        "translation": "И у меня есть мечты о новой любви"
-      },
-      {
-        "time": "0:50",
-        "text": "why me cuesta imaginar lo que vendrá",
-        "translation": "И мне трудно представить, что будет дальше"
-      },
-      {
-        "time": "0:54",
-        "text": "Cambio dolor por libertad",
-        "translation": "Меняю боль на свободу"
-      },
-      {
-        "time": "1:00",
-        "text": "Cambio heridas por un sueño Que me ayude a continua",
-        "translation": "Меняю раны на мечту, которая поможет мне продолжать"
-      },
-      {
-        "time": "1:05",
-        "text": "are Cambio dolor, felicidad",
-        "translation": "Меняю боль на счастье"
-      },
-      {
-        "time": "1:10",
-        "text": "Que la suerte sea suerte why no algo que no he de alcanzar...",
-        "translation": "Пусть удача будет удачей, а не тем, чего мне не суждено достичь..."
+        "time": "0:34",
+        "text": "Permanece a la escucha"
       }
     ],
     "pdf": "",
@@ -117,190 +82,120 @@ const songsDataFromExternal = [
       {
         "title": {
           "ru": "Аудирование",
-          "es": ""
+          "es": "audirovanie"
         },
         "instruction": {
-          "ru": "Послушать песню",
-          "es": ""
-        },
-        "type": "listening",
-        "content": "три раза послушать",
-        "wordBank": [],
-        "answer": ""
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "",
-          "es": ""
-        },
-        "type": "match",
-        "pairs": [
-          {
-            "left": "катя",
-            "right": "мать"
-          },
-          {
-            "left": "маша",
-            "right": "дочь"
-          },
-          {
-            "left": "никита",
-            "right": "сын"
-          }
-        ]
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "эту",
-          "es": ""
-        },
-        "type": "grammar",
-        "content": "выучить\n",
-        "wordBank": [],
-        "answer": ""
-      },
-      {
-        "title": {
-          "ru": "заполни пропуски",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "вставь пропущ",
-          "es": ""
-        },
-        "type": "gapfill",
-        "text": "вавав ___ овлаовло ___ваолоалво",
-        "answers": [
-          "вывы",
-          "ывыа"
-        ],
-        "options": [
-          [
-            "вывы",
-            "ывывы",
-            "в"
-          ],
-          [
-            "gkfjgkf",
-            "dfkd",
-            "dfd"
-          ]
-        ]
-      },
-      {
-        "title": {
-          "ru": "",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "",
-          "es": ""
+          "ru": "послушай первый куплет, выбери три слова на букву а",
+          "es": "если нет таких то спляши"
         },
         "type": "flashcards",
         "flashcards": [
           {
-            "es": "слово",
-            "ru": "перевод",
-            "example": "пример",
-            "example_translation": "перевод примера",
-            "transcription": ""
-          },
-          {
-            "es": "слово1",
-            "ru": "перевод",
-            "example": "пример",
-            "example_translation": "перевод примера",
+            "es": "casa",
+            "ru": "дом",
+            "example": "estoy casa",
+            "example_translation": "я дома",
             "transcription": ""
           }
         ]
-      }
-    ],
-    "liveTasks": [
-      {
-        "type": "word-catch",
-        "time": 30,
-        "correct": "dolor",
-        "options": [
-          "dolor",
-          "прыг",
-          "скок",
-          "стрекотуша"
-        ]
       },
       {
-        "type": "translate",
-        "time": 10,
-        "correct": "Машенька",
-        "options": [
-          "Машенька",
-          "НАстенька",
-          "Никита"
-        ],
-        "word": "hija"
-      },
-      {
-        "type": "gapfill",
-        "time": 20,
-        "correct": "gato",
-        "options": [
-          "perro",
-          "gato",
-          "chica"
-        ],
-        "line": "Yfhjdhfjdh _____kfdhfjdsf"
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "instruction": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "listening",
+        "content": "",
+        "wordBank": [],
+        "answer": ""
       }
     ]
   },
   {
-    "id": 7,
+    "id": 2,
     "title": {
-      "ru": "песня2",
-      "es": "песня исп2"
+      "ru": "танцуем",
+      "es": "Bailando"
     },
-    "artist": "исполнитель2",
-    "video": {
-      "provider": "kinescope",
-      "id": "abc123xyz" // пример ID для Kinescope
-    },
-    "cover": "", // для Kinescope нужно будет указать свою ссылку на обложку
-    "level": [],
+    "artist": "Enrique Iglesias",
+    "youtubeId": "yv-DcNTOMp4",
+    "cover": "https://img.youtube.com/vi/yv-DcNTOMp4/mqdefault.jpg",
+    "level": [
+      "A2"
+    ],
     "themes": [
-      "тема2",
-      "тема22",
-      "тема222"
+      "amor",
+      "baile",
+      "cuerpo"
     ],
     "grammar": [
-      "грамматика2",
-      "грамматика22",
-      "грамматика222"
+      "Герундий",
+      "использование se",
+      "ir + герундий"
     ],
     "vocabulary": [
-      "лексика2",
-      "лексика22",
-      "лексика222"
+      "mirar",
+      "respiración",
+      "corazón",
+      "palpitar",
+      "silencio",
+      "palabra",
+      "noche",
+      "sol",
+      "bailar",
+      "cuerpo",
+      "vacío",
+      "subir",
+      "bajar",
+      "fuego",
+      "dentro",
+      "enloquecer",
+      "saturar",
+      "física",
+      "química",
+      "anatomía",
+      "cerveza",
+      "tequila",
+      "boca",
+      "melodía",
+      "color",
+      "fantasía",
+      "filosofía",
+      "cabeza",
+      "querer",
+      "estar",
+      "vivir",
+      "tener",
+      "besar",
+      "contigo",
+      "loco",
+      "notar",
+      "llevar",
+      "dimensión",
+      "latido",
+      "acelerar",
+      "ironía",
+      "destino",
+      "poder",
+      "tocar",
+      "abrazar",
+      "sentir",
+      "magia",
+      "olor",
+      "amor",
+      "dolor"
     ],
     "culture": {
       "tags": [
         "holidays",
-        "traditions",
-        "geography",
-        "cities",
-        "neighborhoods",
-        "food",
         "music"
       ],
       "items": [
-        "культура2",
-        "культура22",
-        "культура222"
+        "не написали"
       ]
     },
     "restrictions": {
@@ -308,20 +203,139 @@ const songsDataFromExternal = [
       "containsOtherLanguages": false,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": "ограничение2"
+      "note": ""
+    },
+    "lyrics": [],
+    "analysis": [],
+    "tasks": []
+  },
+  {
+    "id": 3,
+    "title": {
+      "ru": "Дикий ангел",
+      "es": "Cambio Dolor"
+    },
+    "artist": "Natalia Oreiro",
+    "video": {
+      "provider": "kinescope",
+      "id": "https://kinescope.io/o9qTdoAV9zEvf2Pszmj9oh"
+    },
+    "cover": "",
+    "level": [
+      "A1"
+    ],
+    "themes": [],
+    "grammar": [],
+    "vocabulary": [
+      "Cambio",
+      "Dolor",
+      "Libertad",
+      "Sueños",
+      "Heridas",
+      "Miedo",
+      "Amor",
+      "Corazón",
+      "Vivir",
+      "Volver",
+      "Sentir",
+      "Locura",
+      "Alas",
+      "Difícil",
+      "Tropezar"
+    ],
+    "culture": {
+      "tags": [
+        "music"
+      ],
+      "items": []
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "sensitiveTopics": [],
+      "note": ""
     },
     "lyrics": [
       {
         "time": "",
-        "text": "текст2"
+        "text": "Juraría que no sé bien lo que quiero",
+        "translation": ""
       },
       {
         "time": "",
-        "text": "текст22"
+        "text": "pero sé que moriría",
+        "translation": ""
       },
       {
         "time": "",
-        "text": "текст222"
+        "text": "si me quedo en la mitad",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "por eso vuelo a otros senderos",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "para conocer el mundo de verdad",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "Aún no es tarde pero así me estoy sintiendo",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "y aparecen tantos miedos",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "que no me dejan pensar",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "y tengo sueños de amores nuevos",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "y me cuesta imaginar lo que vendrá.",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "Cambio dolor por libertad",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "cambio heridas por un sueño",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "que me ayude a continuar",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "cambio dolor.",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "Felicidad que la suerte sea suerte",
+        "translation": ""
+      },
+      {
+        "time": "",
+        "text": "y no algo que he de alcanzar…",
+        "translation": ""
       }
     ],
     "pdf": "",
@@ -329,20 +343,545 @@ const songsDataFromExternal = [
     "tasks": [
       {
         "title": {
-          "ru": "письмо",
-          "es": "письмо исп"
+          "ru": "хаха",
+          "es": ""
         },
         "instruction": {
-          "ru": "писать",
-          "es": "писать исп"
+          "ru": "скажи куку",
+          "es": ""
         },
-        "type": "writing",
-        "content": "написать письмо",
+        "type": "speaking",
+        "content": "",
+        "wordBank": [],
+        "answer": ""
+      }
+    ],
+    "liveTasks": []
+  },
+  {
+    "id": 5,
+    "title": {
+      "ru": "Я прошу у Бога",
+      "es": "A Dios Le Pido"
+    },
+    "artist": "Juanes",
+    "youtubeId": "kMIaYXxLnUA",
+    "cover": "https://img.youtube.com/vi/kMIaYXxLnUA/mqdefault.jpg",
+    "level": [
+      "B1"
+    ],
+    "themes": [
+      "любовь",
+      "желания"
+    ],
+    "grammar": [
+      "presente de subjuntivo"
+    ],
+    "vocabulary": [
+      "el corazón",
+      "desperatrse",
+      "la luz",
+      "la mirada",
+      "pedir",
+      "el alma",
+      "descansar",
+      "amar",
+      "el hijo",
+      "quedarse",
+      "la voz",
+      "recordar",
+      "el cielo"
+    ],
+    "culture": {
+      "tags": [],
+      "items": [
+        "vos"
+      ]
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "sensitiveTopics": [],
+      "note": "\"vos\""
+    },
+    "lyrics": [
+      {
+        "time": "",
+        "text": "Que mis ojos se despierten"
+      },
+      {
+        "time": "",
+        "text": "Con la luz de tu mirada"
+      },
+      {
+        "time": "",
+        "text": "Yo, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi madre no se muera"
+      },
+      {
+        "time": "",
+        "text": "Y que mi padre me recuerde"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que te quedes a mi lado"
+      },
+      {
+        "time": "",
+        "text": "Y que más nunca te me vayas, mi vida"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi alma no descanse"
+      },
+      {
+        "time": "",
+        "text": "Cuando de amarte se trate, mi cielo"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Por los días que me quedan"
+      },
+      {
+        "time": "",
+        "text": "Y las noches que aún no llegan"
+      },
+      {
+        "time": "",
+        "text": "Yo, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Por los hijos de mis hijos"
+      },
+      {
+        "time": "",
+        "text": "Y los hijos de tus hijos"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi pueblo no derrame tanta sangre"
+      },
+      {
+        "time": "",
+        "text": "Y se levante mi gente"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi alma no descanse"
+      },
+      {
+        "time": "",
+        "text": "Cuando de amarte se trate, mi cielo"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida para darte"
+      },
+      {
+        "time": "",
+        "text": "Y mi corazón entero entregarte"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida para darte"
+      },
+      {
+        "time": "",
+        "text": "Y a tu lado para siempre yo quedarme"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida, yo a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mis ojos se despierten"
+      },
+      {
+        "time": "",
+        "text": "Con la luz de tu mirada"
+      },
+      {
+        "time": "",
+        "text": "Yo, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi madre no se muera"
+      },
+      {
+        "time": "",
+        "text": "Y que mi padre me recuerde"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que te quedes a mi lado"
+      },
+      {
+        "time": "",
+        "text": "Y que más nunca te me vayas, mi vida"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que mi alma no descanse"
+      },
+      {
+        "time": "",
+        "text": "Cuando de amarte se trate, mi cielo"
+      },
+      {
+        "time": "",
+        "text": "A Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida para darte"
+      },
+      {
+        "time": "",
+        "text": "Y mi corazón entero entregarte"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida para darte"
+      },
+      {
+        "time": "",
+        "text": "Y a tu lado para siempre yo quedarme"
+      },
+      {
+        "time": "",
+        "text": "Un segundo más de vida, yo, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días, a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días a Dios le pido"
+      },
+      {
+        "time": "",
+        "text": "Que si me muero, sea de amor"
+      },
+      {
+        "time": "",
+        "text": "Y si me enamoro, sea de vos"
+      },
+      {
+        "time": "",
+        "text": "Y que de tu voz, sea este corazón"
+      },
+      {
+        "time": "",
+        "text": "Todos los días, yo a Dios le pido"
+      }
+    ],
+    "analysis": [],
+    "tasks": []
+  },
+  {
+    "id": 6,
+    "title": {
+      "ru": "Мне жаль",
+      "es": "Lo siento"
+    },
+    "artist": "Beret",
+    "youtubeId": "9dN5HLKm_Ow",
+    "cover": "https://img.youtube.com/vi/9dN5HLKm_Ow/mqdefault.jpg",
+    "level": [
+      "A2"
+    ],
+    "themes": [],
+    "grammar": [],
+    "vocabulary": [],
+    "culture": {
+      "tags": [],
+      "items": [
+        "маша сходила на велики"
+      ]
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "sensitiveTopics": [],
+      "note": ""
+    },
+    "lyrics": [
+      {
+        "time": "",
+        "text": "МАША ПОЙДЕТ НА ВЕЛОСИПЕДЫ))) сходила"
+      }
+    ],
+    "pdf": "",
+    "analysis": [],
+    "tasks": [
+      {
+        "title": {
+          "ru": "",
+          "es": ""
+        },
+        "type": "warm-up",
+        "instruction": {
+          "ru": "Спляши",
+          "es": "гапка"
+        },
+        "content": "пример",
         "wordBank": [
-          "банк слов1",
-          "банк слов2"
-        ],
-        "answer": "правильный ответ"
+          "мама",
+          "папа"
+        ]
+      },
+      {
+        "title": {
+          "ru": "авав",
+          "es": "аыва"
+        },
+        "type": "grammar",
+        "instruction": {
+          "ru": "аываыв",
+          "es": "авывавы"
+        },
+        "content": "аываыв",
+        "answer": "аывавыавы",
+        "wordBank": [
+          "аываыв"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": {
+      "ru": "",
+      "es": "пролд"
+    },
+    "artist": "питрьб",
+    "youtubeId": "c8RR6ZDltdc",
+    "cover": "https://img.youtube.com/vi/c8RR6ZDltdc/mqdefault.jpg",
+    "level": [],
+    "themes": [],
+    "grammar": [],
+    "vocabulary": [],
+    "culture": {
+      "tags": [],
+      "items": []
+    },
+    "restrictions": {
+      "age": "16+",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "sensitiveTopics": [],
+      "note": ""
+    },
+    "lyrics": [],
+    "pdf": "",
+    "analysis": [],
+    "tasks": []
+  },
+  {
+    "id": 8,
+    "title": {
+      "ru": "Тестовые карточки",
+      "es": "Tarjetas de prueba"
+    },
+    "artist": "Demo",
+    "youtubeId": "dQw4w9WgXcQ",
+    "cover": "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+    "level": [
+      "A1"
+    ],
+    "themes": [
+      "образовательные"
+    ],
+    "grammar": [],
+    "vocabulary": [],
+    "culture": {
+      "tags": [],
+      "items": []
+    },
+    "restrictions": {
+      "age": "all",
+      "containsOtherLanguages": false,
+      "profanity": "none",
+      "sensitiveTopics": [],
+      "note": "Тестовая песня для карточек"
+    },
+    "lyrics": [
+      {
+        "time": "",
+        "text": "Это тестовая песня для проверки карточек."
+      },
+      {
+        "time": "",
+        "text": "Здесь нет настоящего текста."
+      }
+    ],
+    "pdf": "",
+    "analysis": [],
+    "tasks": [
+      {
+        "title": {
+          "ru": "Словарь к песне",
+          "es": "Vocabulario de la canción"
+        },
+        "instruction": {
+          "ru": "Изучи слова из песни. Нажимай на карточки, чтобы увидеть перевод.",
+          "es": "Estudia las palabras de la canción. Haz clic en las tarjetas para ver la traducción."
+        },
+        "type": "flashcards",
+        "flashcards": [
+          {
+            "es": "viajar",
+            "ru": "путешествовать",
+            "example": "Me gusta viajar",
+            "example_translation": "Мне нравится путешествовать",
+            "transcription": ""
+          },
+          {
+            "es": "soñar",
+            "ru": "мечтать",
+            "example": "Sueño con viajar",
+            "example_translation": "Я мечтаю путешествовать",
+            "transcription": ""
+          },
+          {
+            "es": "correr",
+            "ru": "бегать",
+            "example": "Corro por el parque",
+            "example_translation": "Я бегаю по парку",
+            "transcription": ""
+          },
+          {
+            "es": "volver",
+            "ru": "возвращаться",
+            "example": "Vuelvo a casa",
+            "example_translation": "Я возвращаюсь домой",
+            "transcription": ""
+          },
+          {
+            "es": "moto",
+            "ru": "мотоцикл",
+            "example": "Mi moto es rápida",
+            "example_translation": "Мой мотоцикл быстрый",
+            "transcription": ""
+          }
+        ]
       }
     ]
   }
