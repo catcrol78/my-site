@@ -1,5 +1,6 @@
 // admin.js – полная версия с поддержкой карточек-перевёртышей, живых заданий и переводов
-console.log("admin.js загружен");
+// Обновлено для поддержки нескольких видеопровайдеров (YouTube / Kinescope)
+console.log("admin.js загружен (поддержка Kinescope)");
 
 // ===== Вспомогательные функции =====
 function linesToArray(text) {
@@ -19,10 +20,18 @@ function parseLyrics(text) {
 function checkedValues(containerId) {
   return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)).map(i => i.value);
 }
-function extractYouTubeId(input) {
+
+// Извлекает ID видео из введённого значения (поддерживает прямые ID и ссылки YouTube)
+function extractVideoId(input) {
   const raw = (input || "").trim();
   if (!raw) return "";
-  if (/^[a-zA-Z0-9_-]{6,20}$/.test(raw) && !raw.includes("http")) return raw;
+  
+  // Если это просто ID (буквы, цифры, дефис, подчёркивание)
+  if (/^[a-zA-Z0-9_-]{6,}$/.test(raw) && !raw.includes("http") && !raw.includes("/")) {
+    return raw;
+  }
+  
+  // Попытка извлечь из ссылки YouTube
   try {
     const url = new URL(raw);
     const v = url.searchParams.get("v");
@@ -34,15 +43,20 @@ function extractYouTubeId(input) {
     const embedIdx = parts.indexOf("embed");
     if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
   } catch (_) {}
+  
+  // Регулярка для YouTube
   const m = raw.match(/v=([a-zA-Z0-9_-]{6,20})/);
-  return m ? m[1] : raw;
+  return m ? m[1] : raw; // если ничего не нашли, возвращаем как есть (возможно, ID Kinescope)
 }
-function youtubeCoverUrl(id) { return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : ""; }
-function safeSlug(s) {
-  return (s || "song").toString().toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+
+// Генерирует URL обложки для YouTube, для Kinescope возвращает пустую строку
+function getCoverUrl(provider, id) {
+  if (provider === "youtube" && id) {
+    return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  }
+  return ""; // Для Kinescope обложка не генерируется автоматически
 }
+
 function downloadText(filename, content, mime = "text/plain;charset=utf-8") {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -122,18 +136,20 @@ function getNextId() {
   return Math.max(maxInSet, maxInExternal) + 1;
 }
 
-// ===== Предпросмотр YouTube =====
-function updateYouTubePreview() {
-  const input = document.getElementById('youtubeInput');
-  const previewDiv = document.getElementById('ytPreview');
-  const previewImg = document.getElementById('ytPreviewImg');
-  if (!input || !previewDiv || !previewImg) return;
+// ===== Предпросмотр видео (только для YouTube) =====
+function updateVideoPreview() {
+  const providerSelect = document.getElementById('videoProvider');
+  const videoIdInput = document.getElementById('videoId');
+  const previewDiv = document.getElementById('videoPreview');
+  const previewImg = document.getElementById('videoPreviewImg');
+  if (!providerSelect || !videoIdInput || !previewDiv || !previewImg) return;
 
-  const raw = input.value.trim();
-  const id = extractYouTubeId(raw);
+  const provider = providerSelect.value;
+  const rawId = videoIdInput.value.trim();
+  const id = extractVideoId(rawId); // очищаем ID
 
-  if (id && id.length >= 6) {
-    const coverUrl = youtubeCoverUrl(id);
+  if (provider === 'youtube' && id && id.length >= 6) {
+    const coverUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
     previewImg.src = coverUrl;
     previewDiv.style.display = 'block';
     previewImg.onerror = () => {
@@ -494,11 +510,17 @@ function renumberLiveTasks() {
   document.getElementById("liveTasksCount").textContent = String(tasks.length);
 }
 
-// ===== Построение объекта песни из формы (с переводами) =====
+// ===== Построение объекта песни из формы =====
 function buildSong() {
   const idInput = document.getElementById("id");
   const idVal = (idInput.value || "").trim();
-  const youtubeId = extractYouTubeId(document.getElementById("youtubeInput").value);
+  
+  // Видео данные
+  const provider = document.getElementById("videoProvider").value;
+  const rawVideoId = document.getElementById("videoId").value.trim();
+  const videoId = extractVideoId(rawVideoId); // очищаем ID
+  const cover = getCoverUrl(provider, videoId); // генерируем обложку только для YouTube
+  
   const titleRu = document.getElementById("titleRu").value.trim();
   const titleEs = document.getElementById("titleEs").value.trim();
   const artist = document.getElementById("artist").value.trim();
@@ -517,18 +539,16 @@ function buildSong() {
   // Текст и переводы
   const lyrics = parseLyrics(document.getElementById("lyrics").value);
   const translationsText = document.getElementById("translations").value;
-  const translations = linesToArray(translationsText); // массив переводов
+  const translations = linesToArray(translationsText);
 
   // Добавляем переводы к строкам
   lyrics.forEach((line, index) => {
     if (index < translations.length && translations[index]) {
       line.translation = translations[index];
     } else {
-      line.translation = ""; // явно указываем пустую строку
+      line.translation = "";
     }
   });
-
-  const cover = youtubeCoverUrl(youtubeId);
 
   const taskEditors = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
   const tasks = taskEditors.map(el => collectTaskData(el));
@@ -543,8 +563,11 @@ function buildSong() {
     id: finalId,
     title: { ru: titleRu || "", es: titleEs || "" },
     artist: artist || "",
-    youtubeId: youtubeId || "",
-    cover,
+    video: {
+      provider: provider,
+      id: videoId || ""
+    },
+    cover, // автоматически сгенерированная обложка (только для YouTube)
     level: level ? [level] : [],
     themes,
     grammar,
@@ -559,11 +582,17 @@ function buildSong() {
   };
 }
 
-// ===== Загрузка песни в форму (с переводами) =====
+// ===== Загрузка песни в форму =====
 function loadSongIntoForm(song) {
   if (!song) return;
   document.getElementById("id").value = song.id || "";
-  document.getElementById("youtubeInput").value = song.youtubeId || "";
+  
+  // Видео данные
+  const provider = song.video?.provider || "youtube";
+  const videoId = song.video?.id || "";
+  document.getElementById("videoProvider").value = provider;
+  document.getElementById("videoId").value = videoId;
+  
   document.getElementById("titleRu").value = song.title?.ru || "";
   document.getElementById("titleEs").value = song.title?.es || "";
   document.getElementById("artist").value = song.artist || "";
@@ -610,12 +639,12 @@ function loadSongIntoForm(song) {
   }
   renumberLiveTasks();
 
-  updateYouTubePreview();
+  updateVideoPreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
 
 // ===== Валидация =====
-const REQUIRED_FIELDS = ["youtubeInput", "artist", "titleRu", "titleEs"];
+const REQUIRED_FIELDS = ["videoId", "artist", "titleRu", "titleEs"]; // заменили youtubeInput на videoId
 function setInvalid(el, isInvalid) {
   if (!el) return;
   el.classList.toggle("invalid", !!isInvalid);
@@ -625,13 +654,13 @@ function clearInvalidAll() {
 }
 function validateSong(song) {
   const errors = [];
-  const youtubeOk = !!(song.youtubeId && song.youtubeId.trim().length >= 6);
+  const videoOk = !!(song.video?.id && song.video.id.trim().length >= 1);
   const artistOk = !!(song.artist && song.artist.trim().length >= 1);
   const titleOk = !!((song.title?.ru || "").trim() || (song.title?.es || "").trim());
-  if (!youtubeOk) errors.push("• YouTube: вставь ссылку или ID (обязательно).");
+  if (!videoOk) errors.push("• ID видео: заполни (обязательно).");
   if (!artistOk) errors.push("• Исполнитель: заполни (обязательно).");
   if (!titleOk) errors.push("• Название: заполни хотя бы ru или es (обязательно).");
-  setInvalid(document.getElementById("youtubeInput"), !youtubeOk);
+  setInvalid(document.getElementById("videoId"), !videoOk);
   setInvalid(document.getElementById("artist"), !artistOk);
   const titlesEmpty = !titleOk;
   setInvalid(document.getElementById("titleRu"), titlesEmpty);
@@ -718,7 +747,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renumberTasks();
   renumberLiveTasks();
 
-  ["youtubeInput","artist","titleRu","titleEs"].forEach(id => {
+  // Заменили youtubeInput на videoId и добавили videoProvider
+  ["videoId","artist","titleRu","titleEs"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.addEventListener("input", () => {
@@ -727,12 +757,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  let ytPreviewTimeout;
+  // Предпросмотр видео при изменении провайдера или ID
+  let previewTimeout;
   const debouncedUpdatePreview = () => {
-    clearTimeout(ytPreviewTimeout);
-    ytPreviewTimeout = setTimeout(updateYouTubePreview, 400);
+    clearTimeout(previewTimeout);
+    previewTimeout = setTimeout(updateVideoPreview, 400);
   };
-  document.getElementById('youtubeInput').addEventListener('input', debouncedUpdatePreview);
+  document.getElementById('videoId').addEventListener('input', debouncedUpdatePreview);
+  document.getElementById('videoProvider').addEventListener('change', debouncedUpdatePreview);
 
   document.getElementById("btnAddTask").addEventListener("click", () => {
     tasksContainer.appendChild(createTaskEditor(tasksContainer.children.length));
@@ -761,7 +793,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnClear").addEventListener("click", () => {
     if (confirm("Очистить форму? Все несохранённые данные будут потеряны.")) {
       document.getElementById("id").value = "";
-      document.getElementById("youtubeInput").value = "";
+      document.getElementById("videoProvider").value = "youtube";
+      document.getElementById("videoId").value = "";
       document.getElementById("titleRu").value = "";
       document.getElementById("titleEs").value = "";
       document.getElementById("artist").value = "";
@@ -782,7 +815,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("liveTasksContainer").innerHTML = "";
       renumberTasks();
       renumberLiveTasks();
-      updateYouTubePreview();
+      updateVideoPreview();
       clearInvalidAll();
       showErrors([]);
       showToast("Форма очищена");
@@ -849,5 +882,5 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
-  setTimeout(updateYouTubePreview, 100);
+  setTimeout(updateVideoPreview, 100);
 });
