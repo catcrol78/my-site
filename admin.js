@@ -1,11 +1,5 @@
-// admin.js – полная версия с поддержкой карточек-перевёртышей
-// Возможности:
-// - загрузка песен из localStorage и songs-data.js
-// - редактирование песен (клик по строке или кнопка ✏️)
-// - сохранение (добавление/обновление) в localStorage
-// - экспорт в songs-data.js (одна кнопка)
-// - поддержка типов заданий: gapfill, quiz, match, flashcards и др.
-// - динамические поля для каждого типа задания
+// admin.js – полная версия с поддержкой карточек-перевёртышей и живых заданий
+console.log("admin.js загружен");
 
 // ===== Вспомогательные функции =====
 function linesToArray(text) {
@@ -152,13 +146,12 @@ function updateYouTubePreview() {
   }
 }
 
-// ===== Редактор заданий с динамическими полями =====
+// ===== Редактор обычных заданий =====
 function createTaskEditor(index, taskData = null) {
   const wrap = document.createElement("div");
   wrap.className = "task-editor";
   wrap.dataset.taskIndex = index;
 
-  // Базовая часть (заголовок, тип, инструкция)
   let html = `
     <div class="task-top">
       <h4>Задание <span class="task-number">${index + 1}</span></h4>
@@ -203,16 +196,13 @@ function createTaskEditor(index, taskData = null) {
 
   wrap.innerHTML = html;
 
-  // Добавляем обработчик изменения типа
   const typeSelect = wrap.querySelector('.task-type-select');
   typeSelect.addEventListener('change', () => {
     updateExtraFields(wrap, typeSelect.value, null);
   });
 
-  // Заполняем дополнительные поля в соответствии с типом
   updateExtraFields(wrap, typeSelect.value, taskData);
 
-  // Обработчик удаления
   wrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-action='remove']");
     if (!btn) return;
@@ -225,18 +215,15 @@ function createTaskEditor(index, taskData = null) {
   return wrap;
 }
 
-// Функция обновления дополнительных полей в зависимости от типа
 function updateExtraFields(wrap, type, taskData) {
   const container = wrap.querySelector('.task-extra-fields');
-  container.innerHTML = ''; // очищаем
+  container.innerHTML = '';
 
   let extraHtml = '';
 
   switch (type) {
     case 'flashcards':
-      // Для карточек-перевёртышей
       const cards = taskData?.flashcards || taskData?.cards || [];
-      
       extraHtml = `
         <div class="admin-field" style="grid-column: span 2;">
           <label>Карточки для словаря (каждая карточка с новой строки в формате: испанское | перевод | пример | перевод примера)</label>
@@ -290,7 +277,6 @@ function updateExtraFields(wrap, type, taskData) {
       break;
 
     default:
-      // Для обычных типов (listening, speaking...) используем стандартные поля
       extraHtml = `
         <div class="admin-field" style="grid-column: span 2;">
           <label>Контент (текст задания)</label>
@@ -310,7 +296,6 @@ function updateExtraFields(wrap, type, taskData) {
   container.innerHTML = extraHtml;
 }
 
-// Сбор данных задания из формы
 function collectTaskData(wrap) {
   const type = wrap.querySelector('[data-field="type"]').value;
   const titleRu = wrap.querySelector('[data-field="titleRu"]').value;
@@ -324,12 +309,10 @@ function collectTaskData(wrap) {
     type: type
   };
 
-  // Собираем дополнительные поля в зависимости от типа
   switch (type) {
     case 'flashcards':
       const cardsText = wrap.querySelector('[data-field="flashcardsData"]')?.value || '';
       const transcription = wrap.querySelector('[data-field="flashcardsTranscription"]')?.value || '';
-      
       const cards = cardsText.split('\n').map(line => {
         const parts = line.split('|').map(s => s.trim());
         return {
@@ -337,10 +320,9 @@ function collectTaskData(wrap) {
           ru: parts[1] || '',
           example: parts[2] || '',
           example_translation: parts[3] || '',
-          transcription: transcription // общая транскрипция для всех или можно сделать для каждой
+          transcription: transcription
         };
       }).filter(card => card.es || card.ru);
-      
       task.flashcards = cards;
       break;
 
@@ -348,7 +330,6 @@ function collectTaskData(wrap) {
       task.text = wrap.querySelector('[data-field="gapText"]')?.value || '';
       const answersStr = wrap.querySelector('[data-field="gapAnswers"]')?.value || '';
       task.answers = answersStr.split(',').map(s => s.trim()).filter(Boolean);
-      
       const optionsStr = wrap.querySelector('[data-field="gapOptions"]')?.value || '';
       if (optionsStr) {
         task.options = optionsStr.split('|').map(part => 
@@ -398,6 +379,121 @@ function renumberTasks() {
   document.getElementById("tasksCount").textContent = String(tasks.length);
 }
 
+// ===== Редактор живых заданий (по времени) =====
+function createLiveTaskEditor(index, taskData = null) {
+  const wrap = document.createElement("div");
+  wrap.className = "task-editor";
+  wrap.dataset.taskIndex = index;
+
+  let html = `
+    <div class="task-top">
+      <h4>Живое задание <span class="task-number">${index + 1}</span></h4>
+      <button class="task-remove" type="button" data-action="remove">Удалить</button>
+    </div>
+    <div class="task-grid">
+      <div class="admin-field">
+        <label>Тип</label>
+        <select data-field="type" class="live-type-select">
+          <option value="word-catch" ${taskData?.type === 'word-catch' ? 'selected' : ''}>Лови слово</option>
+          <option value="translate" ${taskData?.type === 'translate' ? 'selected' : ''}>Перевод</option>
+          <option value="gapfill" ${taskData?.type === 'gapfill' ? 'selected' : ''}>Заполни пропуск</option>
+        </select>
+      </div>
+      <div class="admin-field">
+        <label>Время (сек)</label>
+        <input type="number" step="0.1" data-field="time" value="${taskData?.time ?? ''}" placeholder="35.5" />
+      </div>
+      <div class="admin-field" style="grid-column: span 2;">
+        <label>Правильный ответ</label>
+        <input type="text" data-field="correct" value="${(taskData?.correct || '').replace(/"/g, '&quot;')}" />
+      </div>
+      <div class="admin-field" style="grid-column: span 2;">
+        <label>Варианты ответов (по одному на строке)</label>
+        <textarea data-field="options" rows="3">${(taskData?.options || []).join('\n')}</textarea>
+      </div>
+    </div>
+    <div class="live-extra-fields" id="live-extra-${index}"></div>
+  `;
+
+  wrap.innerHTML = html;
+
+  const typeSelect = wrap.querySelector('.live-type-select');
+  typeSelect.addEventListener('change', () => {
+    updateLiveExtraFields(wrap, typeSelect.value, null);
+  });
+
+  updateLiveExtraFields(wrap, typeSelect.value, taskData);
+
+  wrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-action='remove']");
+    if (!btn) return;
+    if (confirm("Удалить это живое задание?")) {
+      wrap.remove();
+      renumberLiveTasks();
+    }
+  });
+
+  return wrap;
+}
+
+function updateLiveExtraFields(wrap, type, taskData) {
+  const container = wrap.querySelector('.live-extra-fields');
+  container.innerHTML = '';
+
+  let extraHtml = '';
+
+  if (type === 'translate') {
+    extraHtml = `
+      <div class="admin-field" style="grid-column: span 2;">
+        <label>Слово (испанское)</label>
+        <input type="text" data-field="word" value="${(taskData?.word || '').replace(/"/g, '&quot;')}" />
+      </div>
+    `;
+  } else if (type === 'gapfill') {
+    extraHtml = `
+      <div class="admin-field" style="grid-column: span 2;">
+        <label>Строка с пропуском (используйте ___ )</label>
+        <input type="text" data-field="line" value="${(taskData?.line || '').replace(/"/g, '&quot;')}" />
+      </div>
+    `;
+  }
+
+  container.innerHTML = extraHtml;
+}
+
+function collectLiveTaskData(wrap) {
+  const type = wrap.querySelector('[data-field="type"]').value;
+  const time = parseFloat(wrap.querySelector('[data-field="time"]').value) || 0;
+  const correct = wrap.querySelector('[data-field="correct"]').value.trim();
+  const optionsText = wrap.querySelector('[data-field="options"]').value;
+  const options = optionsText.split('\n').map(s => s.trim()).filter(Boolean);
+
+  const task = {
+    type,
+    time,
+    correct,
+    options
+  };
+
+  if (type === 'translate') {
+    task.word = wrap.querySelector('[data-field="word"]').value.trim();
+  } else if (type === 'gapfill') {
+    task.line = wrap.querySelector('[data-field="line"]').value.trim();
+  }
+
+  return task;
+}
+
+function renumberLiveTasks() {
+  const tasks = Array.from(document.querySelectorAll("#liveTasksContainer .task-editor"));
+  tasks.forEach((el, idx) => {
+    const num = el.querySelector(".task-number");
+    if (num) num.textContent = String(idx + 1);
+    el.dataset.taskIndex = idx;
+  });
+  document.getElementById("liveTasksCount").textContent = String(tasks.length);
+}
+
 // ===== Построение объекта песни из формы =====
 function buildSong() {
   const idInput = document.getElementById("id");
@@ -423,6 +519,9 @@ function buildSong() {
   const taskEditors = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
   const tasks = taskEditors.map(el => collectTaskData(el));
 
+  const liveTaskEditors = Array.from(document.querySelectorAll("#liveTasksContainer .task-editor"));
+  const liveTasks = liveTaskEditors.map(el => collectLiveTaskData(el));
+
   const autoId = getNextId();
   const finalId = idVal ? Number(idVal) : autoId;
 
@@ -441,7 +540,8 @@ function buildSong() {
     lyrics,
     pdf: pdf || "",
     analysis: [],
-    tasks
+    tasks,
+    liveTasks
   };
 }
 
@@ -479,6 +579,17 @@ function loadSongIntoForm(song) {
     });
   }
   renumberTasks();
+
+  const liveTasksContainer = document.getElementById("liveTasksContainer");
+  liveTasksContainer.innerHTML = "";
+  if (song.liveTasks && song.liveTasks.length > 0) {
+    song.liveTasks.forEach((task, index) => {
+      const editor = createLiveTaskEditor(index, task);
+      liveTasksContainer.appendChild(editor);
+    });
+  }
+  renumberLiveTasks();
+
   updateYouTubePreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
@@ -556,7 +667,7 @@ function renderSet() {
   });
 }
 
-// ===== Сохранение песни (upsert) =====
+// ===== Сохранение песни =====
 function saveSong() {
   clearInvalidAll();
   const song = buildSong();
@@ -583,9 +694,10 @@ function saveSong() {
 // ===== Инициализация =====
 document.addEventListener("DOMContentLoaded", () => {
   const tasksContainer = document.getElementById("tasksContainer");
+  const liveTasksContainer = document.getElementById("liveTasksContainer");
   renumberTasks();
+  renumberLiveTasks();
 
-  // Подписка на изменение полей для снятия ошибок
   ["youtubeInput","artist","titleRu","titleEs"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -595,7 +707,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Предпросмотр YouTube с debounce
   let ytPreviewTimeout;
   const debouncedUpdatePreview = () => {
     clearTimeout(ytPreviewTimeout);
@@ -603,10 +714,14 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   document.getElementById('youtubeInput').addEventListener('input', debouncedUpdatePreview);
 
-  // Кнопки
   document.getElementById("btnAddTask").addEventListener("click", () => {
     tasksContainer.appendChild(createTaskEditor(tasksContainer.children.length));
     renumberTasks();
+  });
+
+  document.getElementById("btnAddLiveTask").addEventListener("click", () => {
+    liveTasksContainer.appendChild(createLiveTaskEditor(liveTasksContainer.children.length));
+    renumberLiveTasks();
   });
 
   document.getElementById("btnSaveSong").addEventListener("click", saveSong);
@@ -617,10 +732,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("btnExportSetJs").addEventListener("click", () => {
-  const set = loadSet();
-  if (!set.length) return alert("Общий набор пустой.");
-  downloadText("songs-data.js", exportSongsDataJs(set), "application/javascript;charset=utf-8");
-  showToast(`Экспортировано ${set.length} песен`);
+    const set = loadSet();
+    if (!set.length) return alert("Общий набор пустой.");
+    // Исправлено: экспортируем только текущий набор, без merge с внешними
+    downloadText("songs-data.js", exportSongsDataJs(set), "application/javascript;charset=utf-8");
+    showToast(`Экспортировано ${set.length} песен`);
   });
 
   document.getElementById("btnClear").addEventListener("click", () => {
@@ -643,8 +759,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("themes").value = "";
       document.getElementById("lyrics").value = "";
       document.getElementById("tasksContainer").innerHTML = "";
+      document.getElementById("liveTasksContainer").innerHTML = "";
       renumberTasks();
-      updateYouTubePreview(); // скрыть превью
+      renumberLiveTasks();
+      updateYouTubePreview();
       clearInvalidAll();
       showErrors([]);
       showToast("Форма очищена");
@@ -659,7 +777,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Общий набор очищен");
   });
 
-  // Слушатель на список песен (редактирование/удаление)
   const setList = document.getElementById("setList");
   if (setList) {
     setList.addEventListener("click", async (e) => {
@@ -694,7 +811,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Автосинхронизация внешних песен при загрузке
   (function autoSyncExternalToSet() {
     const external = getExternalSongs();
     if (!external || !external.length) return;
@@ -705,7 +821,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSet();
   })();
 
-  // Управление скроллом
   const scrollBtn = document.getElementById('scrollTop');
   if (scrollBtn) {
     window.addEventListener('scroll', () => {
@@ -714,6 +829,5 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
-  // Принудительно обновить превью при загрузке (если поле уже заполнено)
   setTimeout(updateYouTubePreview, 100);
 });
