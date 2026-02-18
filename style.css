@@ -1195,3 +1195,34 @@ body{
   90% { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
 }
+.song-controls {
+  display: flex;
+  gap: 20px;
+  padding: 10px 14px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.control-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.control-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.lyric-block {
+  margin-bottom: 10px;
+}
+.lyric-translation {
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--muted);
+  margin: 2px 0 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+}
