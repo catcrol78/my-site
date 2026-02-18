@@ -347,11 +347,20 @@
         <label>Исполнитель <span class="req-star">*</span></label>
         <input type="text" id="artist" />
       </div>
-      <div class="field-group" style="grid-column: span 2;">
-        <label>YouTube ссылка или ID <span class="req-star">*</span></label>
-        <input type="text" id="youtubeInput" placeholder="https://... или ID" />
-        <div class="yt-preview" id="ytPreview" style="display: none;">
-          <img id="ytPreviewImg" src="" alt="YouTube preview" />
+
+      <!-- ===== НОВЫЙ БЛОК ДЛЯ ВИДЕО ===== -->
+      <div class="field-group">
+        <label>Видеоплатформа</label>
+        <select id="videoProvider">
+          <option value="youtube">YouTube</option>
+          <option value="kinescope">Kinescope</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>ID видео <span class="req-star">*</span></label>
+        <input type="text" id="videoId" placeholder="например: G6OYDUomYwI или abc123" />
+        <div class="yt-preview" id="videoPreview" style="display: none;">
+          <img id="videoPreviewImg" src="" alt="Video preview" />
         </div>
       </div>
 
@@ -447,7 +456,6 @@
         <input type="text" id="pdfLink" placeholder="./pdf/lesson.pdf" />
       </div>
 
-     
       <!-- ===== БЛОК 6: Текст песни и переводы ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <h4 class="section-title"><i class="fas fa-file-alt"></i> Текст / таймкоды</h4>
@@ -466,8 +474,8 @@
         <textarea id="translations" placeholder="Введите перевод для каждой строки (по одному на строку)&#10;Я бы поклялся, что не знаю, чего хочу&#10;Но я знаю, что умру..." rows="6"></textarea>
         <small class="hint">Количество строк должно соответствовать количеству строк текста (пустые строки допускаются).</small>
       </div>
-      
-           <!-- ===== БЛОК 7: Задания ===== -->
+
+      <!-- ===== БЛОК 7: Задания ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <h4 class="section-title"><i class="fas fa-tasks"></i> Задания <span class="pill" id="tasksCount">0</span></h4>
