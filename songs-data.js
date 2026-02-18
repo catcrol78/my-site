@@ -1,4 +1,5 @@
 // Автосгенерировано из admin.html
+// Обновлённая структура: поддержка разных видеопровайдеров (youtube / kinescope)
 const songsDataFromExternal = [
   {
     "id": 6,
@@ -7,7 +8,10 @@ const songsDataFromExternal = [
       "es": "Cambio Dolor"
     },
     "artist": "Natalia Oreiro",
-    "youtubeId": "G6OYDUomYwI",
+    "video": {
+      "provider": "youtube",
+      "id": "G6OYDUomYwI"
+    },
     "cover": "https://img.youtube.com/vi/G6OYDUomYwI/mqdefault.jpg",
     "level": [
       "A2"
@@ -43,7 +47,7 @@ const songsDataFromExternal = [
       "containsOtherLanguages": false,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": "есть огранчиения"
+      "note": "есть ограничения"
     },
     "lyrics": [
       {
@@ -262,8 +266,11 @@ const songsDataFromExternal = [
       "es": "песня исп2"
     },
     "artist": "исполнитель2",
-    "youtubeId": "yv-DcNTOMp4",
-    "cover": "https://img.youtube.com/vi/yv-DcNTOMp4/mqdefault.jpg",
+    "video": {
+      "provider": "kinescope",
+      "id": "abc123xyz" // пример ID для Kinescope
+    },
+    "cover": "", // для Kinescope нужно будет указать свою ссылку на обложку
     "level": [],
     "themes": [
       "тема2",
@@ -301,7 +308,7 @@ const songsDataFromExternal = [
       "containsOtherLanguages": false,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": "огарничение2"
+      "note": "ограничение2"
     },
     "lyrics": [
       {
@@ -326,7 +333,7 @@ const songsDataFromExternal = [
           "es": "письмо исп"
         },
         "instruction": {
-          "ru": "псиать",
+          "ru": "писать",
           "es": "писать исп"
         },
         "type": "writing",
@@ -335,7 +342,7 @@ const songsDataFromExternal = [
           "банк слов1",
           "банк слов2"
         ],
-        "answer": "праивльный ответ "
+        "answer": "правильный ответ"
       }
     ]
   }
