@@ -206,6 +206,41 @@ const songsDataFromExternal = [
           }
         ]
       }
+    ],
+    "liveTasks": [
+      {
+        "type": "word-catch",
+        "time": 1.1,
+        "correct": "dolor",
+        "options": [
+          "dolor",
+          "прыг",
+          "скок",
+          "стрекотуша"
+        ]
+      },
+      {
+        "type": "translate",
+        "time": 1.6,
+        "correct": "Машенька",
+        "options": [
+          "Машенька",
+          "НАстенька",
+          "Никита"
+        ],
+        "word": "hija"
+      },
+      {
+        "type": "gapfill",
+        "time": 2.2,
+        "correct": "gato",
+        "options": [
+          "perro",
+          "gato",
+          "chica"
+        ],
+        "line": "Yfhjdhfjdh _____kfdhfjdsf"
+      }
     ]
   },
   {
@@ -289,28 +324,6 @@ const songsDataFromExternal = [
           "банк слов2"
         ],
         "answer": "праивльный ответ "
-      }
-    ],
-    "liveTasks": [
-      {
-        "type": "word-catch",
-        "time": 35,
-        "correct": "corazón",
-        "options": ["corazón", "cabeza", "canción"]
-      },
-      {
-        "type": "translate",
-        "time": 50,
-        "word": "corazón",
-        "correct": "сердце",
-        "options": ["голова", "сердце", "песня"]
-      },
-      {
-        "type": "gapfill",
-        "time": 70,
-        "correct": "corazón",
-        "options": ["corazón", "cabeza", "canción"],
-        "line": "Me duele el ___"
       }
     ]
   }
