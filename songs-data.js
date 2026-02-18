@@ -210,7 +210,7 @@ const songsDataFromExternal = [
     "liveTasks": [
       {
         "type": "word-catch",
-        "time": 1.1,
+        "time": 30,
         "correct": "dolor",
         "options": [
           "dolor",
@@ -221,7 +221,7 @@ const songsDataFromExternal = [
       },
       {
         "type": "translate",
-        "time": 1.6,
+        "time": 10,
         "correct": "Машенька",
         "options": [
           "Машенька",
@@ -232,7 +232,7 @@ const songsDataFromExternal = [
       },
       {
         "type": "gapfill",
-        "time": 2.2,
+        "time": 20,
         "correct": "gato",
         "options": [
           "perro",
