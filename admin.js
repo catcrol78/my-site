@@ -1,4 +1,4 @@
-// admin.js – полная версия с поддержкой карточек-перевёртышей и живых заданий
+// admin.js – полная версия с поддержкой карточек-перевёртышей, живых заданий и переводов
 console.log("admin.js загружен");
 
 // ===== Вспомогательные функции =====
@@ -379,7 +379,7 @@ function renumberTasks() {
   document.getElementById("tasksCount").textContent = String(tasks.length);
 }
 
-// ===== Редактор живых заданий (по времени) =====
+// ===== Редактор живых заданий =====
 function createLiveTaskEditor(index, taskData = null) {
   const wrap = document.createElement("div");
   wrap.className = "task-editor";
@@ -494,7 +494,7 @@ function renumberLiveTasks() {
   document.getElementById("liveTasksCount").textContent = String(tasks.length);
 }
 
-// ===== Построение объекта песни из формы =====
+// ===== Построение объекта песни из формы (с переводами) =====
 function buildSong() {
   const idInput = document.getElementById("id");
   const idVal = (idInput.value || "").trim();
@@ -513,7 +513,21 @@ function buildSong() {
   const grammar = csvToArray(document.getElementById("grammar").value);
   const themes = csvToArray(document.getElementById("themes").value);
   const pdf = (document.getElementById("pdfLink")?.value || "").trim();
+
+  // Текст и переводы
   const lyrics = parseLyrics(document.getElementById("lyrics").value);
+  const translationsText = document.getElementById("translations").value;
+  const translations = linesToArray(translationsText); // массив переводов
+
+  // Добавляем переводы к строкам
+  lyrics.forEach((line, index) => {
+    if (index < translations.length && translations[index]) {
+      line.translation = translations[index];
+    } else {
+      line.translation = ""; // явно указываем пустую строку
+    }
+  });
+
   const cover = youtubeCoverUrl(youtubeId);
 
   const taskEditors = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
@@ -545,7 +559,7 @@ function buildSong() {
   };
 }
 
-// ===== Загрузка песни в форму =====
+// ===== Загрузка песни в форму (с переводами) =====
 function loadSongIntoForm(song) {
   if (!song) return;
   document.getElementById("id").value = song.id || "";
@@ -567,8 +581,14 @@ function loadSongIntoForm(song) {
   document.getElementById("grammar").value = (song.grammar || []).join(", ");
   document.getElementById("pdfLink").value = song.pdf || "";
   document.getElementById("themes").value = (song.themes || []).join(", ");
+
+  // Текст с таймкодами
   const lyricsText = (song.lyrics || []).map(l => l.time ? `${l.time} | ${l.text}` : l.text).join("\n");
   document.getElementById("lyrics").value = lyricsText;
+
+  // Переводы построчно
+  const translationsText = (song.lyrics || []).map(l => l.translation || "").join("\n");
+  document.getElementById("translations").value = translationsText;
 
   const tasksContainer = document.getElementById("tasksContainer");
   tasksContainer.innerHTML = "";
@@ -734,7 +754,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnExportSetJs").addEventListener("click", () => {
     const set = loadSet();
     if (!set.length) return alert("Общий набор пустой.");
-    // Исправлено: экспортируем только текущий набор, без merge с внешними
     downloadText("songs-data.js", exportSongsDataJs(set), "application/javascript;charset=utf-8");
     showToast(`Экспортировано ${set.length} песен`);
   });
@@ -758,6 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("pdfLink").value = "";
       document.getElementById("themes").value = "";
       document.getElementById("lyrics").value = "";
+      document.getElementById("translations").value = "";
       document.getElementById("tasksContainer").innerHTML = "";
       document.getElementById("liveTasksContainer").innerHTML = "";
       renumberTasks();
