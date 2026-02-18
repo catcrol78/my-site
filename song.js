@@ -1,9 +1,10 @@
-// song.js — с поддержкой переключателей и переводов
-console.log("🎵 song.js загружен (с переключателями)");
+// song.js — с поддержкой нескольких видеопровайдеров (YouTube / Kinescope)
+console.log("🎵 song.js загружен (поддержка Kinescope)");
 
 // ===== Глобальные переменные =====
-let ytIframe = null;
-let ytLastTime = 0;
+let ytIframe = null;          // для YouTube
+let kinescopeIframe = null;   // для Kinescope (если понадобится)
+let currentVideoTime = 0;      // текущее время видео (обновляется для YouTube, для Kinescope пока нет)
 let syncInterval;
 let currentSong = null;
 let isUserScrolling = false;
@@ -19,16 +20,23 @@ let liveTasksEnabled = true;
 let lyricsHighlightEnabled = true;
 let translationsVisible = false;
 
+// Унифицированный объект плеера (будет заполнен в зависимости от провайдера)
 const player = {
-  getCurrentTime: () => ytLastTime,
+  getCurrentTime: () => currentVideoTime,
   seekTo: (seconds, allowSeekAhead) => {
-    if (ytIframe && ytIframe.contentWindow) {
+    // Для YouTube уже есть функция, для Kinescope пока заглушка
+    if (currentSong?.video?.provider === 'youtube' && ytIframe && ytIframe.contentWindow) {
       ytPost({ event: 'command', func: 'seekTo', args: [seconds, allowSeekAhead] });
+    } else if (currentSong?.video?.provider === 'kinescope') {
+      // TODO: если у Kinescope есть API перемотки, добавить сюда
+      console.log('Перемотка для Kinescope пока не реализована');
     }
   },
   playVideo: () => {
-    if (ytIframe && ytIframe.contentWindow) {
+    if (currentSong?.video?.provider === 'youtube' && ytIframe && ytIframe.contentWindow) {
       ytPost({ event: 'command', func: 'playVideo', args: [] });
+    } else if (currentSong?.video?.provider === 'kinescope') {
+      // TODO: если есть API, добавить
     }
   }
 };
@@ -58,6 +66,7 @@ function showToast(message, duration = 3000) {
   setTimeout(() => toast.classList.remove('show'), duration);
 }
 
+// Получаем ID песни из URL
 const urlParams = new URLSearchParams(window.location.search);
 const songId = parseInt(urlParams.get('id'));
 
@@ -117,7 +126,15 @@ function renderSong(song) {
 
   hideLoader();
   setupTabs();
-  if (song.youtubeId) initPlayerPostMessage();
+
+  // Инициализируем плеер в зависимости от провайдера
+  if (song.video) {
+    if (song.video.provider === 'youtube') {
+      initYoutubePlayer(song.video.id);
+    } else if (song.video.provider === 'kinescope') {
+      initKinescopePlayer(song.video.id);
+    }
+  }
 }
 
 function setupTabs() {
@@ -554,7 +571,6 @@ function showFeedback(isCorrect, correctAnswer) {
   document.body.appendChild(feedback);
   setTimeout(() => feedback.remove(), 2000);
 }
-// ===== Конец живых заданий =====
 
 // ===== Управление функциями =====
 function toggleLiveTasks(enable) {
@@ -578,34 +594,47 @@ function toggleTranslations(show) {
   });
   showToast(show ? 'Переводы показаны' : 'Переводы скрыты');
 }
-// ===== Конец управления =====
 
-function initPlayerPostMessage() {
-  if (!currentSong || !currentSong.youtubeId) return;
+// ===== Инициализация плееров =====
+function initYoutubePlayer(videoId) {
   ytIframe = document.getElementById('video-iframe');
   if (!ytIframe) return;
   let origin = window.location.origin;
   if (!origin || origin === 'null' || origin === 'file://') origin = 'https://www.youtube.com';
-  ytIframe.src = `https://www.youtube.com/embed/${currentSong.youtubeId}?enablejsapi=1&origin=${encodeURIComponent(origin)}&playsinline=1&rel=0`;
+  ytIframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(origin)}&playsinline=1&rel=0`;
   ytIframe.onload = () => {
     ytPost({ event: 'listening', id: 'yt1' });
     startSyncInterval();
   };
 }
 
+function initKinescopePlayer(videoId) {
+  const iframe = document.getElementById('video-iframe');
+  if (!iframe) return;
+  // Встраиваем Kinescope через iframe (без API, просто видео)
+  iframe.src = `https://kinescope.io/embed/${videoId}`;
+  // Для Kinescope пока не запускаем интервал синхронизации (нет времени)
+  // Можно вывести сообщение, что подсветка отключена
+  showToast('Видео с Kinescope: подсветка текста и живые задания временно недоступны');
+}
+
 function ytPost(obj) { if (ytIframe && ytIframe.contentWindow) ytIframe.contentWindow.postMessage(JSON.stringify(obj), '*'); }
 
 window.addEventListener('message', (e) => {
-  try { const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-  if (d && d.event === 'infoDelivery' && d.info && typeof d.info.currentTime === 'number') ytLastTime = d.info.currentTime; } catch {}
+  try { 
+    const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (d && d.event === 'infoDelivery' && d.info && typeof d.info.currentTime === 'number') {
+      currentVideoTime = d.info.currentTime;
+    }
+  } catch {}
 });
 
 function startSyncInterval() {
   if (syncInterval) clearInterval(syncInterval);
   if (!currentSong.lyrics) return;
   syncInterval = setInterval(() => {
-    highlightCurrentLyric(ytLastTime * 1000);
-    checkLiveTasks(ytLastTime);
+    highlightCurrentLyric(currentVideoTime * 1000);
+    checkLiveTasks(currentVideoTime);
   }, 200);
 }
 
@@ -638,7 +667,9 @@ function highlightCurrentLyric(timeMs) {
 function makeLyricsClickable() {
   document.querySelectorAll('.lyric-line').forEach(line => {
     line.onclick = () => {
-      const ms = parseTimeToMs(currentSong.lyrics[line.dataset.index].time);
+      const index = line.dataset.index;
+      if (!currentSong.lyrics[index]) return;
+      const ms = parseTimeToMs(currentSong.lyrics[index].time);
       if(ms > 0) player.seekTo(ms/1000, true);
     };
   });
