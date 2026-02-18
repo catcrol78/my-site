@@ -124,16 +124,16 @@ const songsDataFromExternal = [
         "type": "match",
         "pairs": [
           {
-            "left": "каса1",
-            "right": "дом"
+            "left": "катя",
+            "right": "мать"
           },
           {
-            "left": "каса5",
-            "right": "дом"
+            "left": "маша",
+            "right": "дочь"
           },
           {
-            "left": "каса8",
-            "right": "дом"
+            "left": "никита",
+            "right": "сын"
           }
         ]
       },
