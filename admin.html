@@ -447,7 +447,8 @@
         <input type="text" id="pdfLink" placeholder="./pdf/lesson.pdf" />
       </div>
 
-      <!-- ===== БЛОК 6: Текст песни ===== -->
+     
+      <!-- ===== БЛОК 6: Текст песни и переводы ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <h4 class="section-title"><i class="fas fa-file-alt"></i> Текст / таймкоды</h4>
       </div>
@@ -456,6 +457,16 @@
         <textarea id="lyrics" placeholder="0:00 | Intro&#10;0:15 | primera estrofa..." rows="6"></textarea>
       </div>
 
+      <!-- НОВОЕ ПОЛЕ ДЛЯ ПЕРЕВОДОВ -->
+      <div style="grid-column: span 2; margin-top: 8px;">
+        <h4 class="section-title"><i class="fas fa-language"></i> Переводы (построчно, в том же порядке, что и текст)</h4>
+      </div>
+
+      <div class="field-group" style="grid-column: span 2;">
+        <textarea id="translations" placeholder="Введите перевод для каждой строки (по одному на строку)&#10;Я бы поклялся, что не знаю, чего хочу&#10;Но я знаю, что умру..." rows="6"></textarea>
+        <small class="hint">Количество строк должно соответствовать количеству строк текста (пустые строки допускаются).</small>
+      </div>
+      
            <!-- ===== БЛОК 7: Задания ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
