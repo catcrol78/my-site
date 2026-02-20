@@ -1,19 +1,6 @@
-// song.js — с добавленной вкладкой Грамматика
-console.log("🎵 song.js загружен");
+// song.js — полная версия с переводом интерфейса (по умолчанию испанский)
+console.log("🎵 song.js загружен (с i18n)");
 
-// ===== Глобальные переменные =====
-let ytIframe = null;
-let ytLastTime = 0;
-let syncInterval;
-let currentSong = null;
-let isUserScrolling = false;
-let scrollTimeout;
-let liveTasks = [];
-let completedLiveTasks = new Set();
-let livePopup = null;
-let liveTasksEnabled = true;
-let lyricsHighlightEnabled = true;
-let translationsVisible = false;
 // ===== i18n для страницы песни =====
 const i18nSong = {
   ru: {
@@ -34,6 +21,7 @@ const i18nSong = {
     checkAnswer: "Проверить",
     correct: "✅ Верно!",
     incorrect: "❌ Неверно",
+    incorrectWithAnswer: "❌ Неверно. Правильный ответ: {answer}",
     showTranslation: "Показать перевод",
     hideTranslation: "Скрыть перевод",
     liveTasksOn: "Живые задания включены",
@@ -42,6 +30,13 @@ const i18nSong = {
     highlightOff: "Подсветка текста отключена",
     translationsOn: "Переводы показаны",
     translationsOff: "Переводы скрыты",
+    learned: "Выучено",
+    notLearned: "Не выучено",
+    know: "✓ Знаю",
+    wordCatchQuestion: "Какое слово ты услышал?",
+    translateQuestion: "Перевод слова \"{word}\":",
+    gapfillQuestion: "Вставь пропущенное слово:",
+    close: "✕"
   },
   es: {
     tabLyrics: "Letra",
@@ -61,6 +56,7 @@ const i18nSong = {
     checkAnswer: "Comprobar",
     correct: "✅ ¡Correcto!",
     incorrect: "❌ Incorrecto",
+    incorrectWithAnswer: "❌ Incorrecto. Respuesta correcta: {answer}",
     showTranslation: "Mostrar traducción",
     hideTranslation: "Ocultar traducción",
     liveTasksOn: "Ejercicios en vivo activados",
@@ -69,16 +65,44 @@ const i18nSong = {
     highlightOff: "Resaltado de letra desactivado",
     translationsOn: "Traducciones mostradas",
     translationsOff: "Traducciones ocultadas",
+    learned: "Aprendido",
+    notLearned: "No aprendido",
+    know: "✓ Saber",
+    wordCatchQuestion: "¿Qué palabra escuchaste?",
+    translateQuestion: "Traducción de \"{word}\":",
+    gapfillQuestion: "Completa la palabra que falta:",
+    close: "✕"
   }
 };
 
-// Текущий язык (берём из localStorage, как в каталоге)
+// Текущий язык (по умолчанию испанский)
 const currentLang = localStorage.getItem("lang") || "es";
 
-// Функция перевода
-function t(key) {
-  return i18nSong[currentLang]?.[key] || i18nSong.ru[key] || key;
+// Функция перевода с поддержкой подстановок {key}
+function t(key, params = {}) {
+  let text = i18nSong[currentLang]?.[key] || i18nSong.ru[key] || key;
+  if (params && typeof params === 'object') {
+    for (let [k, v] of Object.entries(params)) {
+      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    }
+  }
+  return text;
 }
+
+// ===== Глобальные переменные =====
+let ytIframe = null;
+let ytLastTime = 0;
+let syncInterval;
+let currentSong = null;
+let isUserScrolling = false;
+let scrollTimeout;
+let liveTasks = [];
+let completedLiveTasks = new Set();
+let livePopup = null;
+let liveTasksEnabled = true;
+let lyricsHighlightEnabled = true;
+let translationsVisible = false;
+
 const player = {
   getCurrentTime: () => ytLastTime,
   seekTo: (seconds, allowSeekAhead) => {
@@ -152,6 +176,48 @@ document.addEventListener('DOMContentLoaded', function() {
   if (toggleTrans) toggleTrans.addEventListener('change', (e) => toggleTranslations(e.target.checked));
 });
 
+// ===== Применение языка интерфейса =====
+function applyInterfaceLanguage() {
+  // Заголовки вкладок
+  const tabMappings = {
+    'lyrics': t('tabLyrics'),
+    'tasks': t('tabTasks'),
+    'vocab': t('tabVocab'),
+    'flashcards': t('tabFlashcards')
+  };
+  document.querySelectorAll('.detail-tab').forEach(tab => {
+    const tabName = tab.dataset.tab;
+    if (tabName && tabMappings[tabName]) {
+      const span = tab.querySelector('span') || tab;
+      span.textContent = tabMappings[tabName];
+    }
+  });
+
+  // Заголовки панелей
+  const lyricsHeader = document.querySelector('[data-panel="lyrics"] h3');
+  if (lyricsHeader) lyricsHeader.innerHTML = `<i class="fas fa-file-alt"></i> ${t('lyricsHeader')}`;
+  const tasksHeader = document.querySelector('[data-panel="tasks"] h3');
+  if (tasksHeader) tasksHeader.innerHTML = `<i class="fas fa-tasks"></i> ${t('tasksHeader')}`;
+  const vocabHeader = document.querySelector('[data-panel="vocab"] h3');
+  if (vocabHeader) vocabHeader.innerHTML = `<i class="fas fa-language"></i> ${t('vocabHeader')}`;
+  const flashcardsHeader = document.querySelector('[data-panel="flashcards"] h3');
+  if (flashcardsHeader) flashcardsHeader.innerHTML = `<i class="fas fa-layer-group"></i> ${t('flashcardsHeader')}`;
+
+  // Ссылки на ресурсы
+  const pdfLink = document.querySelector('.resource-link.pdf');
+  if (pdfLink) pdfLink.innerHTML = `<i class="fas fa-file-pdf"></i> ${t('downloadPdf')}`;
+  const miroLink = document.querySelector('.resource-link.miro');
+  if (miroLink) miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
+
+  // Лейблы переключателей (если нужны)
+  const toggleLiveLabel = document.querySelector('label[for="toggle-live"]');
+  if (toggleLiveLabel) toggleLiveLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Ejercicios en vivo' : 'Живые задания');
+  const toggleHighlightLabel = document.querySelector('label[for="toggle-highlight"]');
+  if (toggleHighlightLabel) toggleHighlightLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Resaltado' : 'Подсветка');
+  const toggleTransLabel = document.querySelector('label[for="toggle-translations"]');
+  if (toggleTransLabel) toggleTransLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Traducciones' : 'Переводы');
+}
+
 function renderSong(song) {
   const titleEl = $('song-title');
   if (titleEl) titleEl.textContent = safeText(song.title);
@@ -161,15 +227,11 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
-  
-  // НОВОЕ: рендерим грамматические правила
-  renderGrammarRules(song.grammarRules);
 
   liveTasks = song.liveTasks || [];
   completedLiveTasks.clear();
 
   const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
-  console.log('🔍 Найденное задание flashcards:', flashcardTask);
   renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
   renderBadges(song);
 
@@ -182,7 +244,7 @@ function renderSong(song) {
       pdfLink.href = song.pdf;
       pdfLink.className = 'resource-link pdf';
       pdfLink.target = '_blank';
-      pdfLink.innerHTML = '<i class="fas fa-file-pdf"></i> Скачать PDF (материалы)';
+      pdfLink.innerHTML = `<i class="fas fa-file-pdf"></i> ${t('downloadPdf')}`;
       resourcesContainer.appendChild(pdfLink);
     }
     if (song.miro && song.miro.trim() !== '') {
@@ -190,7 +252,7 @@ function renderSong(song) {
       miroLink.href = song.miro;
       miroLink.className = 'resource-link miro';
       miroLink.target = '_blank';
-      miroLink.innerHTML = '<i class="fab fa-miro"></i> Доска Miro';
+      miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
       resourcesContainer.appendChild(miroLink);
     }
   }
@@ -200,6 +262,7 @@ function renderSong(song) {
 
   hideLoader();
   setupTabs();
+  applyInterfaceLanguage(); // <-- применяем перевод интерфейса
   if (song.youtubeId) initPlayerPostMessage();
 }
 
@@ -225,7 +288,7 @@ function renderLyrics(lyrics) {
   const container = $('lyrics-content');
   if (!container) return;
   if (!lyrics || !lyrics.length) {
-    container.innerHTML = '<p class="muted">Текст пока не добавлен</p>';
+    container.innerHTML = `<p class="muted">${t('noLyrics')}</p>`;
     return;
   }
   let html = '';
@@ -245,31 +308,10 @@ function renderVocabulary(vocab) {
   const container = $('vocab-content');
   if (!container) return;
   if (!vocab || !vocab.length) {
-    container.innerHTML = '<p class="muted">Лексика пока не добавлена</p>';
+    container.innerHTML = `<p class="muted">${t('noVocab')}</p>`;
     return;
   }
   container.innerHTML = vocab.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
-}
-
-// ===== НОВАЯ ФУНКЦИЯ: отображение грамматических правил =====
-function renderGrammarRules(rules) {
-  const container = document.getElementById('grammar-rules-content');
-  if (!container) return;
-  
-  if (!rules || rules.trim() === '') {
-    container.innerHTML = '<p class="muted">Грамматические правила для этой песни пока не добавлены.</p>';
-    return;
-  }
-  
-  // Разбиваем текст на абзацы для лучшего форматирования
-  const paragraphs = rules.split('\n').filter(p => p.trim() !== '');
-  
-  let html = '';
-  paragraphs.forEach(p => {
-    html += `<p>${escapeHtml(p)}</p>`;
-  });
-  
-  container.innerHTML = html;
 }
 
 function renderBadges(song) {
@@ -285,72 +327,41 @@ function renderTasks(tasks) {
   const container = $('tasks-container');
   if (!container) return;
   container.innerHTML = '';
-
   if (!tasks || !tasks.length) {
-    container.innerHTML = '<p class="muted">Заданий нет</p>';
+    container.innerHTML = `<p class="muted">${t('noTasks')}</p>`;
     return;
   }
-
-  const listDiv = document.createElement('div');
-  listDiv.className = 'tasks-list';
-
   tasks.forEach((task, index) => {
-    if (task.type === 'flashcards') return; // flashcards обрабатываются отдельно
-
-    const card = document.createElement('div');
-    card.className = 'task-card';
-
-    // Верхняя часть с заголовком и типом
-    const top = document.createElement('div');
-    top.className = 'task-top';
-
-    const title = document.createElement('h4');
-    title.className = 'task-title';
-    title.textContent = safeText(task.title) || `Задание ${index + 1}`;
-
-    const typeSpan = document.createElement('span');
-    typeSpan.className = 'task-type';
-    typeSpan.textContent = task.type || 'задание';
-
-    top.appendChild(title);
-    top.appendChild(typeSpan);
-    card.appendChild(top);
-
-    // Инструкция, если есть
-    if (task.instruction && (task.instruction.ru || task.instruction.es)) {
+    if (task.type === 'flashcards') return;
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'task-block';
+    const header = document.createElement('div');
+    header.className = 'task-header';
+    header.innerHTML = `<h3>${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3><span class="task-type-badge">${task.type || 'задание'}</span>`;
+    taskDiv.appendChild(header);
+    if (task.instruction) {
       const instr = document.createElement('div');
       instr.className = 'task-instruction';
-      instr.innerHTML = `<i class="fas fa-info-circle"></i> ${escapeHtml(safeText(task.instruction))}`;
-      card.appendChild(instr);
+      instr.innerHTML = `<i class="fas fa-info-circle"></i> ${safeText(task.instruction)}`;
+      taskDiv.appendChild(instr);
     }
-
-    // Тело задания
-    const body = document.createElement('div');
-    body.className = 'task-body';
-
-    if (task.type === 'gapfill') renderGapFill(body, task);
-    else if (task.type === 'quiz') renderQuiz(body, task);
-    else if (task.type === 'match') renderMatchTask(body, task);
-    else if (task.type === 'grammar') renderGrammarTask(body, task);
-    else renderDefault(body, task);
-
-    card.appendChild(body);
-    listDiv.appendChild(card);
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'task-content';
+    if (task.type === 'gapfill') renderGapFill(contentDiv, task);
+    else if (task.type === 'quiz') renderQuiz(contentDiv, task);
+    else if (task.type === 'match') renderMatchTask(contentDiv, task);
+    else if (task.type === 'grammar') renderGrammarTask(contentDiv, task);
+    else renderDefault(contentDiv, task);
+    taskDiv.appendChild(contentDiv);
+    container.appendChild(taskDiv);
   });
-
-  container.appendChild(listDiv);
 }
 
 function renderDefault(container, task) {
-  if (task.content) {
-    const p = document.createElement('p');
-    p.textContent = task.content;
-    container.appendChild(p);
-  }
-  if (task.wordBank && task.wordBank.length) {
-    const bankDiv = document.createElement('div');
-    bankDiv.className = 'word-bank';
-    bankDiv.innerHTML = '<strong>Слова:</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+  if (task.content) { const p = document.createElement('p'); p.textContent = task.content; container.appendChild(p); }
+  if (task.wordBank) {
+    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
+    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
     container.appendChild(bankDiv);
   }
 }
@@ -359,7 +370,7 @@ function renderGrammarTask(container, task) {
   if (task.grammarRules) {
     const rulesDiv = document.createElement('div');
     rulesDiv.className = 'grammar-rules';
-    rulesDiv.innerHTML = `<strong>📘 Правило:</strong> ${escapeHtml(task.grammarRules)}`;
+    rulesDiv.innerHTML = `<strong>📘 ${currentLang === 'es' ? 'Regla:' : 'Правило:'}</strong> ${escapeHtml(task.grammarRules)}`;
     container.appendChild(rulesDiv);
   }
   if (task.content) {
@@ -368,133 +379,83 @@ function renderGrammarTask(container, task) {
     container.appendChild(p);
   }
   if (task.wordBank && task.wordBank.length) {
-    const bankDiv = document.createElement('div');
-    bankDiv.className = 'word-bank';
-    bankDiv.innerHTML = '<strong>Слова:</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
+    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
     container.appendChild(bankDiv);
   }
 }
 
 function renderGapFill(container, task) {
   if (!task.text) return;
-
   const parts = task.text.split('___');
   const answers = task.answers || [];
   const options = task.options || [];
-
-  const form = document.createElement('div');
-  form.className = 'gap-fill-form';
-
+  const form = document.createElement('div'); form.className = 'gap-fill-form';
   parts.forEach((part, idx) => {
-    if (part) {
-      const span = document.createElement('span');
-      span.textContent = part;
-      form.appendChild(span);
-    }
+    if (part) { const span = document.createElement('span'); span.textContent = part; form.appendChild(span); }
     if (idx < parts.length - 1) {
       if (options[idx] && Array.isArray(options[idx])) {
-        const select = document.createElement('select');
-        select.className = 'gap-select';
-        const def = document.createElement('option');
-        def.textContent = '...';
-        select.appendChild(def);
-        options[idx].forEach(opt => {
-          const o = document.createElement('option');
-          o.value = opt;
-          o.textContent = opt;
-          select.appendChild(o);
-        });
+        const select = document.createElement('select'); select.className = 'gap-select';
+        const def = document.createElement('option'); def.textContent = '...'; select.appendChild(def);
+        options[idx].forEach(opt => { const o = document.createElement('option'); o.value = opt; o.textContent = opt; select.appendChild(o); });
         form.appendChild(select);
       } else {
-        const input = document.createElement('input');
-        input.className = 'gap-input';
-        input.placeholder = '...';
-        form.appendChild(input);
+        const input = document.createElement('input'); input.className = 'gap-input'; input.placeholder = '...'; form.appendChild(input);
       }
     }
   });
-
   container.appendChild(form);
-
   if (answers.length) {
-    const actions = document.createElement('div');
-    actions.className = 'task-actions';
-
-    const btn = document.createElement('button');
-    btn.className = 'task-btn primary';
-    btn.textContent = 'Проверить';
-
-    const res = document.createElement('div');
-    res.className = 'task-answer';
-    res.style.display = 'none';
-
+    const btn = document.createElement('button'); btn.className = 'check-btn'; btn.textContent = t('checkAnswer');
+    const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
     btn.onclick = () => {
       const inputs = form.querySelectorAll('.gap-input, .gap-select');
       let corr = 0;
       inputs.forEach((inp, i) => {
-        if (inp.value.trim().toLowerCase() === answers[i].toLowerCase()) {
-          inp.style.borderColor = 'green';
-          corr++;
-        } else {
-          inp.style.borderColor = 'red';
-        }
+        if (inp.value.trim().toLowerCase() === answers[i].toLowerCase()) { inp.style.borderColor = 'green'; corr++; } else { inp.style.borderColor = 'red'; }
       });
-      res.textContent = corr === answers.length ? '✅ Верно!' : `❌ Правильных: ${corr} из ${answers.length}`;
+      if (corr === answers.length) {
+        res.textContent = t('correct');
+        res.className = `result-message correct`;
+      } else {
+        res.textContent = t('incorrectWithAnswer', { answer: answers.join(', ') });
+        res.className = `result-message incorrect`;
+      }
       res.style.display = 'block';
     };
-
-    actions.appendChild(btn);
-    actions.appendChild(res);
-    container.appendChild(actions);
+    container.appendChild(btn); container.appendChild(res);
   }
 }
 
 function renderQuiz(container, task) {
   if (!task.questions) return;
-
   const form = document.createElement('div');
-
   task.questions.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'quiz-question';
+    const div = document.createElement('div'); div.className = 'quiz-question';
     div.innerHTML = `<p><strong>${q.question}</strong></p>`;
-
     q.options.forEach((opt, oi) => {
-      const lbl = document.createElement('label');
-      lbl.className = 'quiz-option';
+      const lbl = document.createElement('label'); lbl.className = 'quiz-option';
       lbl.innerHTML = `<input type="radio" name="q_${i}" value="${oi}"> ${opt}`;
       div.appendChild(lbl);
     });
-
     form.appendChild(div);
   });
-
   container.appendChild(form);
-
-  const actions = document.createElement('div');
-  actions.className = 'task-actions';
-
-  const btn = document.createElement('button');
-  btn.className = 'task-btn primary';
-  btn.textContent = 'Проверить';
-
-  const res = document.createElement('div');
-  res.className = 'task-answer';
-  res.style.display = 'none';
-
+  const btn = document.createElement('button'); btn.className = 'check-btn'; btn.textContent = t('checkAnswer');
+  const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
   btn.onclick = () => {
     let corr = 0;
-    task.questions.forEach((q, i) => {
-      const sel = document.querySelector(`input[name="q_${i}"]:checked`);
-      if (sel && +sel.value === q.correct) corr++;
-    });
-    res.textContent = corr === task.questions.length ? '✅ Верно!' : `❌ Правильных: ${corr} из ${task.questions.length}`;
+    task.questions.forEach((q, i) => { const sel = document.querySelector(`input[name="q_${i}"]:checked`); if (sel && +sel.value === q.correct) corr++; });
+    if (corr === task.questions.length) {
+      res.textContent = t('correct');
+      res.className = `result-message correct`;
+    } else {
+      res.textContent = t('incorrect');
+      res.className = `result-message incorrect`;
+    }
     res.style.display = 'block';
   };
-
-  actions.appendChild(btn);
-  actions.appendChild(res);
-  container.appendChild(actions);
+  container.appendChild(btn); container.appendChild(res);
 }
 
 function renderMatchTask(container, task) {
@@ -580,7 +541,6 @@ function renderMatchTask(container, task) {
   container.appendChild(grid);
 }
 
-// ===== Функция для карточек =====
 function renderFlashcards(flashcards) {
   console.log('📇 renderFlashcards вызван, получено карточек:', flashcards ? flashcards.length : 0);
   const container = $('flashcard-wrapper');
@@ -592,22 +552,12 @@ function renderFlashcards(flashcards) {
   const progressText = $('flashcards-progress-text');
   const resetBtn = $('flashcards-reset');
 
-  let actionsContainer = document.querySelector('.flashcards-actions');
-  if (!actionsContainer) {
-    const flashcardsContainer = document.querySelector('.flashcards-container');
-    if (flashcardsContainer) {
-      actionsContainer = document.createElement('div');
-      actionsContainer.className = 'flashcards-actions';
-      flashcardsContainer.appendChild(actionsContainer);
-    }
-  }
-
-  const oldLearnBtn = document.getElementById('dynamic-learn-btn');
-  if (oldLearnBtn) oldLearnBtn.remove();
-
   if (!flashcards || !flashcards.length) {
     console.log('❌ Карточек нет, показываем заглушку');
-    if (emptyDiv) emptyDiv.style.display = 'block';
+    if (emptyDiv) {
+      emptyDiv.style.display = 'block';
+      emptyDiv.innerHTML = `<p class="muted">${t('noFlashcards')}</p>`;
+    }
     if (container) container.innerHTML = '';
     if (counter) counter.textContent = '0/0';
     if (progressFill) progressFill.style.width = '0%';
@@ -622,18 +572,6 @@ function renderFlashcards(flashcards) {
 
   let currentIndex = 0;
   let learned = new Array(flashcards.length).fill(false);
-
-  const learnBtn = document.createElement('button');
-  learnBtn.id = 'dynamic-learn-btn';
-  learnBtn.className = 'flashcards-btn learn-toggle';
-  learnBtn.style.minWidth = '120px';
-  if (actionsContainer) {
-    if (resetBtn) {
-      actionsContainer.insertBefore(learnBtn, resetBtn);
-    } else {
-      actionsContainer.appendChild(learnBtn);
-    }
-  }
 
   function updateProgress() {
     if (!progressFill || !progressText) return;
@@ -653,28 +591,33 @@ function renderFlashcards(flashcards) {
       <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}">
         <div class="flashcard-front">
           <div class="word">${escapeHtml(card.es || card.word || '')}</div>
-          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
           ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
-          ${isLearned ? '<div class="learned-stamp"><i class="fas fa-check-circle"></i> Выучено</div>' : ''}
+          ${isLearned ? `<div class="learned-stamp"><i class="fas fa-check-circle"></i> ${t('learned')}</div>` : ''}
         </div>
         <div class="flashcard-back">
           <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
           ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
         </div>
       </div>
-    `;
+      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 10px;">
+        <button class="flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}" style="min-width: 120px;">
+          <i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i>
+          ${isLearned ? t('notLearned') : t('know')}
+        </button>
+      </div>`;
 
     const flashcardEl = container.querySelector('.flashcard');
     if (flashcardEl) {
       flashcardEl.onclick = function (e) {
+        if (e.target.closest('button')) return;
         this.classList.toggle('flipped');
       };
     }
 
-    if (learnBtn) {
-      learnBtn.innerHTML = `<i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i> ${isLearned ? 'Не выучено' : '✓ Знаю'}`;
-      learnBtn.className = `flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}`;
-      learnBtn.onclick = (e) => {
+    const toggleBtn = container.querySelector('.learn-toggle');
+    if (toggleBtn) {
+      toggleBtn.onclick = (e) => {
         e.stopPropagation();
         learned[currentIndex] = !learned[currentIndex];
         updateProgress();
@@ -739,21 +682,21 @@ function showLiveTaskPopup(task) {
   let content = '';
   if (task.type === 'word-catch') {
     content = `
-      <h3>Какое слово ты услышал?</h3>
+      <h3>${t('wordCatchQuestion')}</h3>
       <div class="live-options">
         ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
       </div>
     `;
   } else if (task.type === 'translate') {
     content = `
-      <h3>Перевод слова "${task.word}":</h3>
+      <h3>${t('translateQuestion', { word: task.word })}</h3>
       <div class="live-options">
         ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
       </div>
     `;
   } else if (task.type === 'gapfill') {
     content = `
-      <h3>Вставь пропущенное слово:</h3>
+      <h3>${t('gapfillQuestion')}</h3>
       <p class="gap-line">${task.line.replace('___', '______')}</p>
       <div class="live-options">
         ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
@@ -764,7 +707,7 @@ function showLiveTaskPopup(task) {
   popup.innerHTML = `
     <div class="live-task-content">
       ${content}
-      <button class="live-close-btn">✕</button>
+      <button class="live-close-btn">${t('close')}</button>
     </div>
   `;
 
@@ -790,14 +733,14 @@ function showLiveTaskPopup(task) {
 function showFeedback(isCorrect, correctAnswer) {
   const feedback = document.createElement('div');
   feedback.className = `live-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-  feedback.textContent = isCorrect ? '✅ Верно!' : `❌ Неверно. Правильный ответ: ${correctAnswer}`;
+  feedback.textContent = isCorrect ? t('correct') : t('incorrectWithAnswer', { answer: correctAnswer });
   document.body.appendChild(feedback);
   setTimeout(() => feedback.remove(), 2000);
 }
 
 function toggleLiveTasks(enable) {
   liveTasksEnabled = enable;
-  showToast(enable ? 'Живые задания включены' : 'Живые задания отключены');
+  showToast(enable ? t('liveTasksOn') : t('liveTasksOff'));
 }
 
 function toggleLyricsHighlight(enable) {
@@ -805,7 +748,7 @@ function toggleLyricsHighlight(enable) {
   if (!enable) {
     document.querySelectorAll('.lyric-line.active').forEach(el => el.classList.remove('active'));
   }
-  showToast(enable ? 'Подсветка текста включена' : 'Подсветка текста отключена');
+  showToast(enable ? t('highlightOn') : t('highlightOff'));
 }
 
 function toggleTranslations(show) {
@@ -814,7 +757,7 @@ function toggleTranslations(show) {
   transEls.forEach(el => {
     el.style.display = show ? 'block' : 'none';
   });
-  showToast(show ? 'Переводы показаны' : 'Переводы скрыты');
+  showToast(show ? t('translationsOn') : t('translationsOff'));
 }
 
 // ===== YouTube =====
@@ -884,4 +827,3 @@ function makeLyricsClickable() {
     };
   });
 }
-
