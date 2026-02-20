@@ -36,7 +36,13 @@ const i18nSong = {
     wordCatchQuestion: "Какое слово ты услышал?",
     translateQuestion: "Перевод слова \"{word}\":",
     gapfillQuestion: "Вставь пропущенное слово:",
-    close: "✕"
+    close: "✕",
+    // Новые ключи
+    grammarRule: "Грамматическое правило",
+    grammar: "Грамматика",
+    liveTasks: "Живые задания",
+    highlight: "Подсветка",
+    translations: "Переводы"
   },
   es: {
     tabLyrics: "Letra",
@@ -71,7 +77,13 @@ const i18nSong = {
     wordCatchQuestion: "¿Qué palabra escuchaste?",
     translateQuestion: "Traducción de \"{word}\":",
     gapfillQuestion: "Completa la palabra que falta:",
-    close: "✕"
+    close: "✕",
+    // Новые ключи
+    grammarRule: "Regla gramatical",
+    grammar: "Gramática",
+    liveTasks: "Ejercicios en vivo",
+    highlight: "Resaltado",
+    translations: "Traducciones"
   }
 };
 
@@ -209,13 +221,35 @@ function applyInterfaceLanguage() {
   const miroLink = document.querySelector('.resource-link.miro');
   if (miroLink) miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
 
-  // Лейблы переключателей (если нужны)
+  // Лейблы переключателей (Живые задания, Подсветка, Переводы)
   const toggleLiveLabel = document.querySelector('label[for="toggle-live"]');
-  if (toggleLiveLabel) toggleLiveLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Ejercicios en vivo' : 'Живые задания');
+  if (toggleLiveLabel) {
+    // Сохраняем чекбокс, меняем только текст
+    const checkbox = toggleLiveLabel.querySelector('input');
+    if (checkbox) {
+      toggleLiveLabel.innerHTML = '';
+      toggleLiveLabel.appendChild(checkbox);
+      toggleLiveLabel.appendChild(document.createTextNode(' ' + t('liveTasks')));
+    }
+  }
   const toggleHighlightLabel = document.querySelector('label[for="toggle-highlight"]');
-  if (toggleHighlightLabel) toggleHighlightLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Resaltado' : 'Подсветка');
+  if (toggleHighlightLabel) {
+    const checkbox = toggleHighlightLabel.querySelector('input');
+    if (checkbox) {
+      toggleHighlightLabel.innerHTML = '';
+      toggleHighlightLabel.appendChild(checkbox);
+      toggleHighlightLabel.appendChild(document.createTextNode(' ' + t('highlight')));
+    }
+  }
   const toggleTransLabel = document.querySelector('label[for="toggle-translations"]');
-  if (toggleTransLabel) toggleTransLabel.childNodes[1].textContent = ' ' + (currentLang === 'es' ? 'Traducciones' : 'Переводы');
+  if (toggleTransLabel) {
+    const checkbox = toggleTransLabel.querySelector('input');
+    if (checkbox) {
+      toggleTransLabel.innerHTML = '';
+      toggleTransLabel.appendChild(checkbox);
+      toggleTransLabel.appendChild(document.createTextNode(' ' + t('translations')));
+    }
+  }
 }
 
 function renderSong(song) {
@@ -370,7 +404,7 @@ function renderGrammarTask(container, task) {
   if (task.grammarRules) {
     const rulesDiv = document.createElement('div');
     rulesDiv.className = 'grammar-rules';
-    rulesDiv.innerHTML = `<strong>📘 ${currentLang === 'es' ? 'Regla:' : 'Правило:'}</strong> ${escapeHtml(task.grammarRules)}`;
+    rulesDiv.innerHTML = `<strong>📘 ${t('grammarRule')}:</strong> ${escapeHtml(task.grammarRules)}`;
     container.appendChild(rulesDiv);
   }
   if (task.content) {
