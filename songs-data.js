@@ -1,10 +1,10 @@
 // Автосгенерировано из admin.html
 const songsDataFromExternal = [
   {
-    "id": 1,
+    "id": 9,
     "title": {
-      "ru": "мне нравишься ты",
-      "es": "Me gustas tú"
+      "ru": "Me Gustas Tú",
+      "es": "проверка Me Gustas Tú"
     },
     "artist": "Manu Chao",
     "youtubeId": "rs6Y4kZ8qtw",
@@ -13,46 +13,50 @@ const songsDataFromExternal = [
       "A1"
     ],
     "themes": [
-      "naturaleza",
-      "tiempo atmosférico"
+      "tiempo atmosférico",
+      "amor"
     ],
     "grammar": [
       "gustar"
     ],
     "vocabulary": [
+      "el corazón",
+      "la escucha",
+      "la noche",
+      "el avión",
+      "el viento",
+      "la mañana",
+      "la mar",
+      "la moto",
+      "la lluvia",
+      "la montaña",
+      "el minuto",
+      "la cena",
+      "la vecina",
+      "la cocina",
+      "la guitarra",
+      "el fuego",
+      "la castaña",
+      "el oro",
       "viajar",
       "soñar",
+      "hacer",
       "correr",
       "volver",
-      "moto",
-      "viento",
-      "lluvia",
-      "montaña",
-      "noche",
-      "cena",
-      "vecino",
-      "cocina",
-      "guitarra",
-      "canela",
-      "fuego",
-      "avión",
-      "mañana",
-      "¿qué voy a hacer?"
+      "camelar",
+      "menear",
+      "brillar"
     ],
     "culture": {
       "tags": [
-        "holidays",
-        "traditions",
         "geography",
-        "cities",
-        "food",
-        "music"
+        "cities"
       ],
       "items": [
         "La Habana",
         "Guatemala",
         "La Coruña",
-        "Malasaña (район в Мадриде)"
+        "Malasaña (un barrio)"
       ]
     },
     "restrictions": {
@@ -60,42 +64,323 @@ const songsDataFromExternal = [
       "containsOtherLanguages": true,
       "profanity": "none",
       "sensitiveTopics": [],
-      "note": "Есть части на французском языке"
+      "note": "есть французский"
     },
     "lyrics": [
       {
-        "time": "0:18",
-        "text": "¿Qué horas son, mi corazón?"
+        "time": "0:00",
+        "text": "¿Qué horas son? Mi corazón,",
+        "translation": "Который час? Моё сердце,"
+      },
+      {
+        "time": "0:04",
+        "text": "te lo dije bien clarito.",
+        "translation": "я сказал тебе это очень ясно."
+      },
+      {
+        "time": "0:06",
+        "text": "Permanece a la escucha.",
+        "translation": "Оставайся на связи."
+      },
+      {
+        "time": "0:11",
+        "text": "Permanece a la escucha.",
+        "translation": "Оставайся на связи."
+      },
+      {
+        "time": "0:13",
+        "text": "12 de la noche en La Habana, Cuba.",
+        "translation": "12 ночи в Гаване, Куба."
+      },
+      {
+        "time": "0:17",
+        "text": "11 de la noche en San Salvador, El Salvador.",
+        "translation": "11 ночи в Сан-Сальвадоре, Сальвадор."
       },
       {
         "time": "0:21",
-        "text": "Te lo dije bien clarito"
+        "text": "11 de la noche en Managua, Nicaragua.",
+        "translation": "11 ночи в Манагуа, Никарагуа."
       },
       {
-        "time": "0:34",
-        "text": "Permanece a la escucha"
+        "time": "0:24",
+        "text": "Me gustan los aviones, me gustas tú.",
+        "translation": "Мне нравятся самолёты, мне нравишься ты."
+      },
+      {
+        "time": "0:26",
+        "text": "Me gusta viajar, me gustas tú.",
+        "translation": "Мне нравится путешествовать, мне нравишься ты."
+      },
+      {
+        "time": "0:30",
+        "text": "Me gusta la mañana, me gustas tú.",
+        "translation": "Мне нравится утро, мне нравишься ты."
+      },
+      {
+        "time": "0:32",
+        "text": "Me gusta el viento, me gustas tú.",
+        "translation": "Мне нравится ветер, мне нравишься ты."
+      },
+      {
+        "time": "0:36",
+        "text": "Me gusta soñar, me gustas tú.",
+        "translation": "Мне нравится мечтать, мне нравишься ты."
+      },
+      {
+        "time": "0:39",
+        "text": "Me gusta la mar, me gustas tú.",
+        "translation": "Мне нравится море, мне нравишься ты."
+      },
+      {
+        "time": "0:44",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "0:48",
+        "text": "¿Qué voy a hacer? Je ne sais plus. ¿Qué voy a hacer? Je suis perdu.",
+        "translation": "Что мне делать? Я больше не знаю. Что мне делать? Я потерян."
+      },
+      {
+        "time": "0:50",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "0:53",
+        "text": "Me gusta la moto, me gustas tú.",
+        "translation": "Мне нравится мотоцикл, мне нравишься ты."
+      },
+      {
+        "time": "0:56",
+        "text": "Me gusta correr, me gustas tú.",
+        "translation": "Мне нравится бегать, мне нравишься ты."
+      },
+      {
+        "time": "1:00",
+        "text": "Me gusta la lluvia, me gustas tú.",
+        "translation": "Мне нравится дождь, мне нравишься ты."
+      },
+      {
+        "time": "1:02",
+        "text": "Me gusta volver, me gustas tú.",
+        "translation": "Мне нравится возвращаться, мне нравишься ты."
+      },
+      {
+        "time": "1:05",
+        "text": "Me gusta marihuana, me gustas tú.",
+        "translation": "Мне нравится марихуана, мне нравишься ты."
+      },
+      {
+        "time": "1:08",
+        "text": "Me gusta colombiana, me gustas tú.",
+        "translation": "Мне нравится колумбийка, мне нравишься ты."
+      },
+      {
+        "time": "1:11",
+        "text": "Me gusta la montaña, me gustas tú.",
+        "translation": "Мне нравятся горы, мне нравишься ты."
+      },
+      {
+        "time": "1:15",
+        "text": "Me gusta la noche, me gustas tú.",
+        "translation": "Мне нравится ночь, мне нравишься ты."
+      },
+      {
+        "time": "1:19",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "1:21",
+        "text": "¿Qué voy a hacer? Je ne sais plus. ¿Qué voy a hacer? Je suis perdu.",
+        "translation": "Что мне делать? Я больше не знаю. Что мне делать? Я потерян."
+      },
+      {
+        "time": "1:25",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "1:32",
+        "text": "12 y un minuto.",
+        "translation": "12 часов и одна минута."
+      },
+      {
+        "time": "1:36",
+        "text": "Me gusta la cena, me gustas tú.",
+        "translation": "Мне нравится ужин, мне нравишься ты."
+      },
+      {
+        "time": "1:39",
+        "text": "Me gusta la vecina, me gustas tú.",
+        "translation": "Мне нравится соседка, мне нравишься ты."
+      },
+      {
+        "time": "1:43",
+        "text": "Me gusta su cocina, me gustas tú.",
+        "translation": "Мне нравится её кухня, мне нравишься ты."
+      },
+      {
+        "time": "1:46",
+        "text": "Me gusta camelar, me gustas tú.",
+        "translation": "Мне нравится ухаживать, мне нравишься ты."
+      },
+      {
+        "time": "1:49",
+        "text": "Me gusta la guitarra, me gustas tú.",
+        "translation": "Мне нравится гитара, мне нравишься ты."
+      },
+      {
+        "time": "1:53",
+        "text": "Me gusta el reggae, me gustas tú.",
+        "translation": "Мне нравится регги, мне нравишься ты."
+      },
+      {
+        "time": "1:56",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "1:59",
+        "text": "¿Qué voy a hacer? Je ne sais plus. ¿Qué voy a hacer? Je suis perdu.",
+        "translation": "Что мне делать? Я больше не знаю. Что мне делать? Я потерян."
+      },
+      {
+        "time": "2:01",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "2:04",
+        "text": "Me gusta el fuego, me gustas tú.",
+        "translation": "Мне нравится огонь, мне нравишься ты."
+      },
+      {
+        "time": "2:07",
+        "text": "Me gusta menear, me gustas tú.",
+        "translation": "Мне нравится двигаться, мне нравишься ты."
+      },
+      {
+        "time": "2:11",
+        "text": "Me gusta La Coruña, me gustas tú.",
+        "translation": "Мне нравится Ла-Корунья, мне нравишься ты."
+      },
+      {
+        "time": "2:14",
+        "text": "Me gusta Malasaña, me gustas tú.",
+        "translation": "Мне нравится Маласанья, мне нравишься ты."
+      },
+      {
+        "time": "2:17",
+        "text": "Me gusta la castaña, me gustas tú.",
+        "translation": "Мне нравится каштан, мне нравишься ты."
+      },
+      {
+        "time": "2:20",
+        "text": "Me gusta Guatemala, me gustas tú.",
+        "translation": "Мне нравится Гватемала, мне нравишься ты."
+      },
+      {
+        "time": "2:24",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "2:32",
+        "text": "¿Qué voy a hacer? Je ne sais plus. ¿Qué voy a hacer? Je suis perdu.",
+        "translation": "Что мне делать? Я больше не знаю. Что мне делать? Я потерян."
+      },
+      {
+        "time": "2:40",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "2:44",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "2:49",
+        "text": "Qué voy a hacer? Je ne sais plus.",
+        "translation": "Что мне делать? Я больше не знаю."
+      },
+      {
+        "time": "2:51",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "2:57",
+        "text": "¿Qué voy a hacer? Je ne sais pas.",
+        "translation": "Что мне делать? Я не знаю."
+      },
+      {
+        "time": "3:00",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "3:02",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "3:08",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "3:13",
+        "text": "¿Qué horas son, mi corazón?",
+        "translation": "Который час, моё сердце?"
+      },
+      {
+        "time": "3:17",
+        "text": "4 de la mañana.",
+        "translation": "4 часа утра."
+      },
+      {
+        "time": "3:48",
+        "text": "Radio Reloj.",
+        "translation": "Радио «Reloj»."
+      },
+      {
+        "time": "3:52",
+        "text": "5 de la mañana.",
+        "translation": "5 часов утра."
+      },
+      {
+        "time": "3:55",
+        "text": "No todo lo que es oro brilla.",
+        "translation": "Не всё то золото, что блестит."
       }
     ],
-    "pdf": "",
+    "pdf": "https://drive.google.com/uc?export=download&id=1a9M8yQRxZqFaUPGS1kTDeUxORzc7wCYN",
+    "miro": "https://miro.com/app/board/uXjVLWKD0nM=/?share_link_id=492300152690",
     "analysis": [],
     "tasks": [
       {
         "title": {
-          "ru": "Аудирование",
-          "es": "audirovanie"
+          "ru": "Глагол gustar",
+          "es": "Gustar"
         },
         "instruction": {
-          "ru": "послушай первый куплет, выбери три слова на букву а",
-          "es": "если нет таких то спляши"
+          "ru": "",
+          "es": ""
         },
-        "type": "flashcards",
-        "flashcards": [
+        "type": "quiz",
+        "questions": [
           {
-            "es": "casa",
-            "ru": "дом",
-            "example": "estoy casa",
-            "example_translation": "я дома",
-            "transcription": ""
+            "question": "Elige la opción correcta:",
+            "options": [
+              "me gusta viajar",
+              "me gustan viajar",
+              "me gusto viajar"
+            ],
+            "correct": 0
           }
         ]
       },
@@ -108,779 +393,311 @@ const songsDataFromExternal = [
           "ru": "",
           "es": ""
         },
-        "type": "listening",
-        "content": "",
-        "wordBank": [],
-        "answer": ""
-      }
-    ]
-  },
-  {
-    "id": 2,
-    "title": {
-      "ru": "танцуем",
-      "es": "Bailando"
-    },
-    "artist": "Enrique Iglesias",
-    "youtubeId": "yv-DcNTOMp4",
-    "cover": "https://img.youtube.com/vi/yv-DcNTOMp4/mqdefault.jpg",
-    "level": [
-      "A2"
-    ],
-    "themes": [
-      "amor",
-      "baile",
-      "cuerpo"
-    ],
-    "grammar": [
-      "Герундий",
-      "использование se",
-      "ir + герундий"
-    ],
-    "vocabulary": [
-      "mirar",
-      "respiración",
-      "corazón",
-      "palpitar",
-      "silencio",
-      "palabra",
-      "noche",
-      "sol",
-      "bailar",
-      "cuerpo",
-      "vacío",
-      "subir",
-      "bajar",
-      "fuego",
-      "dentro",
-      "enloquecer",
-      "saturar",
-      "física",
-      "química",
-      "anatomía",
-      "cerveza",
-      "tequila",
-      "boca",
-      "melodía",
-      "color",
-      "fantasía",
-      "filosofía",
-      "cabeza",
-      "querer",
-      "estar",
-      "vivir",
-      "tener",
-      "besar",
-      "contigo",
-      "loco",
-      "notar",
-      "llevar",
-      "dimensión",
-      "latido",
-      "acelerar",
-      "ironía",
-      "destino",
-      "poder",
-      "tocar",
-      "abrazar",
-      "sentir",
-      "magia",
-      "olor",
-      "amor",
-      "dolor"
-    ],
-    "culture": {
-      "tags": [
-        "holidays",
-        "music"
-      ],
-      "items": [
-        "не написали"
-      ]
-    },
-    "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": ""
-    },
-    "lyrics": [],
-    "analysis": [],
-    "tasks": []
-  },
-  {
-    "id": 3,
-    "title": {
-      "ru": "Дикий ангел",
-      "es": "Cambio Dolor"
-    },
-    "artist": "Natalia Oreiro",
-    "video": {
-      "provider": "kinescope",
-      "id": "https://kinescope.io/o9qTdoAV9zEvf2Pszmj9oh"
-    },
-    "cover": "",
-    "level": [
-      "A1"
-    ],
-    "themes": [],
-    "grammar": [],
-    "vocabulary": [
-      "Cambio",
-      "Dolor",
-      "Libertad",
-      "Sueños",
-      "Heridas",
-      "Miedo",
-      "Amor",
-      "Corazón",
-      "Vivir",
-      "Volver",
-      "Sentir",
-      "Locura",
-      "Alas",
-      "Difícil",
-      "Tropezar"
-    ],
-    "culture": {
-      "tags": [
-        "music"
-      ],
-      "items": []
-    },
-    "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": ""
-    },
-    "lyrics": [
-      {
-        "time": "",
-        "text": "Juraría que no sé bien lo que quiero",
-        "translation": ""
+        "type": "quiz",
+        "questions": [
+          {
+            "question": "Elige la opción correcta:",
+            "options": [
+              "me gusta los aviones",
+              "me gustan los aviones",
+              "me gusten los aviones"
+            ],
+            "correct": 1
+          }
+        ]
       },
-      {
-        "time": "",
-        "text": "pero sé que moriría",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "si me quedo en la mitad",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "por eso vuelo a otros senderos",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "para conocer el mundo de verdad",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "Aún no es tarde pero así me estoy sintiendo",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "y aparecen tantos miedos",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "que no me dejan pensar",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "y tengo sueños de amores nuevos",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "y me cuesta imaginar lo que vendrá.",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "Cambio dolor por libertad",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "cambio heridas por un sueño",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "que me ayude a continuar",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "cambio dolor.",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "Felicidad que la suerte sea suerte",
-        "translation": ""
-      },
-      {
-        "time": "",
-        "text": "y no algo que he de alcanzar…",
-        "translation": ""
-      }
-    ],
-    "pdf": "",
-    "analysis": [],
-    "tasks": [
-      {
-        "title": {
-          "ru": "хаха",
-          "es": ""
-        },
-        "instruction": {
-          "ru": "скажи куку",
-          "es": ""
-        },
-        "type": "speaking",
-        "content": "",
-        "wordBank": [],
-        "answer": ""
-      }
-    ],
-    "liveTasks": []
-  },
-  {
-    "id": 5,
-    "title": {
-      "ru": "Я прошу у Бога",
-      "es": "A Dios Le Pido"
-    },
-    "artist": "Juanes",
-    "youtubeId": "kMIaYXxLnUA",
-    "cover": "https://img.youtube.com/vi/kMIaYXxLnUA/mqdefault.jpg",
-    "level": [
-      "B1"
-    ],
-    "themes": [
-      "любовь",
-      "желания"
-    ],
-    "grammar": [
-      "presente de subjuntivo"
-    ],
-    "vocabulary": [
-      "el corazón",
-      "desperatrse",
-      "la luz",
-      "la mirada",
-      "pedir",
-      "el alma",
-      "descansar",
-      "amar",
-      "el hijo",
-      "quedarse",
-      "la voz",
-      "recordar",
-      "el cielo"
-    ],
-    "culture": {
-      "tags": [],
-      "items": [
-        "vos"
-      ]
-    },
-    "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": "\"vos\""
-    },
-    "lyrics": [
-      {
-        "time": "",
-        "text": "Que mis ojos se despierten"
-      },
-      {
-        "time": "",
-        "text": "Con la luz de tu mirada"
-      },
-      {
-        "time": "",
-        "text": "Yo, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi madre no se muera"
-      },
-      {
-        "time": "",
-        "text": "Y que mi padre me recuerde"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que te quedes a mi lado"
-      },
-      {
-        "time": "",
-        "text": "Y que más nunca te me vayas, mi vida"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi alma no descanse"
-      },
-      {
-        "time": "",
-        "text": "Cuando de amarte se trate, mi cielo"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Por los días que me quedan"
-      },
-      {
-        "time": "",
-        "text": "Y las noches que aún no llegan"
-      },
-      {
-        "time": "",
-        "text": "Yo, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Por los hijos de mis hijos"
-      },
-      {
-        "time": "",
-        "text": "Y los hijos de tus hijos"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi pueblo no derrame tanta sangre"
-      },
-      {
-        "time": "",
-        "text": "Y se levante mi gente"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi alma no descanse"
-      },
-      {
-        "time": "",
-        "text": "Cuando de amarte se trate, mi cielo"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida para darte"
-      },
-      {
-        "time": "",
-        "text": "Y mi corazón entero entregarte"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida para darte"
-      },
-      {
-        "time": "",
-        "text": "Y a tu lado para siempre yo quedarme"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida, yo a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mis ojos se despierten"
-      },
-      {
-        "time": "",
-        "text": "Con la luz de tu mirada"
-      },
-      {
-        "time": "",
-        "text": "Yo, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi madre no se muera"
-      },
-      {
-        "time": "",
-        "text": "Y que mi padre me recuerde"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que te quedes a mi lado"
-      },
-      {
-        "time": "",
-        "text": "Y que más nunca te me vayas, mi vida"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que mi alma no descanse"
-      },
-      {
-        "time": "",
-        "text": "Cuando de amarte se trate, mi cielo"
-      },
-      {
-        "time": "",
-        "text": "A Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida para darte"
-      },
-      {
-        "time": "",
-        "text": "Y mi corazón entero entregarte"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida para darte"
-      },
-      {
-        "time": "",
-        "text": "Y a tu lado para siempre yo quedarme"
-      },
-      {
-        "time": "",
-        "text": "Un segundo más de vida, yo, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días, a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días a Dios le pido"
-      },
-      {
-        "time": "",
-        "text": "Que si me muero, sea de amor"
-      },
-      {
-        "time": "",
-        "text": "Y si me enamoro, sea de vos"
-      },
-      {
-        "time": "",
-        "text": "Y que de tu voz, sea este corazón"
-      },
-      {
-        "time": "",
-        "text": "Todos los días, yo a Dios le pido"
-      }
-    ],
-    "analysis": [],
-    "tasks": []
-  },
-  {
-    "id": 6,
-    "title": {
-      "ru": "Мне жаль",
-      "es": "Lo siento"
-    },
-    "artist": "Beret",
-    "youtubeId": "9dN5HLKm_Ow",
-    "cover": "https://img.youtube.com/vi/9dN5HLKm_Ow/mqdefault.jpg",
-    "level": [
-      "A2"
-    ],
-    "themes": [],
-    "grammar": [],
-    "vocabulary": [],
-    "culture": {
-      "tags": [],
-      "items": [
-        "маша сходила на велики"
-      ]
-    },
-    "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": ""
-    },
-    "lyrics": [
-      {
-        "time": "",
-        "text": "МАША ПОЙДЕТ НА ВЕЛОСИПЕДЫ))) сходила"
-      }
-    ],
-    "pdf": "",
-    "analysis": [],
-    "tasks": [
       {
         "title": {
           "ru": "",
           "es": ""
         },
-        "type": "warm-up",
         "instruction": {
-          "ru": "Спляши",
-          "es": "гапка"
+          "ru": "",
+          "es": ""
         },
-        "content": "пример",
-        "wordBank": [
-          "мама",
-          "папа"
+        "type": "quiz",
+        "questions": [
+          {
+            "question": "Elige la opción correcta:",
+            "options": [
+              "me gusta tú",
+              "me gustan tú",
+              "me gustas tú"
+            ],
+            "correct": 2
+          }
         ]
       },
       {
         "title": {
-          "ru": "авав",
-          "es": "аыва"
+          "ru": "",
+          "es": "Me gusta ..."
         },
-        "type": "grammar",
         "instruction": {
-          "ru": "аываыв",
-          "es": "авывавы"
+          "ru": "Соедини два столбика",
+          "es": "Conecta dos columnas"
         },
-        "content": "аываыв",
-        "answer": "аывавыавы",
-        "wordBank": [
-          "аываыв"
+        "type": "match",
+        "pairs": [
+          {
+            "left": "me gusta",
+            "right": "volver"
+          },
+          {
+            "left": "te gustan",
+            "right": "las montañas"
+          },
+          {
+            "left": "me gustas",
+            "right": "tú"
+          },
+          {
+            "left": "le gustamos",
+            "right": "nosotros"
+          },
+          {
+            "left": "te gusto",
+            "right": "yo"
+          }
         ]
-      }
-    ]
-  },
-  {
-    "id": 7,
-    "title": {
-      "ru": "",
-      "es": "пролд"
-    },
-    "artist": "питрьб",
-    "youtubeId": "c8RR6ZDltdc",
-    "cover": "https://img.youtube.com/vi/c8RR6ZDltdc/mqdefault.jpg",
-    "level": [],
-    "themes": [],
-    "grammar": [],
-    "vocabulary": [],
-    "culture": {
-      "tags": [],
-      "items": []
-    },
-    "restrictions": {
-      "age": "16+",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": ""
-    },
-    "lyrics": [],
-    "pdf": "",
-    "analysis": [],
-    "tasks": []
-  },
-  {
-    "id": 8,
-    "title": {
-      "ru": "Тестовые карточки",
-      "es": "Tarjetas de prueba"
-    },
-    "artist": "Demo",
-    "youtubeId": "dQw4w9WgXcQ",
-    "cover": "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
-    "level": [
-      "A1"
-    ],
-    "themes": [
-      "образовательные"
-    ],
-    "grammar": [],
-    "vocabulary": [],
-    "culture": {
-      "tags": [],
-      "items": []
-    },
-    "restrictions": {
-      "age": "all",
-      "containsOtherLanguages": false,
-      "profanity": "none",
-      "sensitiveTopics": [],
-      "note": "Тестовая песня для карточек"
-    },
-    "lyrics": [
-      {
-        "time": "",
-        "text": "Это тестовая песня для проверки карточек."
       },
       {
-        "time": "",
-        "text": "Здесь нет настоящего текста."
-      }
-    ],
-    "pdf": "",
-    "analysis": [],
-    "tasks": [
-      {
         "title": {
-          "ru": "Словарь к песне",
-          "es": "Vocabulario de la canción"
+          "ru": "",
+          "es": ""
         },
         "instruction": {
-          "ru": "Изучи слова из песни. Нажимай на карточки, чтобы увидеть перевод.",
-          "es": "Estudia las palabras de la canción. Haz clic en las tarjetas para ver la traducción."
+          "ru": "",
+          "es": ""
         },
         "type": "flashcards",
         "flashcards": [
           {
+            "es": "el corazón",
+            "ru": "сердце",
+            "example": "Mi corazón está triste.",
+            "example_translation": "Моё сердце грустит.",
+            "transcription": ""
+          },
+          {
+            "es": "la escucha",
+            "ru": "слушание, прослушивание",
+            "example": "Permanece a la escucha.",
+            "example_translation": "Оставайся на связи (дословно: оставайся в режиме слушания).",
+            "transcription": ""
+          },
+          {
+            "es": "la noche",
+            "ru": "ночь",
+            "example": "La noche es tranquila.",
+            "example_translation": "Ночь спокойная.",
+            "transcription": ""
+          },
+          {
+            "es": "el avión",
+            "ru": "самолёт",
+            "example": "El avión despega ahora.",
+            "example_translation": "Самолёт сейчас взлетает.",
+            "transcription": ""
+          },
+          {
+            "es": "el viento",
+            "ru": "ветер",
+            "example": "El viento es fuerte hoy.",
+            "example_translation": "Сегодня сильный ветер.",
+            "transcription": ""
+          },
+          {
+            "es": "la mañana",
+            "ru": "утро",
+            "example": "Me gusta la mañana.",
+            "example_translation": "Мне нравится утро.",
+            "transcription": ""
+          },
+          {
+            "es": "la mar",
+            "ru": "море",
+            "example": "La mar está tranquila.",
+            "example_translation": "Море спокойное.",
+            "transcription": ""
+          },
+          {
+            "es": "la moto",
+            "ru": "мотоцикл",
+            "example": "La moto es rápida.",
+            "example_translation": "Мотоцикл быстрый.",
+            "transcription": ""
+          },
+          {
+            "es": "la lluvia",
+            "ru": "дождь",
+            "example": "La lluvia cae suavemente.",
+            "example_translation": "Дождь мягко падает.",
+            "transcription": ""
+          },
+          {
+            "es": "la montaña",
+            "ru": "гора",
+            "example": "La montaña es alta.",
+            "example_translation": "Гора высокая.",
+            "transcription": ""
+          },
+          {
+            "es": "el minuto",
+            "ru": "минута",
+            "example": "Un minuto, por favor.",
+            "example_translation": "Одну минуту, пожалуйста.",
+            "transcription": ""
+          },
+          {
+            "es": "la cena",
+            "ru": "ужин",
+            "example": "La cena está lista.",
+            "example_translation": "Ужин готов.",
+            "transcription": ""
+          },
+          {
+            "es": "la vecina",
+            "ru": "соседка",
+            "example": "La vecina es amable.",
+            "example_translation": "Соседка добрая.",
+            "transcription": ""
+          },
+          {
+            "es": "la cocina",
+            "ru": "кухня",
+            "example": "La cocina es pequeña.",
+            "example_translation": "Кухня маленькая.",
+            "transcription": ""
+          },
+          {
+            "es": "la guitarra",
+            "ru": "гитара",
+            "example": "Toco la guitarra.",
+            "example_translation": "Я играю на гитаре.",
+            "transcription": ""
+          },
+          {
+            "es": "el fuego",
+            "ru": "огонь",
+            "example": "El fuego quema.",
+            "example_translation": "Огонь обжигает.",
+            "transcription": ""
+          },
+          {
+            "es": "la castaña",
+            "ru": "каштан",
+            "example": "La castaña es dulce.",
+            "example_translation": "Каштан сладкий.",
+            "transcription": ""
+          },
+          {
+            "es": "el oro",
+            "ru": "золото",
+            "example": "El oro es caro.",
+            "example_translation": "Золото дорогое.",
+            "transcription": ""
+          },
+          {
             "es": "viajar",
             "ru": "путешествовать",
-            "example": "Me gusta viajar",
-            "example_translation": "Мне нравится путешествовать",
+            "example": "Me gusta viajar.",
+            "example_translation": "Мне нравится путешествовать.",
             "transcription": ""
           },
           {
             "es": "soñar",
             "ru": "мечтать",
-            "example": "Sueño con viajar",
-            "example_translation": "Я мечтаю путешествовать",
+            "example": "Me gusta soñar.",
+            "example_translation": "Мне нравится мечтать.",
+            "transcription": ""
+          },
+          {
+            "es": "hacer",
+            "ru": "делать",
+            "example": "¿Qué voy a hacer?",
+            "example_translation": "Что мне делать?",
             "transcription": ""
           },
           {
             "es": "correr",
             "ru": "бегать",
-            "example": "Corro por el parque",
-            "example_translation": "Я бегаю по парку",
+            "example": "Me gusta correr.",
+            "example_translation": "Мне нравится бегать.",
             "transcription": ""
           },
           {
             "es": "volver",
             "ru": "возвращаться",
-            "example": "Vuelvo a casa",
-            "example_translation": "Я возвращаюсь домой",
+            "example": "Quiero volver a casa.",
+            "example_translation": "Я хочу вернуться домой.",
             "transcription": ""
           },
           {
-            "es": "moto",
-            "ru": "мотоцикл",
-            "example": "Mi moto es rápida",
-            "example_translation": "Мой мотоцикл быстрый",
+            "es": "camelar",
+            "ru": "ухаживать, заигрывать",
+            "example": "Él quiere camelar a la chica.",
+            "example_translation": "Он хочет приударить за девушкой.",
+            "transcription": ""
+          },
+          {
+            "es": "menear",
+            "ru": "двигать, трясти",
+            "example": "Me gusta menear el cuerpo.",
+            "example_translation": "Мне нравится двигать телом.",
+            "transcription": ""
+          },
+          {
+            "es": "brillar",
+            "ru": "блестеть",
+            "example": "El oro brilla.",
+            "example_translation": "Золото блестит.",
             "transcription": ""
           }
+        ]
+      }
+    ],
+    "liveTasks": [
+      {
+        "type": "word-catch",
+        "time": 60,
+        "correct": "la lluvia",
+        "options": [
+          "el viento",
+          "la lluvia",
+          "la nieve"
+        ]
+      },
+      {
+        "type": "gapfill",
+        "time": 71,
+        "correct": "montaña",
+        "options": [
+          "montaña",
+          "sol",
+          "playa"
+        ],
+        "line": "Me gusta la ___, me gustas tú."
+      },
+      {
+        "type": "gapfill",
+        "time": 24,
+        "correct": "gustan",
+        "options": [
+          "gusta",
+          "gustan",
+          "gustas"
+        ],
+        "line": "Me ___ los aviones, me gustas tú."
+      },
+      {
+        "type": "word-catch",
+        "time": 96,
+        "correct": "la cena",
+        "options": [
+          "la cena",
+          "la noche",
+          "el cine"
         ]
       }
     ]
