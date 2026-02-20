@@ -1,877 +1,1427 @@
-// song.js — полная версия с переводом интерфейса (по умолчанию испанский)
-console.log("🎵 song.js загружен (с i18n)");
+:root{
+  --bg:#f3f4f6;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e5e7eb;
+  --accent:#1f6feb;
+  --brand: var(--accent);
+  --shadow: 0 8px 20px rgba(15, 23, 42, .08);
+  --radius:16px;
+}
 
-// ===== i18n для страницы песни =====
-const i18nSong = {
-  ru: {
-    tabLyrics: "Текст",
-    tabTasks: "Задания",
-    tabVocab: "Лексика",
-    tabGrammar: "Грамматика",
-    tabFlashcards: "Карточки",
-    lyricsHeader: "Текст песни",
-    tasksHeader: "Задания",
-    vocabHeader: "Лексика",
-    flashcardsHeader: "Карточки для запоминания",
-    downloadPdf: "Скачать PDF (материалы)",
-    openMiro: "Доска Miro",
-    noLyrics: "Текст пока не добавлен",
-    noTasks: "Заданий нет",
-    noVocab: "Лексика пока не добавлена",
-    noFlashcards: "Карточек пока нет",
-    checkAnswer: "Проверить",
-    correct: "✅ Верно!",
-    incorrect: "❌ Неверно",
-    incorrectWithAnswer: "❌ Неверно. Правильный ответ: {answer}",
-    showTranslation: "Показать перевод",
-    hideTranslation: "Скрыть перевод",
-    liveTasksOn: "Живые задания включены",
-    liveTasksOff: "Живые задания отключены",
-    highlightOn: "Подсветка текста включена",
-    highlightOff: "Подсветка текста отключена",
-    translationsOn: "Переводы показаны",
-    translationsOff: "Переводы скрыты",
-    learned: "Выучено",
-    notLearned: "Не выучено",
-    know: "✓ Знаю",
-    wordCatchQuestion: "Какое слово ты услышал?",
-    translateQuestion: "Перевод слова \"{word}\":",
-    gapfillQuestion: "Вставь пропущенное слово:",
-    close: "✕",
-    grammarRule: "Грамматические правила",
-    grammar: "Грамматика",
-    liveTasks: "Живые задания",
-    highlight: "Подсветка",
-    translations: "Переводы",
-    resetProgress: "Сбросить прогресс"
-  },
-  es: {
-    tabLyrics: "Letra",
-    tabTasks: "Ejercicios",
-    tabVocab: "Vocabulario",
-    tabGrammar: "Gramática",
-    tabFlashcards: "Tarjetas",
-    lyricsHeader: "Letra de la canción",
-    tasksHeader: "Ejercicios",
-    vocabHeader: "Vocabulario",
-    flashcardsHeader: "Tarjetas de memoria",
-    downloadPdf: "Descargar PDF (materiales)",
-    openMiro: "Pizarra Miro",
-    noLyrics: "La letra aún no está disponible",
-    noTasks: "No hay ejercicios",
-    noVocab: "El vocabulario aún no está disponible",
-    noFlashcards: "No hay tarjetas",
-    checkAnswer: "Comprobar",
-    correct: "✅ ¡Correcto!",
-    incorrect: "❌ Incorrecto",
-    incorrectWithAnswer: "❌ Incorrecto. Respuesta correcta: {answer}",
-    showTranslation: "Mostrar traducción",
-    hideTranslation: "Ocultar traducción",
-    liveTasksOn: "Ejercicios en vivo activados",
-    liveTasksOff: "Ejercicios en vivo desactivados",
-    highlightOn: "Resaltado de letra activado",
-    highlightOff: "Resaltado de letra desactivado",
-    translationsOn: "Traducciones mostradas",
-    translationsOff: "Traducciones ocultadas",
-    learned: "Aprendido",
-    notLearned: "No aprendido",
-    know: "✓ Saber",
-    wordCatchQuestion: "¿Qué palabra escuchaste?",
-    translateQuestion: "Traducción de \"{word}\":",
-    gapfillQuestion: "Completa la palabra que falta:",
-    close: "✕",
-    grammarRule: "Reglas gramaticales",
-    grammar: "Gramática",
-    liveTasks: "Ejercicios en vivo",
-    highlight: "Resaltado",
-    translations: "Traducciones",
-    resetProgress: "Reiniciar progreso"
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+.container{
+  width:min(1200px, calc(100% - 32px));
+  margin:0 auto;
+}
+
+.sr-only{
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* Header */
+.main-header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(243,244,246,.92);
+  backdrop-filter: blur(8px);
+  border-bottom:1px solid var(--border);
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 0 10px;
+  gap:12px;
+}
+
+.logo-area{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.dino-logo{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  flex-shrink:0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.logo-text{
+  font-family: Pacifico, cursive;
+  font-weight:400;
+  font-size:22px;
+  margin:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.header-right select{
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:14px;
+}
+
+.admin-button{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  background: var(--card);
+  border-radius: 12px;
+  padding:10px 12px;
+  font-size:14px;
+  font-weight:800;
+  color: var(--text);
+  text-decoration:none;
+}
+.admin-button:hover{ box-shadow: var(--shadow); }
+.header-right{ display:flex; align-items:center; gap:10px; }
+
+/* Filters */
+.header-filters{ padding:0 0 12px; }
+.filters-collapse{
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.flashcard-footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  width: 100%;
+}
+.flashcard-footer-actions button {
+  min-width: 120px;
+}
+.filters-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  cursor:pointer;
+  list-style:none;
+}
+.filters-summary::-webkit-details-marker{ display:none; }
+
+.filters-title{ font-weight:700; display:flex; align-items:center; gap:8px; }
+.filters-hint{ color:var(--muted); font-size:12px; }
+
+.filters-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:12px 14px 14px;
+  border-top:1px solid var(--border);
+}
+
+.filter-item{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  min-width:180px;
+  flex: 1 1 180px;
+}
+
+.search-item{ flex: 2 1 320px; min-width:260px; }
+
+.filter-label{
+  font-size:13px;
+  font-weight:700;
+  color:#111827;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.filter-item input[type="text"],
+.filter-item select{
+  border:1px solid var(--border);
+  background:#f8fafc;
+  border-radius:14px;
+  padding:12px 12px;
+  font-size:14px;
+  outline:none;
+}
+.filter-item input[type="text"]:focus,
+.filter-item select:focus{
+  border-color:#c7d2fe;
+  box-shadow: 0 0 0 4px rgba(99,102,241,.15);
+  background:#fff;
+}
+
+.checks-item{
+  min-width:220px;
+  flex: 1 1 220px;
+}
+.checks-title{
+  font-weight:700;
+  font-size:13px;
+  color:#111827;
+}
+.check-pill{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:10px 12px;
+  background:#fff;
+  font-size:13px;
+}
+.check-pill input{ width:16px; height:16px; }
+
+.actions-item{
+  min-width:220px;
+  flex: 0 1 220px;
+  gap:10px;
+}
+.apply-filters-button, .clear-filters-button, .load-more-button{
+  border:0;
+  border-radius:14px;
+  padding:12px 12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.apply-filters-button{
+  background:#111827;
+  color:#fff;
+}
+.clear-filters-button{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.search-results-summary{
+  font-size:13px;
+  color:var(--muted);
+}
+.search-results-summary p{ margin:0; }
+
+.results-click{ cursor:pointer; }
+.show-results-btn{
+  display:none;
+  width:100%;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background:#111827;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@media (max-width: 820px){
+  .show-results-btn{ display:block; }
+}
+
+/* Layout */
+.main-layout{
+  display:grid;
+  grid-template-columns: 1.2fr .9fr;
+  gap:16px;
+  padding:16px 0 20px;
+}
+
+.song-detail-area, .song-list-area{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+
+.placeholder-detail-message{
+  padding:22px;
+  text-align:center;
+  color:var(--muted);
+}
+.waiting-dino{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-top:10px;
+  opacity:.95;
+}
+
+.waiting-cover{
+  width:min(420px, 100%);
+  aspect-ratio: 1 / 1;
+  height:auto;
+  object-fit:contain;
+  margin:14px auto 0;
+  display:block;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  background: #fff;
+  padding: 8px;
+}
+
+.video-player-container{ padding:14px; }
+.video-player-container iframe{
+  width:100%;
+  border-radius: 16px;
+}
+.video-fallback{
+  padding:0 14px 14px;
+  color:var(--muted);
+  font-size:13px;
+}
+.video-fallback.hidden{ display:none; }
+.open-youtube{ color:var(--accent); font-weight:700; text-decoration:none; }
+
+/* PDF download button (старый класс, но новый использует .resource-link) */
+.detail-resources{ margin-top:10px; }
+.pdf-download{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  font-weight:700;
+  text-decoration:none;
+}
+.pdf-download:hover{ box-shadow: var(--shadow); }
+
+.song-meta{
+  padding:0 14px 14px;
+}
+.song-title-detail{ margin:0; font-size:22px; }
+.song-artist-detail{ margin:6px 0 10px; color:var(--muted); }
+.meta-badges{ display:flex; flex-wrap:wrap; gap:8px; }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  font-size:12px;
+  color:#0f172a;
+}
+
+.detail-tabs{
+  display:flex;
+  gap:8px;
+  padding:12px 14px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+}
+.detail-tab{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:999px;
+  padding:9px 12px;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.detail-tab.active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827;
+}
+.tab-badge{
+  margin-left:6px;
+  background:#fff;
+  color:#111827;
+  border-radius:999px;
+  padding:1px 7px;
+  font-size:12px;
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.detail-panels{ padding:14px; }
+.detail-panel{ display:none; }
+.detail-panel.active{ display:block; }
+
+.panel-card{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius: 16px;
+  padding:14px;
+}
+.panel-card h3{ margin:0 0 10px; }
+.muted{ color:var(--muted); margin:0 0 10px; font-size:13px; }
+
+.lyrics-text p{
+  margin:0 0 8px;
+  line-height:1.45;
+  font-size:14px;
+}
+
+.simple-list{ margin:0; padding-left:18px; }
+.simple-list li{ margin:0 0 6px; color:#0f172a; }
+.chips-wrap{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:999px;
+  padding:8px 10px;
+  font-size:13px;
+}
+
+/* Tasks */
+.tasks-list{ display:flex; flex-direction:column; gap:12px; }
+.task-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+}
+.task-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.task-title{ margin:0; font-size:15px; }
+.task-type{
+  font-size:12px;
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f8fafc;
+  white-space:nowrap;
+}
+.task-instruction{ margin:8px 0 10px; color:#0f172a; font-size:14px; }
+.task-body ul{ margin:0; padding-left:18px; }
+.task-body li{ margin:0 0 6px; }
+.task-actions{ margin-top:10px; display: flex; gap: 8px; flex-wrap: wrap; }
+.task-btn{
+  border:0;
+  border-radius:12px;
+  padding:10px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.task-btn.primary{ background:#111827; color:#fff; }
+.task-answer{
+  display:none;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px dashed #cbd5e1;
+  background:#f8fafc;
+  color:#0f172a;
+  font-size:14px;
+}
+.tasks-empty{ color:var(--muted); font-size:14px; }
+
+/* Match задания */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+.match-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.match-item {
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.match-item:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
+}
+.match-item.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(31, 111, 235, 0.2);
+}
+.match-item.matched {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+  text-decoration: line-through;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Gap-fill */
+.gap-fill-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+.gap-fill-form span {
+  font-size: 16px;
+}
+.gap-input, .gap-select {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 80px;
+}
+.gap-input:focus, .gap-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Quiz */
+.quiz-question {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.quiz-option {
+  display: block;
+  margin: 8px 0;
+  font-size: 14px;
+}
+.quiz-option input {
+  margin-right: 8px;
+}
+
+/* Grammar rules */
+.grammar-rules {
+  background: #f1f5f9;
+  border-left: 4px solid var(--accent);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Word bank */
+.word-bank {
+  margin-top: 10px;
+}
+.word-bank .chip {
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+/* Flashcards */
+.flashcards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.flashcards-header h3 { margin: 0; }
+.flashcards-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+.progress-bar-container {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 45px;
+}
+.flashcards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  padding: 20px 0;
+}
+.flashcard-wrapper {
+  width: 100%;
+  max-width: 500px;  /* увеличено с 400px для более горизонтального вида */
+  margin: 0 auto;
+  perspective: 1500px;
+  min-height: 300px; /* увеличено с 250px */
+}
+.flashcard {
+  width: 100%;
+  height: 300px;     /* увеличено с 250px */
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s;
+  transform-style: preserve-3d;
+}
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  padding: 20px;      /* уменьшено с 30px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.3s ease;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.flashcard-front {
+  background: linear-gradient(135deg, var(--accent), #1a4fa0);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.flashcard-front .word {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.flashcard-front .transcription {
+  font-size: 16px;
+  opacity: 0.9;
+  font-style: italic;
+}
+.flashcard-front .example {
+  font-size: 16px;
+  margin-top: 8px;
+  opacity: 0.9;
+}
+.flashcard-back {
+  background: white;
+  color: var(--text);
+  transform: rotateY(180deg);
+  border: 1px solid var(--border);
+  overflow-y: auto;
+}
+.flashcard-back .translation {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 15px;
+}
+.flashcard-back .example {
+  font-size: 16px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 10px;
+  max-width: 80%;
+}
+.flashcard-back .example-translation {
+  font-size: 14px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+.flashcard-learned {
+  cursor: default;
+  opacity: 0.9;
+}
+.flashcard-learned .flashcard-front {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+.flashcard-learned .learned-stamp {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.3);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+.flashcards-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.flashcards-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+.flashcards-nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.flashcards-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.flashcards-counter {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.flashcards-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.flashcards-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.flashcards-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.flashcards-btn.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+/* Live tasks */
+.live-task-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  padding: 24px;
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 90%;
+  border: 1px solid var(--border);
+}
+.live-task-content { position: relative; }
+.live-close-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--muted);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.live-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center;
+}
+.live-option {
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  border-radius: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.live-option:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.live-feedback {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 40px;
+  color: white;
+  font-weight: 500;
+  z-index: 1001;
+  animation: fadeInOut 2s ease;
+}
+.live-feedback.correct { background: #10b981; }
+.live-feedback.incorrect { background: #ef4444; }
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+/* Адаптация для мобильных устройств (флешкарты) */
+@media (max-width: 640px) {
+  .flashcard-wrapper {
+    max-width: 350px;  /* чуть больше для мобильных */
+    min-height: 280px;
   }
-};
-
-// Текущий язык (по умолчанию испанский)
-const currentLang = localStorage.getItem("lang") || "es";
-
-// Функция перевода с поддержкой подстановок {key}
-function t(key, params = {}) {
-  let text = i18nSong[currentLang]?.[key] || i18nSong.ru[key] || key;
-  if (params && typeof params === 'object') {
-    for (let [k, v] of Object.entries(params)) {
-      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
-    }
+  .flashcard {
+    height: 280px;
   }
-  return text;
 }
 
-// ===== Глобальные переменные =====
-let ytIframe = null;
-let ytLastTime = 0;
-let syncInterval;
-let currentSong = null;
-let isUserScrolling = false;
-let scrollTimeout;
-let liveTasks = [];
-let completedLiveTasks = new Set();
-let livePopup = null;
-let liveTasksEnabled = true;
-let lyricsHighlightEnabled = true;
-let translationsVisible = false;
-
-const player = {
-  getCurrentTime: () => ytLastTime,
-  seekTo: (seconds, allowSeekAhead) => {
-    if (ytIframe && ytIframe.contentWindow) {
-      ytPost({ event: 'command', func: 'seekTo', args: [seconds, allowSeekAhead] });
-    }
-  },
-  playVideo: () => {
-    if (ytIframe && ytIframe.contentWindow) {
-      ytPost({ event: 'command', func: 'playVideo', args: [] });
-    }
+/* Song page grid */
+@media (min-width: 981px) {
+  #song-content {
+    display: grid;
+    grid-template-columns: 450px 1fr; 
+    grid-template-areas: 
+      "video tabs"
+      "video content";
+    gap: 24px;
+    align-items: start;
   }
-};
-
-const $ = id => document.getElementById(id);
-
-function hideLoader() {
-  const loader = document.getElementById('loader');
-  if (loader) loader.style.display = 'none';
+  .song-header {
+    grid-area: video;
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    z-index: 5;
+    margin-bottom: 0 !important; 
+  }
+  .detail-tabs {
+    grid-area: tabs;
+    position: sticky;
+    top: 60px;
+    z-index: 4;
+    background: var(--bg);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0;
+  }
+  .detail-panels {
+    grid-area: content;
+    min-width: 0;
+  }
 }
 
-function safeText(obj) {
-  if (!obj) return '';
-  if (typeof obj === 'string') return obj;
-  return obj.ru || obj.es || '';
+/* Video container */
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
-function escapeHtml(str) {
-  return (str ?? '').toString()
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+/* Song header */
+.song-header {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.song-title-text {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.song-artist-text {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #64748b;
+}
+.badges-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
-function showToast(message, duration = 3000) {
-  const toast = document.getElementById('toast');
-  if (!toast) return;
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), duration);
+/* Resources under video */
+.song-resources {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  width: 100%;
+  justify-content: center;
+}
+.resource-link i { font-size: 18px; }
+.resource-link.pdf {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+.resource-link.pdf:hover { background: #b91c1c; }
+.resource-link.miro {
+  background: #0a3d5e;
+  color: white;
+  border-color: #0a3d5e;
+}
+.resource-link.miro:hover { background: #052d44; }
+
+/* Lyrics controls */
+.lyrics-controls {
+  display: flex;
+  gap: 16px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border-radius: 40px;
+  flex-wrap: wrap;
+}
+.control-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #334155;
+}
+.control-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const songId = parseInt(urlParams.get('id'));
+/* Lyrics blocks */
+.lyric-block {
+  margin-bottom: 10px;
+}
+.lyric-line {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  margin: 2px 0;
+  border-radius: 8px;
+}
+.lyric-line.active {
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(31, 111, 235, 0.3);
+}
+.lyric-line:hover:not(.active) {
+  background-color: rgba(31, 111, 235, 0.1);
+}
+.lyric-translation {
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--muted);
+  margin: 2px 0 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-  if (typeof songsDataFromExternal === 'undefined') return alert('Ошибка данных');
-  const song = songsDataFromExternal.find(s => s.id === songId);
-  if (!song) return alert('Песня не найдена');
+/* ===== КАРТОЧКИ ПЕСЕН (ГЛАВНАЯ) ===== */
+.song-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.song-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+.song-card:focus {
+  outline: 3px solid rgba(99,102,241,.25);
+}
+.song-card::after {
+  content: '→';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.song-card:hover::after {
+  opacity: 1;
+  transform: translate(4px, -50%);
+}
+.song-card-cover {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #e5e7eb;
+  transition: transform 0.2s ease;
+}
+.song-card-info {
+  min-width: 0;
+  flex: 1;
+}
+.song-card-info h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.song-card-info p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.song-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.song-card-tags span {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: #0f172a;
+  background-color: #fff;
+  border-color: #d1d5db;
+  font-weight: 500;
+  /* Гарантируем корректное отображение цифр */
+  font-variant-numeric: normal;
+}
+.song-card-restrictions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.restriction-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  color: #1e293b;
+}
+.restriction-badge.age {
+  background: #fef9c3;
+  border-color: #facc15;
+}
+.restriction-badge.other-lang {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+/* Toolbar списка песен (заголовок, счётчик, сортировка) */
+.song-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.song-list-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.song-list-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.song-list-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.song-list-actions {
+  flex-shrink: 0;
+}
+
+.song-list-actions select {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* List pagination */
+.list-pagination{
+  padding:0 14px 14px;
+}
+.load-more-button{
+  width:100%;
+  background:#111827;
+  color:#fff;
+}
+.list-hint{
+  margin:10px 0 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* Footer */
+.main-footer{
+  padding:18px 0 30px;
+  color:var(--muted);
+  text-align:center;
+}
+
+/* Mobile */
+.mobile-view-toggle{
+  display:none;
+  gap:8px;
+  margin:12px 0 0;
+}
+.mobile-toggle-btn{
+  flex:1;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:800;
+}
+
+@media (max-width: 980px){
+  .main-layout{ grid-template-columns: 1fr; }
+  .mobile-view-toggle{ display:flex; }
+  body.mobile-show-list #detail-pane{ display:none; }
+  body.mobile-show-detail #list-pane{ display:none; }
+}
+
+@media (max-width: 480px){
+  .dino-logo{ width:38px; height:38px; }
+  .logo-text{ font-size:20px; }
+  .filters-hint{ display:none; }
+}
+/* Уменьшаем шрифт подзаголовка списка (Показано: X из Y) */
+.song-list-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: normal;
+}
+/* Стили для панели грамматических правил */
+.grammar-rules-content {
+  padding: 10px 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.grammar-rules-content p {
+  margin: 0 0 12px 0;
+  color: var(--text);
+}
+
+.grammar-rules-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Стили для выделения важных терминов в грамматике */
+.grammar-rules-content strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.grammar-rules-content em {
+  font-style: italic;
+  color: var(--muted);
+}
+/* Фикс для панелей, чтобы они не выглядели пустыми при малом контенте */
+.detail-panel .panel-card {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-card h3 {
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Для грамматических правил */
+#grammar-rules-content {
+  flex: 1;
+  min-height: 100px;
+}
+
+#grammar-rules-content p {
+  margin: 0 0 12px 0;
+  line-height: 1.6;
+}
+
+#grammar-rules-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Для лексики */
+#vocab-content {
+  min-height: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
+}
+
+/* Для текста песни */
+#lyrics-content {
+  min-height: 200px;
+}
+
+/* Для заданий */
+#tasks-container {
+  min-height: 150px;
+}
+
+/* Для карточек */
+.flashcards-container {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flashcard-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Добавляем плавный отступ для всех panel-card */
+.panel-card {
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+/* Делаем фон чуть светлее для лучшей читаемости */
+.panel-card {
+  background: #ffffff;
+}
+
+/* Убираем лишние отступы у последних элементов */
+.panel-card > :last-child {
+  margin-bottom: 0;
+}
+
+/* Стили для пустых состояний */
+.muted {
+  color: var(--muted);
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin: 0;
+}
+/* Фикс для выравнивания колонок */
+@media (min-width: 981px) {
+  #song-content {
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    grid-template-areas: 
+      "video tabs"
+      "video content";
+    gap: 24px;
+    align-items: start;
+  }
+
+  .detail-panels {
+    grid-area: content;
+    min-width: 0;
+    min-height: 500px; /* Фиксированная минимальная высота */
+  }
+
+  .detail-panel.active {
+    min-height: 450px; /* Минимальная высота активной панели */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Для панели лексики */
+  [data-panel="vocab"] .panel-card {
+    min-height: 300px;
+  }
+
+  #vocab-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+    min-height: 200px;
+  }
+
+  /* Для панели грамматики */
+  [data-panel="grammar"] .panel-card {
+    min-height: 300px;
+  }
+
+  #grammar-rules-content {
+    flex: 1;
+    min-height: 200px;
+  }
+
+  /* Для панели текста */
+  [data-panel="lyrics"] .panel-card {
+    min-height: 400px;
+  }
+
+  #lyrics-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 300px;
+  }
+
+  /* Для панели заданий */
+  [data-panel="tasks"] .panel-card {
+    min-height: 400px;
+  }
+
+  #tasks-container {
+    flex: 1;
+    min-height: 300px;
+  }
+
+  /* Для панели карточек */
+  [data-panel="flashcards"] .panel-card {
+    min-height: 450px;
+  }
+
+  .flashcards-container {
+    flex: 1;
+    min-height: 350px;
+  }
+}
+
+/* Для мобильных устройств */
+@media (max-width: 980px) {
+  .detail-panel.active {
+    min-height: auto;
+  }
   
-  currentSong = song;
-  renderSong(song);
-
-  const lyricsContainer = document.getElementById('lyrics-content');
-  if (lyricsContainer) {
-    lyricsContainer.addEventListener('scroll', () => {
-      isUserScrolling = true;
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => isUserScrolling = false, 2000);
-    });
-  }
-
-  // Переключатели
-  const toggleLive = document.getElementById('toggle-live');
-  if (toggleLive) toggleLive.addEventListener('change', (e) => toggleLiveTasks(e.target.checked));
-  const toggleHighlight = document.getElementById('toggle-highlight');
-  if (toggleHighlight) toggleHighlight.addEventListener('change', (e) => toggleLyricsHighlight(e.target.checked));
-  const toggleTrans = document.getElementById('toggle-translations');
-  if (toggleTrans) toggleTrans.addEventListener('change', (e) => toggleTranslations(e.target.checked));
-});
-
-// ===== Применение языка интерфейса =====
-function applyInterfaceLanguage() {
-  // Заголовки вкладок
-  const tabMappings = {
-    'lyrics': t('tabLyrics'),
-    'tasks': t('tabTasks'),
-    'vocab': t('tabVocab'),
-    'grammar': t('tabGrammar'),
-    'flashcards': t('tabFlashcards')
-  };
-  document.querySelectorAll('.detail-tab').forEach(tab => {
-    const tabName = tab.dataset.tab;
-    if (tabName && tabMappings[tabName]) {
-      const span = tab.querySelector('span') || tab;
-      span.textContent = tabMappings[tabName];
-    }
-  });
-
-  // Заголовки панелей
-  const lyricsHeader = document.querySelector('[data-panel="lyrics"] h3');
-  if (lyricsHeader) lyricsHeader.innerHTML = `<i class="fas fa-file-alt"></i> ${t('lyricsHeader')}`;
-  const tasksHeader = document.querySelector('[data-panel="tasks"] h3');
-  if (tasksHeader) tasksHeader.innerHTML = `<i class="fas fa-tasks"></i> ${t('tasksHeader')}`;
-  const vocabHeader = document.querySelector('[data-panel="vocab"] h3');
-  if (vocabHeader) vocabHeader.innerHTML = `<i class="fas fa-language"></i> ${t('vocabHeader')}`;
-  const grammarHeader = document.querySelector('[data-panel="grammar"] h3');
-  if (grammarHeader) grammarHeader.innerHTML = `<i class="fas fa-book-open"></i> ${t('grammarRule')}`;
-  const flashcardsHeader = document.querySelector('[data-panel="flashcards"] h3');
-  if (flashcardsHeader) flashcardsHeader.innerHTML = `<i class="fas fa-layer-group"></i> ${t('flashcardsHeader')}`;
-
-  // Ссылки на ресурсы
-  const pdfLink = document.querySelector('.resource-link.pdf');
-  if (pdfLink) pdfLink.innerHTML = `<i class="fas fa-file-pdf"></i> ${t('downloadPdf')}`;
-  const miroLink = document.querySelector('.resource-link.miro');
-  if (miroLink) miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
-
-  // Переключатели
-  const toggleLiveLabel = document.querySelector('input#toggle-live')?.closest('label.control-toggle');
-  if (toggleLiveLabel) {
-    const checkbox = toggleLiveLabel.querySelector('input');
-    if (checkbox) {
-      toggleLiveLabel.innerHTML = '';
-      toggleLiveLabel.appendChild(checkbox);
-      toggleLiveLabel.appendChild(document.createTextNode(' ' + t('liveTasks')));
-    }
-  }
-  const toggleHighlightLabel = document.querySelector('input#toggle-highlight')?.closest('label.control-toggle');
-  if (toggleHighlightLabel) {
-    const checkbox = toggleHighlightLabel.querySelector('input');
-    if (checkbox) {
-      toggleHighlightLabel.innerHTML = '';
-      toggleHighlightLabel.appendChild(checkbox);
-      toggleHighlightLabel.appendChild(document.createTextNode(' ' + t('highlight')));
-    }
-  }
-  const toggleTransLabel = document.querySelector('input#toggle-translations')?.closest('label.control-toggle');
-  if (toggleTransLabel) {
-    const checkbox = toggleTransLabel.querySelector('input');
-    if (checkbox) {
-      toggleTransLabel.innerHTML = '';
-      toggleTransLabel.appendChild(checkbox);
-      toggleTransLabel.appendChild(document.createTextNode(' ' + t('translations')));
-    }
+  .panel-card {
+    min-height: auto;
   }
 }
-
-function renderSong(song) {
-  const titleEl = $('song-title');
-  if (titleEl) titleEl.textContent = safeText(song.title);
-  const artistEl = $('song-artist');
-  if (artistEl) artistEl.textContent = song.artist || '';
-
-  renderLyrics(song.lyrics);
-  renderTasks(song.tasks);
-  renderVocabulary(song.vocabulary);
-
-  liveTasks = song.liveTasks || [];
-  completedLiveTasks.clear();
-
-  const flashcardTask = (song.tasks || []).find(t => t.type === 'flashcards');
-  renderFlashcards(flashcardTask ? flashcardTask.flashcards : null);
-  renderBadges(song);
-
-  // Ресурсы (PDF, Miro) под видео
-  const resourcesContainer = document.getElementById('song-resources');
-  if (resourcesContainer) {
-    resourcesContainer.innerHTML = '';
-    if (song.pdf && song.pdf.trim() !== '') {
-      const pdfLink = document.createElement('a');
-      pdfLink.href = song.pdf;
-      pdfLink.className = 'resource-link pdf';
-      pdfLink.target = '_blank';
-      pdfLink.innerHTML = `<i class="fas fa-file-pdf"></i> ${t('downloadPdf')}`;
-      resourcesContainer.appendChild(pdfLink);
-    }
-    if (song.miro && song.miro.trim() !== '') {
-      const miroLink = document.createElement('a');
-      miroLink.href = song.miro;
-      miroLink.className = 'resource-link miro';
-      miroLink.target = '_blank';
-      miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
-      resourcesContainer.appendChild(miroLink);
-    }
-  }
-
-  const contentEl = $('song-content');
-  if (contentEl) contentEl.style.display = '';
-
-  hideLoader();
-  setupTabs();
-  applyInterfaceLanguage(); // применяем перевод интерфейса
-  if (song.youtubeId) initPlayerPostMessage();
+.flashcard-footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  width: 100%;
 }
-
-function setupTabs() {
-  const tabs = document.querySelectorAll('.detail-tab');
-  const panels = document.querySelectorAll('.detail-panel');
-  if (!tabs.length || !panels.length) return;
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabName = tab.dataset.tab;
-      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
-      const activePanel = document.querySelector(`[data-panel="${tabName}"]`);
-      if (activePanel) activePanel.classList.add('active');
-    });
-  });
-}
-
-function renderLyrics(lyrics) {
-  const container = $('lyrics-content');
-  if (!container) return;
-  if (!lyrics || !lyrics.length) {
-    container.innerHTML = `<p class="muted">${t('noLyrics')}</p>`;
-    return;
-  }
-  let html = '';
-  lyrics.forEach((line, index) => {
-    html += `<div class="lyric-block">`;
-    html += `<p class="lyric-line" data-index="${index}" data-time="${line.time || ''}">${escapeHtml(line.text)}</p>`;
-    if (line.translation) {
-      html += `<p class="lyric-translation" style="display: ${translationsVisible ? 'block' : 'none'};">${escapeHtml(line.translation)}</p>`;
-    }
-    html += `</div>`;
-  });
-  container.innerHTML = html;
-  setTimeout(makeLyricsClickable, 100);
-}
-
-function renderVocabulary(vocab) {
-  const container = $('vocab-content');
-  if (!container) return;
-  if (!vocab || !vocab.length) {
-    container.innerHTML = `<p class="muted">${t('noVocab')}</p>`;
-    return;
-  }
-  container.innerHTML = vocab.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
-}
-
-function renderBadges(song) {
-  const badgesDiv = $('song-badges');
-  if (!badgesDiv) return;
-  const badges = [];
-  if (song.level) badges.push(`<span class="badge"><i class="fas fa-signal"></i> ${song.level.join(', ')}</span>`);
-  if (song.themes) song.themes.forEach(t => badges.push(`<span class="badge"><i class="fas fa-tag"></i> ${escapeHtml(t)}</span>`));
-  badgesDiv.innerHTML = badges.join('');
-}
-
-function renderTasks(tasks) {
-  const container = $('tasks-container');
-  if (!container) return;
-  container.innerHTML = '';
-  if (!tasks || !tasks.length) {
-    container.innerHTML = `<p class="muted">${t('noTasks')}</p>`;
-    return;
-  }
-  tasks.forEach((task, index) => {
-    if (task.type === 'flashcards') return;
-    const taskDiv = document.createElement('div');
-    taskDiv.className = 'task-block';
-    const header = document.createElement('div');
-    header.className = 'task-header';
-    header.innerHTML = `<h3>${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3><span class="task-type-badge">${task.type || 'задание'}</span>`;
-    taskDiv.appendChild(header);
-    if (task.instruction) {
-      const instr = document.createElement('div');
-      instr.className = 'task-instruction';
-      instr.innerHTML = `<i class="fas fa-info-circle"></i> ${safeText(task.instruction)}`;
-      taskDiv.appendChild(instr);
-    }
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'task-content';
-    if (task.type === 'gapfill') renderGapFill(contentDiv, task);
-    else if (task.type === 'quiz') renderQuiz(contentDiv, task);
-    else if (task.type === 'match') renderMatchTask(contentDiv, task);
-    else if (task.type === 'grammar') renderGrammarTask(contentDiv, task);
-    else renderDefault(contentDiv, task);
-    taskDiv.appendChild(contentDiv);
-    container.appendChild(taskDiv);
-  });
-}
-
-function renderDefault(container, task) {
-  if (task.content) { const p = document.createElement('p'); p.textContent = task.content; container.appendChild(p); }
-  if (task.wordBank) {
-    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
-    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
-    container.appendChild(bankDiv);
-  }
-}
-
-function renderGrammarTask(container, task) {
-  if (task.grammarRules) {
-    const rulesDiv = document.createElement('div');
-    rulesDiv.className = 'grammar-rules';
-    rulesDiv.innerHTML = `<strong>📘 ${t('grammarRule')}:</strong> ${escapeHtml(task.grammarRules)}`;
-    container.appendChild(rulesDiv);
-  }
-  if (task.content) {
-    const p = document.createElement('p');
-    p.textContent = task.content;
-    container.appendChild(p);
-  }
-  if (task.wordBank && task.wordBank.length) {
-    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
-    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
-    container.appendChild(bankDiv);
-  }
-}
-
-function renderGapFill(container, task) {
-  if (!task.text) return;
-  const parts = task.text.split('___');
-  const answers = task.answers || [];
-  const options = task.options || [];
-  const form = document.createElement('div'); form.className = 'gap-fill-form';
-  parts.forEach((part, idx) => {
-    if (part) { const span = document.createElement('span'); span.textContent = part; form.appendChild(span); }
-    if (idx < parts.length - 1) {
-      if (options[idx] && Array.isArray(options[idx])) {
-        const select = document.createElement('select'); select.className = 'gap-select';
-        const def = document.createElement('option'); def.textContent = '...'; select.appendChild(def);
-        options[idx].forEach(opt => { const o = document.createElement('option'); o.value = opt; o.textContent = opt; select.appendChild(o); });
-        form.appendChild(select);
-      } else {
-        const input = document.createElement('input'); input.className = 'gap-input'; input.placeholder = '...'; form.appendChild(input);
-      }
-    }
-  });
-  container.appendChild(form);
-  if (answers.length) {
-    const btn = document.createElement('button'); btn.className = 'check-btn'; btn.textContent = t('checkAnswer');
-    const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
-    btn.onclick = () => {
-      const inputs = form.querySelectorAll('.gap-input, .gap-select');
-      let corr = 0;
-      inputs.forEach((inp, i) => {
-        if (inp.value.trim().toLowerCase() === answers[i].toLowerCase()) { inp.style.borderColor = 'green'; corr++; } else { inp.style.borderColor = 'red'; }
-      });
-      if (corr === answers.length) {
-        res.textContent = t('correct');
-        res.className = `result-message correct`;
-      } else {
-        res.textContent = t('incorrectWithAnswer', { answer: answers.join(', ') });
-        res.className = `result-message incorrect`;
-      }
-      res.style.display = 'block';
-    };
-    container.appendChild(btn); container.appendChild(res);
-  }
-}
-
-function renderQuiz(container, task) {
-  if (!task.questions) return;
-  const form = document.createElement('div');
-  task.questions.forEach((q, i) => {
-    const div = document.createElement('div'); div.className = 'quiz-question';
-    div.innerHTML = `<p><strong>${q.question}</strong></p>`;
-    q.options.forEach((opt, oi) => {
-      const lbl = document.createElement('label'); lbl.className = 'quiz-option';
-      lbl.innerHTML = `<input type="radio" name="q_${i}" value="${oi}"> ${opt}`;
-      div.appendChild(lbl);
-    });
-    form.appendChild(div);
-  });
-  container.appendChild(form);
-  const btn = document.createElement('button'); btn.className = 'check-btn'; btn.textContent = t('checkAnswer');
-  const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
-  btn.onclick = () => {
-    let corr = 0;
-    task.questions.forEach((q, i) => { const sel = document.querySelector(`input[name="q_${i}"]:checked`); if (sel && +sel.value === q.correct) corr++; });
-    if (corr === task.questions.length) {
-      res.textContent = t('correct');
-      res.className = `result-message correct`;
-    } else {
-      res.textContent = t('incorrect');
-      res.className = `result-message incorrect`;
-    }
-    res.style.display = 'block';
-  };
-  container.appendChild(btn); container.appendChild(res);
-}
-
-function renderMatchTask(container, task) {
-  if (!task.pairs) return;
-
-  const leftItems = task.pairs.map((p, idx) => ({ text: p.left, id: idx }));
-  const rightItems = task.pairs.map((p, idx) => ({ text: p.right, id: idx }));
-
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
-
-  shuffle(leftItems);
-  shuffle(rightItems);
-
-  const grid = document.createElement('div');
-  grid.className = 'match-grid';
-
-  const lCol = document.createElement('div');
-  lCol.className = 'match-column';
-
-  const rCol = document.createElement('div');
-  rCol.className = 'match-column';
-
-  let selectedId = null;
-  const matched = new Set();
-
-  leftItems.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'match-item';
-    el.textContent = item.text;
-    el.dataset.id = item.id;
-    el.dataset.side = 'left';
-
-    el.onclick = () => {
-      if (matched.has(item.id)) return;
-      if (selectedId === item.id) {
-        el.classList.remove('selected');
-        selectedId = null;
-      } else {
-        document.querySelectorAll('.match-item.selected').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedId = item.id;
-      }
-    };
-
-    lCol.appendChild(el);
-  });
-
-  rightItems.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'match-item';
-    el.textContent = item.text;
-    el.dataset.id = item.id;
-    el.dataset.side = 'right';
-
-    el.onclick = () => {
-      if (matched.has(item.id)) return;
-      if (selectedId !== null && selectedId === item.id) {
-        const leftEl = document.querySelector(`.match-item[data-id="${item.id}"][data-side="left"]`);
-        if (leftEl) {
-          leftEl.classList.add('matched');
-          leftEl.classList.remove('selected');
-        }
-        el.classList.add('matched');
-        matched.add(item.id);
-        selectedId = null;
-      } else {
-        el.style.backgroundColor = '#fee2e2';
-        setTimeout(() => el.style.backgroundColor = '', 300);
-      }
-    };
-
-    rCol.appendChild(el);
-  });
-
-  grid.appendChild(lCol);
-  grid.appendChild(rCol);
-  container.appendChild(grid);
-}
-
-// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ КАРТОЧЕК =====
-function renderFlashcards(flashcards) {
-  console.log('📇 renderFlashcards вызван, получено карточек:', flashcards ? flashcards.length : 0);
-  const container = $('flashcard-wrapper');
-  const emptyDiv = $('flashcards-empty');
-  const counter = $('flashcards-counter');
-  const prevBtn = $('flashcards-prev');
-  const nextBtn = $('flashcards-next');
-  const progressFill = $('flashcards-progress-fill');
-  const progressText = $('flashcards-progress-text');
-  const resetBtn = $('flashcards-reset');
-
-  // Обновляем текст кнопки сброса сразу (даже если карточек нет)
-  if (resetBtn) {
-    resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
-  }
-
-  if (!flashcards || !flashcards.length) {
-    console.log('❌ Карточек нет, показываем заглушку');
-    if (emptyDiv) {
-      emptyDiv.style.display = 'block';
-      emptyDiv.innerHTML = `<p class="muted">${t('noFlashcards')}</p>`;
-    }
-    if (container) container.innerHTML = '';
-    if (counter) counter.textContent = '0/0';
-    if (progressFill) progressFill.style.width = '0%';
-    if (progressText) progressText.textContent = '0/0';
-    if (prevBtn) prevBtn.disabled = true;
-    if (nextBtn) nextBtn.disabled = true;
-    return;
-  }
-
-  console.log('✅ Карточки есть, начинаем рендер');
-  if (emptyDiv) emptyDiv.style.display = 'none';
-
-  let currentIndex = 0;
-  let learned = new Array(flashcards.length).fill(false);
-
-  function updateProgress() {
-    if (!progressFill || !progressText) return;
-    const learnedCount = learned.filter(v => v).length;
-    const percent = (learnedCount / flashcards.length) * 100;
-    progressFill.style.width = `${percent}%`;
-    progressText.textContent = `${learnedCount}/${flashcards.length}`;
-  }
-
-  function updateCard() {
-    if (!container || !flashcards.length) return;
-    const card = flashcards[currentIndex];
-    const isLearned = learned[currentIndex];
-    console.log(`🃏 Обновляем карточку ${currentIndex + 1}:`, card.es);
-
-    // Лицевая сторона: испанское слово + пример на испанском (если есть)
-    // Оборот: перевод слова + перевод примера (если есть)
-    container.innerHTML = `
-      <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}">
-        <div class="flashcard-front">
-          <div class="word">${escapeHtml(card.es || card.word || '')}</div>
-          ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
-          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
-          ${isLearned ? `<div class="learned-stamp"><i class="fas fa-check-circle"></i> ${t('learned')}</div>` : ''}
-        </div>
-        <div class="flashcard-back">
-          <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
-          ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
-        </div>
-      </div>
-      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 16px; width: 100%;">
-        <button class="flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}" style="min-width: 120px;">
-          <i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i>
-          ${isLearned ? t('notLearned') : t('know')}
-        </button>
-      </div>`;
-
-    const flashcardEl = container.querySelector('.flashcard');
-    if (flashcardEl) {
-      flashcardEl.onclick = function (e) {
-        if (e.target.closest('button')) return;
-        this.classList.toggle('flipped');
-      };
-    }
-
-    const toggleBtn = container.querySelector('.learn-toggle');
-    if (toggleBtn) {
-      toggleBtn.onclick = (e) => {
-        e.stopPropagation();
-        learned[currentIndex] = !learned[currentIndex];
-        updateProgress();
-        updateCard();
-      };
-    }
-
-    if (counter) counter.textContent = `${currentIndex + 1}/${flashcards.length}`;
-    if (prevBtn) prevBtn.disabled = currentIndex === 0;
-    if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
-  }
-
-  // Обновляем текст кнопки сброса (на случай, если язык поменялся)
-  if (resetBtn) {
-    resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
-    resetBtn.onclick = () => {
-      learned.fill(false);
-      updateProgress();
-      updateCard();
-    };
-  }
-
-  if (prevBtn) {
-    prevBtn.onclick = () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCard();
-      }
-    };
-  }
-
-  if (nextBtn) {
-    nextBtn.onclick = () => {
-      if (currentIndex < flashcards.length - 1) {
-        currentIndex++;
-        updateCard();
-      }
-    };
-  }
-
-  updateProgress();
-  updateCard();
-}
-
-// ===== Живые задания =====
-function checkLiveTasks(currentTime) {
-  if (!liveTasksEnabled) return;
-  if (!liveTasks.length) return;
-  const taskIndex = liveTasks.findIndex((t, idx) => t.time <= currentTime && !completedLiveTasks.has(idx));
-  if (taskIndex === -1) return;
-
-  const task = liveTasks[taskIndex];
-  completedLiveTasks.add(taskIndex);
-  showLiveTaskPopup(task);
-}
-
-function showLiveTaskPopup(task) {
-  if (livePopup) livePopup.remove();
-
-  const popup = document.createElement('div');
-  popup.className = 'live-task-popup';
-  popup.setAttribute('role', 'dialog');
-
-  let content = '';
-  if (task.type === 'word-catch') {
-    content = `
-      <h3>${t('wordCatchQuestion')}</h3>
-      <div class="live-options">
-        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
-      </div>
-    `;
-  } else if (task.type === 'translate') {
-    content = `
-      <h3>${t('translateQuestion', { word: task.word })}</h3>
-      <div class="live-options">
-        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
-      </div>
-    `;
-  } else if (task.type === 'gapfill') {
-    content = `
-      <h3>${t('gapfillQuestion')}</h3>
-      <p class="gap-line">${task.line.replace('___', '______')}</p>
-      <div class="live-options">
-        ${task.options.map(opt => `<button class="live-option" data-value="${opt}">${opt}</button>`).join('')}
-      </div>
-    `;
-  }
-
-  popup.innerHTML = `
-    <div class="live-task-content">
-      ${content}
-      <button class="live-close-btn">${t('close')}</button>
-    </div>
-  `;
-
-  popup.querySelectorAll('.live-option').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const selected = e.target.dataset.value;
-      const isCorrect = (selected === task.correct);
-      showFeedback(isCorrect, task.correct);
-      popup.remove();
-      livePopup = null;
-    });
-  });
-
-  popup.querySelector('.live-close-btn').addEventListener('click', () => {
-    popup.remove();
-    livePopup = null;
-  });
-
-  document.body.appendChild(popup);
-  livePopup = popup;
-}
-
-function showFeedback(isCorrect, correctAnswer) {
-  const feedback = document.createElement('div');
-  feedback.className = `live-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-  feedback.textContent = isCorrect ? t('correct') : t('incorrectWithAnswer', { answer: correctAnswer });
-  document.body.appendChild(feedback);
-  setTimeout(() => feedback.remove(), 2000);
-}
-
-function toggleLiveTasks(enable) {
-  liveTasksEnabled = enable;
-  showToast(enable ? t('liveTasksOn') : t('liveTasksOff'));
-}
-
-function toggleLyricsHighlight(enable) {
-  lyricsHighlightEnabled = enable;
-  if (!enable) {
-    document.querySelectorAll('.lyric-line.active').forEach(el => el.classList.remove('active'));
-  }
-  showToast(enable ? t('highlightOn') : t('highlightOff'));
-}
-
-function toggleTranslations(show) {
-  translationsVisible = show;
-  const transEls = document.querySelectorAll('.lyric-translation');
-  transEls.forEach(el => {
-    el.style.display = show ? 'block' : 'none';
-  });
-  showToast(show ? t('translationsOn') : t('translationsOff'));
-}
-
-// ===== YouTube =====
-function initPlayerPostMessage() {
-  if (!currentSong || !currentSong.youtubeId) return;
-  ytIframe = document.getElementById('video-iframe');
-  if (!ytIframe) return;
-  let origin = window.location.origin;
-  if (!origin || origin === 'null' || origin === 'file://') origin = 'https://www.youtube.com';
-  ytIframe.src = `https://www.youtube.com/embed/${currentSong.youtubeId}?enablejsapi=1&origin=${encodeURIComponent(origin)}&playsinline=1&rel=0`;
-  ytIframe.onload = () => {
-    ytPost({ event: 'listening', id: 'yt1' });
-    startSyncInterval();
-  };
-}
-
-function ytPost(obj) { if (ytIframe && ytIframe.contentWindow) ytIframe.contentWindow.postMessage(JSON.stringify(obj), '*'); }
-
-window.addEventListener('message', (e) => {
-  try {
-    const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-    if (d && d.event === 'infoDelivery' && d.info && typeof d.info.currentTime === 'number') ytLastTime = d.info.currentTime;
-  } catch {}
-});
-
-function startSyncInterval() {
-  if (syncInterval) clearInterval(syncInterval);
-  if (!currentSong.lyrics) return;
-  syncInterval = setInterval(() => {
-    highlightCurrentLyric(ytLastTime * 1000);
-    checkLiveTasks(ytLastTime);
-  }, 200);
-}
-
-function parseTimeToMs(time) {
-  if (!time) return 0;
-  const parts = time.toString().split(':');
-  if (parts.length === 2) return (parseInt(parts[0]) * 60 + parseFloat(parts[1].replace(',', '.'))) * 1000;
-  return 0;
-}
-
-function highlightCurrentLyric(timeMs) {
-  if (!lyricsHighlightEnabled) return;
-  if (!currentSong.lyrics) return;
-  let activeIndex = -1;
-  for (let i = 0; i < currentSong.lyrics.length; i++) {
-    const t = parseTimeToMs(currentSong.lyrics[i].time);
-    if (t <= timeMs && t > 0) activeIndex = i;
-    else if (t > timeMs) break;
-  }
-  const curr = document.querySelector('.lyric-line.active');
-  const next = document.querySelector(`.lyric-line[data-index="${activeIndex}"]`);
-  if (curr !== next) {
-    if (curr) curr.classList.remove('active');
-    if (next) {
-      next.classList.add('active');
-      if (!isUserScrolling) next.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
-}
-
-function makeLyricsClickable() {
-  document.querySelectorAll('.lyric-line').forEach(line => {
-    line.onclick = () => {
-      const ms = parseTimeToMs(currentSong.lyrics[line.dataset.index].time);
-      if (ms > 0) player.seekTo(ms / 1000, true);
-    };
-  });
+.flashcard-footer-actions button {
+  min-width: 120px;
 }
