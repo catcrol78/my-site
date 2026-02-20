@@ -1,5 +1,5 @@
 // ===== State =====
-let currentLang = localStorage.getItem("lang") || "ru";
+let currentLang = localStorage.getItem("lang") || "es";
 
 console.log("🚀 script.js загружен");
 console.log("songsDataFromExternal:", window.songsDataFromExternal);
