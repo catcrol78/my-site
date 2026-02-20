@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== Применение языка интерфейса =====
 function applyInterfaceLanguage() {
-  // Заголовки вкладок (ДОБАВЛЕН КЛЮЧ grammar)
+  // Заголовки вкладок
   const tabMappings = {
     'lyrics': t('tabLyrics'),
     'tasks': t('tabTasks'),
@@ -226,7 +226,7 @@ function applyInterfaceLanguage() {
   const miroLink = document.querySelector('.resource-link.miro');
   if (miroLink) miroLink.innerHTML = `<i class="fab fa-miro"></i> ${t('openMiro')}`;
 
-  // Переключатели (ИСПРАВЛЕННЫЕ СЕЛЕКТОРЫ)
+  // Переключатели
   const toggleLiveLabel = document.querySelector('input#toggle-live')?.closest('label.control-toggle');
   if (toggleLiveLabel) {
     const checkbox = toggleLiveLabel.querySelector('input');
@@ -579,6 +579,7 @@ function renderMatchTask(container, task) {
   container.appendChild(grid);
 }
 
+// ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ КАРТОЧЕК =====
 function renderFlashcards(flashcards) {
   console.log('📇 renderFlashcards вызван, получено карточек:', flashcards ? flashcards.length : 0);
   const container = $('flashcard-wrapper');
@@ -630,16 +631,18 @@ function renderFlashcards(flashcards) {
     const isLearned = learned[currentIndex];
     console.log(`🃏 Обновляем карточку ${currentIndex + 1}:`, card.es);
 
+    // Лицевая сторона: испанское слово + пример на испанском (если есть)
+    // Оборот: перевод слова + перевод примера (если есть)
     container.innerHTML = `
       <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}">
         <div class="flashcard-front">
           <div class="word">${escapeHtml(card.es || card.word || '')}</div>
           ${card.transcription ? `<div class="transcription">${escapeHtml(card.transcription)}</div>` : ''}
+          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
           ${isLearned ? `<div class="learned-stamp"><i class="fas fa-check-circle"></i> ${t('learned')}</div>` : ''}
         </div>
         <div class="flashcard-back">
           <div class="translation">${escapeHtml(card.ru || card.translation || '')}</div>
-          ${card.example ? `<div class="example">${escapeHtml(card.example)}</div>` : ''}
           ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
         </div>
       </div>
