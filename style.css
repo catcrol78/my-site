@@ -5,7 +5,7 @@
   --muted:#64748b;
   --border:#e5e7eb;
   --accent:#1f6feb;
-  --brand: var(--accent); /* alias for legacy */
+  --brand: var(--accent);
   --shadow: 0 8px 20px rgba(15, 23, 42, .08);
   --radius:16px;
 }
@@ -81,8 +81,6 @@ body{
   font-size:14px;
 }
 
-
-/* Admin link button (catalog header) */
 .admin-button{
   display:inline-flex;
   align-items:center;
@@ -98,7 +96,6 @@ body{
 }
 .admin-button:hover{ box-shadow: var(--shadow); }
 .header-right{ display:flex; align-items:center; gap:10px; }
-
 
 /* Filters */
 .header-filters{ padding:0 0 12px; }
@@ -263,7 +260,6 @@ body{
   opacity:.95;
 }
 
-/* Квадратная обложка на стартовом экране (без кружка) */
 .waiting-cover{
   width:min(420px, 100%);
   aspect-ratio: 1 / 1;
@@ -290,7 +286,7 @@ body{
 .video-fallback.hidden{ display:none; }
 .open-youtube{ color:var(--accent); font-weight:700; text-decoration:none; }
 
-/* PDF download button in song details */
+/* PDF download button (старый класс, но новый использует .resource-link) */
 .detail-resources{ margin-top:10px; }
 .pdf-download{
   display:inline-flex;
@@ -416,7 +412,7 @@ body{
 .task-instruction{ margin:8px 0 10px; color:#0f172a; font-size:14px; }
 .task-body ul{ margin:0; padding-left:18px; }
 .task-body li{ margin:0 0 6px; }
-.task-actions{ margin-top:10px; }
+.task-actions{ margin-top:10px; display: flex; gap: 8px; flex-wrap: wrap; }
 .task-btn{
   border:0;
   border-radius:12px;
@@ -437,70 +433,714 @@ body{
 }
 .tasks-empty{ color:var(--muted); font-size:14px; }
 
-/* List */
-.song-list-toolbar{
-  padding:14px;
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  border-bottom:1px solid var(--border);
+/* Match задания */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
 }
-.song-list-title h3{ margin:0; }
-.song-list-subtitle{ margin-top:6px; color:var(--muted); font-size:13px; }
-
-.song-list-actions select{
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
+.match-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-
-.song-grid{
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+.match-item {
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-
-.song-card{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:16px;
-  padding:10px;
-  cursor:pointer;
+.match-item:hover {
+  background: #f1f5f9;
+  border-color: var(--accent);
 }
-.song-card:focus{ outline: 3px solid rgba(99,102,241,.25); }
-.song-card-cover{
-  width:84px;
-  height:84px;
-  border-radius:14px;
-  object-fit:cover;
-  flex-shrink:0;
-  background:#e5e7eb;
+.match-item.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(31, 111, 235, 0.2);
 }
-.song-card-info{ min-width:0; flex:1; }
-.song-card-info h4{ margin:0; font-size:15px; }
-.song-card-info p{ margin:6px 0 0; color:var(--muted); font-size:13px; }
-
-.song-card-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:8px;
-}
-.song-card-tags span{
-  font-size:11px;
-  padding:5px 8px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#f8fafc;
-  color:#0f172a;
+.match-item.matched {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+  text-decoration: line-through;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
+/* Gap-fill */
+.gap-fill-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+.gap-fill-form span {
+  font-size: 16px;
+}
+.gap-input, .gap-select {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 80px;
+}
+.gap-input:focus, .gap-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Quiz */
+.quiz-question {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.quiz-option {
+  display: block;
+  margin: 8px 0;
+  font-size: 14px;
+}
+.quiz-option input {
+  margin-right: 8px;
+}
+
+/* Grammar rules */
+.grammar-rules {
+  background: #f1f5f9;
+  border-left: 4px solid var(--accent);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Word bank */
+.word-bank {
+  margin-top: 10px;
+}
+.word-bank .chip {
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+/* Flashcards */
+.flashcards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.flashcards-header h3 { margin: 0; }
+.flashcards-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+.progress-bar-container {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 45px;
+}
+.flashcards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  padding: 20px 0;
+}
+.flashcard-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  perspective: 1500px;
+  min-height: 250px;
+}
+.flashcard {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s;
+  transform-style: preserve-3d;
+}
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.3s ease;
+}
+.flashcard-front {
+  background: linear-gradient(135deg, var(--accent), #1a4fa0);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.flashcard-front .word {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.flashcard-front .transcription {
+  font-size: 16px;
+  opacity: 0.9;
+  font-style: italic;
+}
+.flashcard-front .example {
+  font-size: 16px;
+  margin-top: 8px;
+  opacity: 0.9;
+}
+.flashcard-back {
+  background: white;
+  color: var(--text);
+  transform: rotateY(180deg);
+  border: 1px solid var(--border);
+  overflow-y: auto;
+}
+.flashcard-back .translation {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 15px;
+}
+.flashcard-back .example {
+  font-size: 16px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 10px;
+  max-width: 80%;
+}
+.flashcard-back .example-translation {
+  font-size: 14px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+.flashcard-learned {
+  cursor: default;
+  opacity: 0.9;
+}
+.flashcard-learned .flashcard-front {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+.flashcard-learned .learned-stamp {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.3);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+.flashcards-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.flashcards-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+.flashcards-nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.flashcards-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.flashcards-counter {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.flashcards-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.flashcards-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.flashcards-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.flashcards-btn.danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+/* Live tasks */
+.live-task-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  padding: 24px;
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 90%;
+  border: 1px solid var(--border);
+}
+.live-task-content { position: relative; }
+.live-close-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--muted);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.live-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center;
+}
+.live-option {
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  border-radius: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.live-option:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.live-feedback {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 40px;
+  color: white;
+  font-weight: 500;
+  z-index: 1001;
+  animation: fadeInOut 2s ease;
+}
+.live-feedback.correct { background: #10b981; }
+.live-feedback.incorrect { background: #ef4444; }
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+/* Адаптация для мобильных устройств (флешкарты) */
+@media (max-width: 640px) {
+  .flashcard-wrapper {
+    max-width: 300px;
+    min-height: 200px;
+  }
+  .flashcard {
+    height: 200px;
+  }
+}
+
+/* Song page grid */
+@media (min-width: 981px) {
+  #song-content {
+    display: grid;
+    grid-template-columns: 450px 1fr; 
+    grid-template-areas: 
+      "video tabs"
+      "video content";
+    gap: 24px;
+    align-items: start;
+  }
+  .song-header {
+    grid-area: video;
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    z-index: 5;
+    margin-bottom: 0 !important; 
+  }
+  .detail-tabs {
+    grid-area: tabs;
+    position: sticky;
+    top: 60px;
+    z-index: 4;
+    background: var(--bg);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0;
+  }
+  .detail-panels {
+    grid-area: content;
+    min-width: 0;
+  }
+}
+
+/* Video container */
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Song header */
+.song-header {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.song-title-text {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.song-artist-text {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #64748b;
+}
+.badges-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Resources under video */
+.song-resources {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  width: 100%;
+  justify-content: center;
+}
+.resource-link i { font-size: 18px; }
+.resource-link.pdf {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+.resource-link.pdf:hover { background: #b91c1c; }
+.resource-link.miro {
+  background: #0a3d5e;
+  color: white;
+  border-color: #0a3d5e;
+}
+.resource-link.miro:hover { background: #052d44; }
+
+/* Lyrics controls */
+.lyrics-controls {
+  display: flex;
+  gap: 16px;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border-radius: 40px;
+  flex-wrap: wrap;
+}
+.control-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #334155;
+}
+.control-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+/* Lyrics blocks */
+.lyric-block {
+  margin-bottom: 10px;
+}
+.lyric-line {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  margin: 2px 0;
+  border-radius: 8px;
+}
+.lyric-line.active {
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(31, 111, 235, 0.3);
+}
+.lyric-line:hover:not(.active) {
+  background-color: rgba(31, 111, 235, 0.1);
+}
+.lyric-translation {
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--muted);
+  margin: 2px 0 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+}
+
+/* ===== КАРТОЧКИ ПЕСЕН (ГЛАВНАЯ) ===== */
+.song-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.song-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+.song-card:focus {
+  outline: 3px solid rgba(99,102,241,.25);
+}
+.song-card::after {
+  content: '→';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.song-card:hover::after {
+  opacity: 1;
+  transform: translate(4px, -50%);
+}
+.song-card-cover {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #e5e7eb;
+  transition: transform 0.2s ease;
+}
+.song-card-info {
+  min-width: 0;
+  flex: 1;
+}
+.song-card-info h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.song-card-info p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.song-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.song-card-tags span {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: #0f172a;
+  background-color: #fff;
+  border-color: #d1d5db;
+  font-weight: 500;
+  /* Гарантируем корректное отображение цифр */
+  font-variant-numeric: normal;
+}
+.song-card-restrictions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.restriction-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  color: #1e293b;
+}
+.restriction-badge.age {
+  background: #fef9c3;
+  border-color: #facc15;
+}
+.restriction-badge.other-lang {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+/* Toolbar списка песен (заголовок, счётчик, сортировка) */
+.song-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.song-list-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.song-list-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.song-list-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.song-list-actions {
+  flex-shrink: 0;
+}
+
+.song-list-actions select {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+/* List pagination */
 .list-pagination{
   padding:0 14px 14px;
 }
@@ -550,528 +1190,131 @@ body{
   .logo-text{ font-size:20px; }
   .filters-hint{ display:none; }
 }
-/* ===== Улучшенные карточки песен ===== */
-.song-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Уменьшаем шрифт подзаголовка списка (Показано: X из Y) */
+.song-list-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: normal;
+}
+/* Стили для панели грамматических правил */
+.grammar-rules-content {
+  padding: 10px 0;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-.song-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+.grammar-rules-content p {
+  margin: 0 0 12px 0;
+  color: var(--text);
 }
 
-.song-card-cover {
-  transition: transform 0.2s ease;
+.grammar-rules-content p:last-child {
+  margin-bottom: 0;
 }
 
-.song-card:hover .song-card-cover {
-  transform: scale(1.02);
-}
-
-/* Дополнительно: чуть более плавные углы и аккуратный текст */
-.song-card {
-  border-radius: 20px; /* увеличиваем скругление */
-}
-
-.song-card-info h4 {
-  font-weight: 600; /* делаем название чуть жирнее */
-  letter-spacing: -0.01em;
-}
-
-.song-card-tags span {
-  background-color: #fff;
-  border-color: #d1d5db;
-  color: #1f2937;
-  font-weight: 500;
-  padding: 4px 10px;
-}
-/* Стили для интерактивных заданий */
-.task-block {
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.task-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.task-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.task-type-badge {
-  padding: 4px 12px;
-  background: var(--accent);
-  color: white;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.task-instruction {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: #fff;
-  border-radius: 12px;
-  border-left: 4px solid var(--accent);
-  font-size: 14px;
-}
-
-.gap-fill-form {
-  line-height: 2.5;
-  margin-bottom: 16px;
-}
-
-.gap-input, .gap-select {
-  padding: 6px 10px;
-  margin: 0 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  min-width: 80px;
-}
-
-.gap-select {
-  min-width: 120px;
-}
-
-.check-btn {
-  padding: 10px 20px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.check-btn:hover {
-  background: #1a5fcc;
-}
-
-.result-message {
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 12px;
-  font-weight: 500;
-}
-
-.result-message.correct {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.result-message.incorrect {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.quiz-question {
-  margin-bottom: 20px;
-}
-
-.quiz-option {
-  display: block;
-  padding: 8px 12px;
-  margin: 5px 0;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.quiz-option:hover {
-  background: #f1f5f9;
-}
-
-.quiz-option input {
-  margin-right: 10px;
-}
-
-.word-bank {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-/* Стили для сопоставления (match) */
-.match-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 10px;
-}
-
-.match-column {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-}
-
-.match-item {
-  padding: 10px;
-  margin: 5px 0;
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-}
-
-.match-item.selected {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.match-item.matched {
-  opacity: 0.6;
-  cursor: default;
-  background: #e5e7eb;
-  text-decoration: line-through;
-}
-
-.match-item:hover:not(.matched) {
-  background: #e2e8f0;
-}
-/* ===== Стили для карточек-перевёртышей (Flashcards) ===== */
-
-.flashcards-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.flashcards-header h3 {
-  margin: 0;
-}
-
-.flashcards-progress {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 200px;
-}
-
-.progress-bar-container {
-  flex: 1;
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 999px;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  font-size: 14px;
-  font-weight: 600;
+/* Стили для выделения важных терминов в грамматике */
+.grammar-rules-content strong {
   color: var(--accent);
-  min-width: 45px;
+  font-weight: 600;
 }
 
-.flashcards-container {
+.grammar-rules-content em {
+  font-style: italic;
+  color: var(--muted);
+}
+/* Фикс для панелей, чтобы они не выглядели пустыми при малом контенте */
+.detail-panel .panel-card {
+  min-height: 200px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 25px;
-  padding: 20px 0;
+}
+
+.panel-card h3 {
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Для грамматических правил */
+#grammar-rules-content {
+  flex: 1;
+  min-height: 100px;
+}
+
+#grammar-rules-content p {
+  margin: 0 0 12px 0;
+  line-height: 1.6;
+}
+
+#grammar-rules-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Для лексики */
+#vocab-content {
+  min-height: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
+}
+
+/* Для текста песни */
+#lyrics-content {
+  min-height: 200px;
+}
+
+/* Для заданий */
+#tasks-container {
+  min-height: 150px;
+}
+
+/* Для карточек */
+.flashcards-container {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
 }
 
 .flashcard-wrapper {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  perspective: 1500px;
-}
-
-.flashcard {
-  width: 100%;
-  height: 250px;
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.3s;
-  transform-style: preserve-3d;
-}
-
-.flashcard.flipped {
-  transform: rotateY(180deg);
-}
-
-.flashcard-front, .flashcard-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 20px;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-  transition: box-shadow 0.3s ease;
-}
-
-.flashcard-front {
-  background: linear-gradient(135deg, var(--accent), #1a4fa0);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.flashcard-front .word {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.flashcard-front .transcription {
-  font-size: 16px;
-  opacity: 0.9;
-  font-style: italic;
-}
-
-.flashcard-back {
-  background: white;
-  color: var(--text);
-  transform: rotateY(180deg);
-  border: 1px solid var(--border);
-  overflow-y: auto;
-}
-
-.flashcard-back .translation {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 15px;
-}
-
-.flashcard-back .example {
-  font-size: 16px;
-  color: var(--muted);
-  font-style: italic;
-  margin-bottom: 10px;
-  max-width: 80%;
-}
-
-.flashcard-back .example-translation {
-  font-size: 14px;
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-.flashcard-back .learned-badge {
-  margin-top: 15px;
-  padding: 5px 15px;
-  background: #10b981;
-  color: white;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.flashcard-footer {
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 12px;
-  color: rgba(0,0,0,0.4);
-}
-
-.flashcard-learned {
-  cursor: default;
-  opacity: 0.9;
-}
-
-.flashcard-learned .flashcard-front {
-  background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.flashcard-learned .learned-stamp {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(255,255,255,0.3);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
-}
-
-.flashcards-controls {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
 }
 
-.flashcards-nav-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: white;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.2s;
-}
-
-.flashcards-nav-btn:hover:not(:disabled) {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.flashcards-nav-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.flashcards-counter {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.flashcards-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.flashcards-btn {
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  background: white;
-  border-radius: 30px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-
-.flashcards-btn:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.flashcards-btn.danger:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-  color: white;
-}
-
-.word-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 30px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 8px;
-}
-
-.word-badge.learned {
-  background: #10b981;
-  color: white;
-}
-
-.word-badge.new {
-  background: var(--accent);
-  color: white;
-}
-
-/* ===== Синхронизация текста с видео ===== */
-.lyric-line {
-  cursor: pointer;
+/* Добавляем плавный отступ для всех panel-card */
+.panel-card {
+  padding: 20px;
   transition: all 0.2s ease;
-  padding: 4px 8px;
-  margin: 2px 0;
-  border-radius: 8px;
 }
 
-.lyric-line.active {
-  background-color: var(--accent);
-  color: white;
-  font-weight: 600;
-  transform: scale(1.02);
-  box-shadow: 0 2px 8px rgba(31, 111, 235, 0.3);
+/* Делаем фон чуть светлее для лучшей читаемости */
+.panel-card {
+  background: #ffffff;
 }
 
-.lyric-line:hover:not(.active) {
-  background-color: rgba(31, 111, 235, 0.1);
+/* Убираем лишние отступы у последних элементов */
+.panel-card > :last-child {
+  margin-bottom: 0;
 }
 
-/* Плавная прокрутка к активной строке */
-.lyrics-text {
-  scroll-margin-top: 20px;
+/* Стили для пустых состояний */
+.muted {
+  color: var(--muted);
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin: 0;
 }
-
-/* Адаптация для мобильных */
-@media (max-width: 640px) {
-  .flashcard-wrapper {
-    max-width: 300px;
-  }
-  
-  .flashcard {
-    height: 200px;
-  }
-  
-  .flashcard-front .word {
-    font-size: 24px;
-  }
-  
-  .flashcard-back .translation {
-    font-size: 22px;
-  }
-  
-  .flashcards-progress {
-    width: 100%;
-  }
-}
-/* ===== СПЛИТ-ЭКРАН (ВИДЕО СЛЕВА, ТЕКСТ СПРАВА) ===== */
-
-/* На больших экранах */
+/* Фикс для выравнивания колонок */
 @media (min-width: 981px) {
-  
   #song-content {
     display: grid;
-    /* Левая колонка 450px, правая - всё остальное */
-    grid-template-columns: 450px 1fr; 
+    grid-template-columns: 450px 1fr;
     grid-template-areas: 
       "video tabs"
       "video content";
@@ -1079,150 +1322,87 @@ body{
     align-items: start;
   }
 
-  /* Левая колонка: Видео и инфо */
-  .song-header {
-    grid-area: video;
-    position: sticky;
-    top: 80px; /* Отступ сверху, чтобы не прилипало к меню */
-    height: fit-content;
-    z-index: 5;
-    /* Убираем отступ снизу на ПК, так как блоки стоят рядом */
-    margin-bottom: 0 !important; 
-  }
-
-  /* Правая колонка: Вкладки (липкие) */
-  .detail-tabs {
-    grid-area: tabs;
-    position: sticky;
-    top: 60px; /* Чуть ниже основного меню */
-    z-index: 4;
-    background: var(--bg);
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 0;
-  }
-
-  /* Правая колонка: Контент */
   .detail-panels {
     grid-area: content;
     min-width: 0;
+    min-height: 500px; /* Фиксированная минимальная высота */
+  }
+
+  .detail-panel.active {
+    min-height: 450px; /* Минимальная высота активной панели */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Для панели лексики */
+  [data-panel="vocab"] .panel-card {
+    min-height: 300px;
+  }
+
+  #vocab-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+    min-height: 200px;
+  }
+
+  /* Для панели грамматики */
+  [data-panel="grammar"] .panel-card {
+    min-height: 300px;
+  }
+
+  #grammar-rules-content {
+    flex: 1;
+    min-height: 200px;
+  }
+
+  /* Для панели текста */
+  [data-panel="lyrics"] .panel-card {
+    min-height: 400px;
+  }
+
+  #lyrics-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 300px;
+  }
+
+  /* Для панели заданий */
+  [data-panel="tasks"] .panel-card {
+    min-height: 400px;
+  }
+
+  #tasks-container {
+    flex: 1;
+    min-height: 300px;
+  }
+
+  /* Для панели карточек */
+  [data-panel="flashcards"] .panel-card {
+    min-height: 450px;
+  }
+
+  .flashcards-container {
+    flex: 1;
+    min-height: 350px;
   }
 }
-.live-task-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  padding: 24px;
-  z-index: 1000;
-  min-width: 300px;
-  max-width: 90%;
-  border: 1px solid var(--border);
-}
 
-.live-task-content {
-  position: relative;
-}
-
-.live-close-btn {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: var(--muted);
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.live-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 20px;
-  justify-content: center;
-}
-
-.live-option {
-  padding: 12px 24px;
-  border: 1px solid var(--border);
-  background: #f8fafc;
-  border-radius: 40px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.live-option:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.live-feedback {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  border-radius: 40px;
-  color: white;
-  font-weight: 500;
-  z-index: 1001;
-  animation: fadeInOut 2s ease;
-}
-
-.live-feedback.correct {
-  background: #10b981;
-}
-
-.live-feedback.incorrect {
-  background: #ef4444;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-}
-.song-controls {
-  display: flex;
-  gap: 20px;
-  padding: 10px 14px;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-.control-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.control-toggle input {
-  width: 16px;
-  height: 16px;
-}
-
-.lyric-block {
-  margin-bottom: 10px;
-}
-.lyric-translation {
-  font-size: 0.85em;
-  font-style: italic;
-  color: var(--muted);
-  margin: 2px 0 0 0;
-  padding-left: 10px;
-  border-left: 2px solid var(--border);
+/* Для мобильных устройств */
+@media (max-width: 980px) {
+  .detail-panel.active {
+    min-height: auto;
+  }
+  
+  .panel-card {
+    min-height: auto;
+  }
 }
