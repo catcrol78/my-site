@@ -347,20 +347,11 @@
         <label>Исполнитель <span class="req-star">*</span></label>
         <input type="text" id="artist" />
       </div>
-
-      <!-- ===== НОВЫЙ БЛОК ДЛЯ ВИДЕО ===== -->
-      <div class="field-group">
-        <label>Видеоплатформа</label>
-        <select id="videoProvider">
-          <option value="youtube">YouTube</option>
-          <option value="kinescope">Kinescope</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label>ID видео <span class="req-star">*</span></label>
-        <input type="text" id="videoId" placeholder="например: G6OYDUomYwI или abc123" />
-        <div class="yt-preview" id="videoPreview" style="display: none;">
-          <img id="videoPreviewImg" src="" alt="Video preview" />
+      <div class="field-group" style="grid-column: span 2;">
+        <label>YouTube ссылка или ID <span class="req-star">*</span></label>
+        <input type="text" id="youtubeInput" placeholder="https://... или ID" />
+        <div class="yt-preview" id="ytPreview" style="display: none;">
+          <img id="ytPreviewImg" src="" alt="YouTube preview" />
         </div>
       </div>
 
@@ -429,18 +420,24 @@
       </div>
 
       <!-- ===== БЛОК 4: Лексика и грамматика ===== -->
-      <div style="grid-column: span 2; margin-top: 8px;">
-        <h4 class="section-title"><i class="fas fa-language"></i> Лексика и грамматика</h4>
-      </div>
+<div style="grid-column: span 2; margin-top: 8px;">
+  <h4 class="section-title"><i class="fas fa-language"></i> Лексика и грамматика</h4>
+</div>
 
-      <div class="field-group" style="grid-column: span 2;">
-        <label>Лексика (по слову на строке)</label>
-        <textarea id="vocabulary" placeholder="ritmo&#10;playa" rows="3"></textarea>
-      </div>
-      <div class="field-group" style="grid-column: span 2;">
-        <label>Грамматика (через запятую)</label>
-        <input type="text" id="grammar" placeholder="presente, gustar, subjuntivo" />
-      </div>
+<div class="field-group" style="grid-column: span 2;">
+  <label>Лексика (по слову на строке)</label>
+  <textarea id="vocabulary" placeholder="ritmo&#10;playa" rows="3"></textarea>
+</div>
+<div class="field-group" style="grid-column: span 2;">
+  <label>Грамматика (через запятую)</label>
+  <input type="text" id="grammar" placeholder="presente, gustar, subjuntivo" />
+</div>
+<!-- НОВОЕ ПОЛЕ ДЛЯ ГРАММАТИЧЕСКИХ ПРАВИЛ -->
+<div class="field-group" style="grid-column: span 2;">
+  <label>Грамматические правила (текстовое описание)</label>
+  <textarea id="grammarRules" placeholder="Например: В этой песне используется конструкция 'me gusta' для выражения симпатий. Обратите внимание на спряжение глаголов в presente de indicativo." rows="4"></textarea>
+  <small class="hint">Подробное описание грамматических явлений, которые встречаются в песне</small>
+</div>
 
       <!-- ===== БЛОК 5: Темы и PDF ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
@@ -453,9 +450,13 @@
       </div>
       <div class="field-group" style="grid-column: span 2;">
         <label>PDF ссылка</label>
-        <input type="text" id="pdfLink" placeholder="./pdf/lesson.pdf" />
+                <input type="text" id="pdfLink" placeholder="./pdf/lesson.pdf" />
       </div>
-
+<div class="field-group" style="grid-column: span 2;">
+  <label>Miro ссылка</label>
+  <input type="text" id="miroLink" placeholder="https://miro.com/app/board/..." />
+</div>
+     
       <!-- ===== БЛОК 6: Текст песни и переводы ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <h4 class="section-title"><i class="fas fa-file-alt"></i> Текст / таймкоды</h4>
@@ -474,8 +475,8 @@
         <textarea id="translations" placeholder="Введите перевод для каждой строки (по одному на строку)&#10;Я бы поклялся, что не знаю, чего хочу&#10;Но я знаю, что умру..." rows="6"></textarea>
         <small class="hint">Количество строк должно соответствовать количеству строк текста (пустые строки допускаются).</small>
       </div>
-
-      <!-- ===== БЛОК 7: Задания ===== -->
+      
+           <!-- ===== БЛОК 7: Задания ===== -->
       <div style="grid-column: span 2; margin-top: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <h4 class="section-title"><i class="fas fa-tasks"></i> Задания <span class="pill" id="tasksCount">0</span></h4>
