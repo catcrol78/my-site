@@ -106,7 +106,15 @@ body{
   box-shadow: var(--shadow);
   overflow:hidden;
 }
-
+.flashcard-footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  width: 100%;
+}
+.flashcard-footer-actions button {
+  min-width: 120px;
+}
 .filters-summary{
   display:flex;
   align-items:center;
