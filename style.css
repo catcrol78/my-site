@@ -1406,3 +1406,12 @@ body{
     min-height: auto;
   }
 }
+.flashcard-footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  width: 100%;
+}
+.flashcard-footer-actions button {
+  min-width: 120px;
+}
