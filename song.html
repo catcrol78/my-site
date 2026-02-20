@@ -4,86 +4,62 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Песня | Каталог испанских песен</title>
-  
-  <!-- Подключаем основной файл стилей -->
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Шрифты и иконки -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <!-- YouTube Iframe API (оставлен, но используется только для YouTube) -->
   <script src="https://www.youtube.com/iframe_api"></script>
+  <style>
+    /* Дополнительные стили для карточек, если нужно */
+  </style>
 </head>
 <body>
-  
-  <!-- Загрузчик -->
-  <div class="loader" id="loader">
-    <div class="spinner"></div>
-  </div>
-  
-  <!-- Основной контент -->
+  <div class="loader" id="loader"><div class="spinner"></div></div>
   <main class="container song-page-container">
-    
-    <!-- Кнопка назад -->
-    <a href="index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Вернуться к каталогу
-    </a>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Вернуться к каталогу</a>
 
-    <!-- Главный контейнер песни (скрыт до загрузки данных) -->
     <div id="song-content" style="display: none;">
-      
-      <!-- Левая колонка (на ПК): шапка и видео -->
+      <!-- Левая колонка (видео) -->
       <div class="song-header">
         <h1 id="song-title" class="song-title-text"></h1>
         <p id="song-artist" class="song-artist-text"></p>
-        
         <div id="song-badges" class="badges-section"></div>
 
-        <!-- Видео-плеер (ID используется в song.js) -->
         <div class="video-container">
           <iframe id="video-iframe" allowfullscreen></iframe>
         </div>
+
+        <!-- Ресурсы (PDF, Miro) -->
+        <div class="song-resources" id="song-resources"></div>
       </div>
 
-      <!-- Правая колонка (на ПК): вкладки -->
-      <div class="detail-tabs" role="tablist" aria-label="Разделы песни">
-        <button class="detail-tab active" type="button" data-tab="lyrics" role="tab" aria-selected="true">
-          <i class="fas fa-file-alt"></i> <span data-i18n="tabLyrics">Текст</span>
-        </button>
-        <button class="detail-tab" type="button" data-tab="tasks" role="tab" aria-selected="false">
-          <i class="fas fa-tasks"></i> <span data-i18n="tabTasks">Задания</span>
-          <span class="tab-badge" id="tasks-count-badge" style="display:none;"></span>
-        </button>
-        <button class="detail-tab" type="button" data-tab="vocab" role="tab" aria-selected="false">
-          <i class="fas fa-language"></i> <span data-i18n="tabVocab">Лексика</span>
-        </button>
-        <button class="detail-tab" type="button" data-tab="flashcards" role="tab" aria-selected="false">
-          <i class="fas fa-layer-group"></i> <span data-i18n="tabFlashcards">Карточки</span>
-          <span class="tab-badge" id="flashcards-count" style="display:none;"></span>
-        </button>
+      <!-- Правая колонка: вкладки -->
+      <div class="detail-tabs" role="tablist">
+        <button class="detail-tab active" data-tab="lyrics"><i class="fas fa-file-alt"></i> <span data-i18n="tabLyrics">Текст</span></button>
+        <button class="detail-tab" data-tab="tasks"><i class="fas fa-tasks"></i> <span data-i18n="tabTasks">Задания</span></button>
+        <button class="detail-tab" data-tab="vocab"><i class="fas fa-language"></i> <span data-i18n="tabVocab">Лексика</span></button>
+        <button class="detail-tab" data-tab="grammar"><i class="fas fa-book-open"></i> <span data-i18n="tabGrammar">Грамматика</span></button>
+        <button class="detail-tab" data-tab="flashcards"><i class="fas fa-layer-group"></i> <span data-i18n="tabFlashcards">Карточки</span></button>
       </div>
 
-      <!-- Панель управления (переключатели) -->
-      <div class="song-controls">
-        <label class="control-toggle">
-          <input type="checkbox" id="toggle-live" checked> Живые задания
-        </label>
-        <label class="control-toggle">
-          <input type="checkbox" id="toggle-highlight" checked> Подсветка текста
-        </label>
-        <label class="control-toggle">
-          <input type="checkbox" id="toggle-translations"> Переводы
-        </label>
-      </div>
-
-      <!-- Правая колонка (на ПК): контент вкладок -->
+      <!-- Правая колонка: контент -->
       <div class="detail-panels">
-        
         <!-- Панель текста -->
         <div class="detail-panel active" data-panel="lyrics">
           <div class="panel-card">
-            <h3><i class="fas fa-file-alt"></i> <span data-i18n="lyricsHeader">Текст песни</span></h3>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <h3><i class="fas fa-file-alt"></i> <span data-i18n="lyricsHeader">Текст песни</span></h3>
+              <div class="lyrics-controls">
+                <label class="control-toggle">
+                  <input type="checkbox" id="toggle-live" checked> Живые задания
+                </label>
+                <label class="control-toggle">
+                  <input type="checkbox" id="toggle-highlight" checked> Подсветка
+                </label>
+                <label class="control-toggle">
+                  <input type="checkbox" id="toggle-translations"> Переводы
+                </label>
+              </div>
+            </div>
             <div id="lyrics-content" class="lyrics-text"></div>
           </div>
         </div>
@@ -103,7 +79,15 @@
             <div id="vocab-content" class="chips-wrap"></div>
           </div>
         </div>
-     
+
+        <!-- Панель грамматических правил -->
+        <div class="detail-panel" data-panel="grammar">
+          <div class="panel-card">
+            <h3><i class="fas fa-book-open"></i> Грамматические правила</h3>
+            <div id="grammar-rules-content" class="grammar-rules-content"></div>
+          </div>
+        </div>
+
         <!-- Панель карточек -->
         <div class="detail-panel" data-panel="flashcards">
           <div class="panel-card">
@@ -111,56 +95,45 @@
               <h3><i class="fas fa-layer-group"></i> <span data-i18n="flashcardsTitle">Словарь в карточках</span></h3>
               <div class="flashcards-progress">
                 <div class="progress-bar-container">
-                  <div class="progress-bar-fill" id="flashcards-progress-fill" style="width: 0%"></div>
+                  <div class="progress-bar-fill" id="flashcards-progress-fill" style="width: 0%;"></div>
                 </div>
                 <span class="progress-text" id="flashcards-progress-text">0/0</span>
               </div>
             </div>
-            
+
+            <div id="flashcards-empty" style="display: none; text-align: center; padding: 20px;">
+              <p>Карточки для этой песни не найдены.</p>
+            </div>
+
             <div class="flashcards-container">
               <div class="flashcard-wrapper" id="flashcard-wrapper">
-                <!-- Карточка будет создаваться JS -->
+                <!-- карточка будет вставлена сюда скриптом -->
               </div>
-              
+
               <div class="flashcards-controls">
-                <button class="flashcards-nav-btn" id="flashcards-prev" disabled>
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="flashcards-counter" id="flashcards-counter">1 / 0</span>
-                <button class="flashcards-nav-btn" id="flashcards-next" disabled>
-                  <i class="fas fa-chevron-right"></i>
-                </button>
+                <button class="flashcards-nav-btn" id="flashcards-prev" disabled>‹</button>
+                <span class="flashcards-counter" id="flashcards-counter">1/1</span>
+                <button class="flashcards-nav-btn" id="flashcards-next" disabled>›</button>
               </div>
-              
+
               <div class="flashcards-actions">
-                <button class="flashcards-btn" id="flashcards-reset">
-                  <i class="fas fa-redo-alt"></i> <span data-i18n="reset">Сбросить прогресс</span>
-                </button>
+                <button class="flashcards-btn" id="flashcards-reset"><i class="fas fa-undo"></i> Сбросить прогресс</button>
               </div>
-            </div>
-            
-            <!-- Пустое состояние -->
-            <div id="flashcards-empty" style="display: none; text-align: center; padding: 40px 0;">
-              <p class="muted">Для этой песни пока нет карточек</p>
             </div>
           </div>
         </div>
-      </div> <!-- Конец detail-panels -->
-    </div> <!-- Конец song-content -->
+      </div> <!-- end detail-panels -->
+    </div> <!-- end song-content -->
 
-    <!-- Сообщение об ошибке (если песня не найдена) -->
-    <div id="not-found" class="not-found-container">
-      <i class="fas fa-music not-found-icon"></i>
+    <div id="not-found" class="not-found-container" style="display: none;">
       <h2>Песня не найдена</h2>
-      <p>К сожалению, запрошенная песня отсутствует в каталоге.</p>
-      <a href="index.html" class="back-link" style="margin-top: 20px;">
-        <i class="fas fa-arrow-left"></i> Вернуться в каталог
-      </a>
+      <p>Попробуйте вернуться к каталогу и выбрать другую песню.</p>
+      <a href="index.html" class="back-link">Вернуться в каталог</a>
     </div>
-
   </main>
 
-  <!-- Подключаем данные песен и основной скрипт -->
+  <div class="toast" id="toast"></div>
+
   <script src="songs-data.js"></script>
   <script src="song.js"></script>
 </body>
