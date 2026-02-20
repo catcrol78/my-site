@@ -37,12 +37,12 @@ const i18nSong = {
     translateQuestion: "Перевод слова \"{word}\":",
     gapfillQuestion: "Вставь пропущенное слово:",
     close: "✕",
-    // Новые ключи
     grammarRule: "Грамматическое правило",
     grammar: "Грамматика",
     liveTasks: "Живые задания",
     highlight: "Подсветка",
-    translations: "Переводы"
+    translations: "Переводы",
+    resetProgress: "Сбросить прогресс" // добавлено
   },
   es: {
     tabLyrics: "Letra",
@@ -78,12 +78,12 @@ const i18nSong = {
     translateQuestion: "Traducción de \"{word}\":",
     gapfillQuestion: "Completa la palabra que falta:",
     close: "✕",
-    // Новые ключи
     grammarRule: "Regla gramatical",
     grammar: "Gramática",
     liveTasks: "Ejercicios en vivo",
     highlight: "Resaltado",
-    translations: "Traducciones"
+    translations: "Traducciones",
+    resetProgress: "Reiniciar progreso" // добавлено
   }
 };
 
@@ -224,7 +224,6 @@ function applyInterfaceLanguage() {
   // Лейблы переключателей (Живые задания, Подсветка, Переводы)
   const toggleLiveLabel = document.querySelector('label[for="toggle-live"]');
   if (toggleLiveLabel) {
-    // Сохраняем чекбокс, меняем только текст
     const checkbox = toggleLiveLabel.querySelector('input');
     if (checkbox) {
       toggleLiveLabel.innerHTML = '';
@@ -296,7 +295,7 @@ function renderSong(song) {
 
   hideLoader();
   setupTabs();
-  applyInterfaceLanguage(); // <-- применяем перевод интерфейса
+  applyInterfaceLanguage(); // применяем перевод интерфейса
   if (song.youtubeId) initPlayerPostMessage();
 }
 
@@ -586,6 +585,11 @@ function renderFlashcards(flashcards) {
   const progressText = $('flashcards-progress-text');
   const resetBtn = $('flashcards-reset');
 
+  // Обновляем текст кнопки сброса сразу (даже если карточек нет)
+  if (resetBtn) {
+    resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
+  }
+
   if (!flashcards || !flashcards.length) {
     console.log('❌ Карточек нет, показываем заглушку');
     if (emptyDiv) {
@@ -634,7 +638,7 @@ function renderFlashcards(flashcards) {
           ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
         </div>
       </div>
-      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 10px;">
+      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 16px; width: 100%;">
         <button class="flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}" style="min-width: 120px;">
           <i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i>
           ${isLearned ? t('notLearned') : t('know')}
@@ -664,6 +668,16 @@ function renderFlashcards(flashcards) {
     if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
   }
 
+  // Обновляем текст кнопки сброса (на случай, если язык поменялся)
+  if (resetBtn) {
+    resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
+    resetBtn.onclick = () => {
+      learned.fill(false);
+      updateProgress();
+      updateCard();
+    };
+  }
+
   if (prevBtn) {
     prevBtn.onclick = () => {
       if (currentIndex > 0) {
@@ -679,14 +693,6 @@ function renderFlashcards(flashcards) {
         currentIndex++;
         updateCard();
       }
-    };
-  }
-
-  if (resetBtn) {
-    resetBtn.onclick = () => {
-      learned.fill(false);
-      updateProgress();
-      updateCard();
     };
   }
 
