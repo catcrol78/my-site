@@ -14,7 +14,71 @@ let livePopup = null;
 let liveTasksEnabled = true;
 let lyricsHighlightEnabled = true;
 let translationsVisible = false;
+// ===== i18n для страницы песни =====
+const i18nSong = {
+  ru: {
+    tabLyrics: "Текст",
+    tabTasks: "Задания",
+    tabVocab: "Лексика",
+    tabFlashcards: "Карточки",
+    lyricsHeader: "Текст песни",
+    tasksHeader: "Задания",
+    vocabHeader: "Лексика",
+    flashcardsHeader: "Карточки для запоминания",
+    downloadPdf: "Скачать PDF (материалы)",
+    openMiro: "Доска Miro",
+    noLyrics: "Текст пока не добавлен",
+    noTasks: "Заданий нет",
+    noVocab: "Лексика пока не добавлена",
+    noFlashcards: "Карточек пока нет",
+    checkAnswer: "Проверить",
+    correct: "✅ Верно!",
+    incorrect: "❌ Неверно",
+    showTranslation: "Показать перевод",
+    hideTranslation: "Скрыть перевод",
+    liveTasksOn: "Живые задания включены",
+    liveTasksOff: "Живые задания отключены",
+    highlightOn: "Подсветка текста включена",
+    highlightOff: "Подсветка текста отключена",
+    translationsOn: "Переводы показаны",
+    translationsOff: "Переводы скрыты",
+  },
+  es: {
+    tabLyrics: "Letra",
+    tabTasks: "Ejercicios",
+    tabVocab: "Vocabulario",
+    tabFlashcards: "Tarjetas",
+    lyricsHeader: "Letra de la canción",
+    tasksHeader: "Ejercicios",
+    vocabHeader: "Vocabulario",
+    flashcardsHeader: "Tarjetas de memoria",
+    downloadPdf: "Descargar PDF (materiales)",
+    openMiro: "Pizarra Miro",
+    noLyrics: "La letra aún no está disponible",
+    noTasks: "No hay ejercicios",
+    noVocab: "El vocabulario aún no está disponible",
+    noFlashcards: "No hay tarjetas",
+    checkAnswer: "Comprobar",
+    correct: "✅ ¡Correcto!",
+    incorrect: "❌ Incorrecto",
+    showTranslation: "Mostrar traducción",
+    hideTranslation: "Ocultar traducción",
+    liveTasksOn: "Ejercicios en vivo activados",
+    liveTasksOff: "Ejercicios en vivo desactivados",
+    highlightOn: "Resaltado de letra activado",
+    highlightOff: "Resaltado de letra desactivado",
+    translationsOn: "Traducciones mostradas",
+    translationsOff: "Traducciones ocultadas",
+  }
+};
 
+// Текущий язык (берём из localStorage, как в каталоге)
+const currentLang = localStorage.getItem("lang") || "es";
+
+// Функция перевода
+function t(key) {
+  return i18nSong[currentLang]?.[key] || i18nSong.ru[key] || key;
+}
 const player = {
   getCurrentTime: () => ytLastTime,
   seekTo: (seconds, allowSeekAhead) => {
@@ -820,3 +884,4 @@ function makeLyricsClickable() {
     };
   });
 }
+
