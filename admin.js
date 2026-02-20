@@ -1,6 +1,5 @@
-// admin.js – полная версия с поддержкой карточек-перевёртышей, живых заданий и переводов
-// Обновлено для поддержки нескольких видеопровайдеров (YouTube / Kinescope)
-console.log("admin.js загружен (поддержка Kinescope)");
+// admin.js – полная версия с поддержкой грамматических правил
+console.log("admin.js загружен");
 
 // ===== Вспомогательные функции =====
 function linesToArray(text) {
@@ -20,18 +19,10 @@ function parseLyrics(text) {
 function checkedValues(containerId) {
   return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`)).map(i => i.value);
 }
-
-// Извлекает ID видео из введённого значения (поддерживает прямые ID и ссылки YouTube)
-function extractVideoId(input) {
+function extractYouTubeId(input) {
   const raw = (input || "").trim();
   if (!raw) return "";
-  
-  // Если это просто ID (буквы, цифры, дефис, подчёркивание)
-  if (/^[a-zA-Z0-9_-]{6,}$/.test(raw) && !raw.includes("http") && !raw.includes("/")) {
-    return raw;
-  }
-  
-  // Попытка извлечь из ссылки YouTube
+  if (/^[a-zA-Z0-9_-]{6,20}$/.test(raw) && !raw.includes("http")) return raw;
   try {
     const url = new URL(raw);
     const v = url.searchParams.get("v");
@@ -43,20 +34,15 @@ function extractVideoId(input) {
     const embedIdx = parts.indexOf("embed");
     if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
   } catch (_) {}
-  
-  // Регулярка для YouTube
   const m = raw.match(/v=([a-zA-Z0-9_-]{6,20})/);
-  return m ? m[1] : raw; // если ничего не нашли, возвращаем как есть (возможно, ID Kinescope)
+  return m ? m[1] : raw;
 }
-
-// Генерирует URL обложки для YouTube, для Kinescope возвращает пустую строку
-function getCoverUrl(provider, id) {
-  if (provider === "youtube" && id) {
-    return `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
-  }
-  return ""; // Для Kinescope обложка не генерируется автоматически
+function youtubeCoverUrl(id) { return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : ""; }
+function safeSlug(s) {
+  return (s || "song").toString().toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
-
 function downloadText(filename, content, mime = "text/plain;charset=utf-8") {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -136,20 +122,18 @@ function getNextId() {
   return Math.max(maxInSet, maxInExternal) + 1;
 }
 
-// ===== Предпросмотр видео (только для YouTube) =====
-function updateVideoPreview() {
-  const providerSelect = document.getElementById('videoProvider');
-  const videoIdInput = document.getElementById('videoId');
-  const previewDiv = document.getElementById('videoPreview');
-  const previewImg = document.getElementById('videoPreviewImg');
-  if (!providerSelect || !videoIdInput || !previewDiv || !previewImg) return;
+// ===== Предпросмотр YouTube =====
+function updateYouTubePreview() {
+  const input = document.getElementById('youtubeInput');
+  const previewDiv = document.getElementById('ytPreview');
+  const previewImg = document.getElementById('ytPreviewImg');
+  if (!input || !previewDiv || !previewImg) return;
 
-  const provider = providerSelect.value;
-  const rawId = videoIdInput.value.trim();
-  const id = extractVideoId(rawId); // очищаем ID
+  const raw = input.value.trim();
+  const id = extractYouTubeId(raw);
 
-  if (provider === 'youtube' && id && id.length >= 6) {
-    const coverUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  if (id && id.length >= 6) {
+    const coverUrl = youtubeCoverUrl(id);
     previewImg.src = coverUrl;
     previewDiv.style.display = 'block';
     previewImg.onerror = () => {
@@ -292,6 +276,27 @@ function updateExtraFields(wrap, type, taskData) {
       `;
       break;
 
+    case 'grammar':
+      extraHtml = `
+        <div class="admin-field" style="grid-column: span 2;">
+          <label>Грамматическое правило (текст)</label>
+          <textarea data-field="grammarRules" placeholder="Например: употребление Presente de Subjuntivo после 'a Dios le pido que...'" rows="3">${(taskData?.grammarRules || '').replace(/</g, '&lt;')}</textarea>
+        </div>
+        <div class="admin-field" style="grid-column: span 2;">
+          <label>Контент (текст задания)</label>
+          <textarea data-field="content" placeholder="Текст задания" rows="4">${(taskData?.content || '').replace(/</g, '&lt;')}</textarea>
+        </div>
+        <div class="admin-field">
+          <label>Word bank (по слову на строке)</label>
+          <textarea data-field="wordBank" placeholder="palabra1&#10;palabra2" rows="4">${(taskData?.wordBank || []).join('\n')}</textarea>
+        </div>
+        <div class="admin-field">
+          <label>Ответ (если есть)</label>
+          <input type="text" data-field="answer" placeholder="Правильный ответ" value="${(taskData?.answer || '').replace(/"/g, '&quot;')}" />
+        </div>
+      `;
+      break;
+
     default:
       extraHtml = `
         <div class="admin-field" style="grid-column: span 2;">
@@ -373,6 +378,14 @@ function collectTaskData(wrap) {
         }
         return null;
       }).filter(Boolean);
+      break;
+
+    case 'grammar':
+      task.grammarRules = wrap.querySelector('[data-field="grammarRules"]')?.value || '';
+      task.content = wrap.querySelector('[data-field="content"]')?.value || '';
+      const wbGrammar = wrap.querySelector('[data-field="wordBank"]')?.value || '';
+      task.wordBank = linesToArray(wbGrammar);
+      task.answer = wrap.querySelector('[data-field="answer"]')?.value || '';
       break;
 
     default:
@@ -510,17 +523,11 @@ function renumberLiveTasks() {
   document.getElementById("liveTasksCount").textContent = String(tasks.length);
 }
 
-// ===== Построение объекта песни из формы =====
+// ===== Построение объекта песни из формы (с переводами и грамматическими правилами) =====
 function buildSong() {
   const idInput = document.getElementById("id");
   const idVal = (idInput.value || "").trim();
-  
-  // Видео данные
-  const provider = document.getElementById("videoProvider").value;
-  const rawVideoId = document.getElementById("videoId").value.trim();
-  const videoId = extractVideoId(rawVideoId); // очищаем ID
-  const cover = getCoverUrl(provider, videoId); // генерируем обложку только для YouTube
-  
+  const youtubeId = extractYouTubeId(document.getElementById("youtubeInput").value);
   const titleRu = document.getElementById("titleRu").value.trim();
   const titleEs = document.getElementById("titleEs").value.trim();
   const artist = document.getElementById("artist").value.trim();
@@ -535,13 +542,16 @@ function buildSong() {
   const grammar = csvToArray(document.getElementById("grammar").value);
   const themes = csvToArray(document.getElementById("themes").value);
   const pdf = (document.getElementById("pdfLink")?.value || "").trim();
+  const miro = (document.getElementById("miroLink")?.value || "").trim();
+  
+  // НОВОЕ: грамматические правила
+  const grammarRules = document.getElementById("grammarRules")?.value.trim() || "";
 
   // Текст и переводы
   const lyrics = parseLyrics(document.getElementById("lyrics").value);
   const translationsText = document.getElementById("translations").value;
   const translations = linesToArray(translationsText);
 
-  // Добавляем переводы к строкам
   lyrics.forEach((line, index) => {
     if (index < translations.length && translations[index]) {
       line.translation = translations[index];
@@ -549,6 +559,8 @@ function buildSong() {
       line.translation = "";
     }
   });
+
+  const cover = youtubeCoverUrl(youtubeId);
 
   const taskEditors = Array.from(document.querySelectorAll("#tasksContainer .task-editor"));
   const tasks = taskEditors.map(el => collectTaskData(el));
@@ -563,19 +575,18 @@ function buildSong() {
     id: finalId,
     title: { ru: titleRu || "", es: titleEs || "" },
     artist: artist || "",
-    video: {
-      provider: provider,
-      id: videoId || ""
-    },
-    cover, // автоматически сгенерированная обложка (только для YouTube)
+    youtubeId: youtubeId || "",
+    cover,
     level: level ? [level] : [],
     themes,
     grammar,
+    grammarRules, // НОВОЕ: добавляем поле
     vocabulary,
     culture: { tags: cultureTags, items: cultureItems },
     restrictions: { age, containsOtherLanguages, profanity, sensitiveTopics: [], note },
     lyrics,
     pdf: pdf || "",
+    miro: miro || "",
     analysis: [],
     tasks,
     liveTasks
@@ -586,13 +597,7 @@ function buildSong() {
 function loadSongIntoForm(song) {
   if (!song) return;
   document.getElementById("id").value = song.id || "";
-  
-  // Видео данные
-  const provider = song.video?.provider || "youtube";
-  const videoId = song.video?.id || "";
-  document.getElementById("videoProvider").value = provider;
-  document.getElementById("videoId").value = videoId;
-  
+  document.getElementById("youtubeInput").value = song.youtubeId || "";
   document.getElementById("titleRu").value = song.title?.ru || "";
   document.getElementById("titleEs").value = song.title?.es || "";
   document.getElementById("artist").value = song.artist || "";
@@ -609,13 +614,15 @@ function loadSongIntoForm(song) {
   document.getElementById("vocabulary").value = (song.vocabulary || []).join("\n");
   document.getElementById("grammar").value = (song.grammar || []).join(", ");
   document.getElementById("pdfLink").value = song.pdf || "";
+  document.getElementById("miroLink").value = song.miro || "";
   document.getElementById("themes").value = (song.themes || []).join(", ");
+  
+  // НОВОЕ: загружаем грамматические правила
+  document.getElementById("grammarRules").value = song.grammarRules || "";
 
-  // Текст с таймкодами
   const lyricsText = (song.lyrics || []).map(l => l.time ? `${l.time} | ${l.text}` : l.text).join("\n");
   document.getElementById("lyrics").value = lyricsText;
 
-  // Переводы построчно
   const translationsText = (song.lyrics || []).map(l => l.translation || "").join("\n");
   document.getElementById("translations").value = translationsText;
 
@@ -639,12 +646,12 @@ function loadSongIntoForm(song) {
   }
   renumberLiveTasks();
 
-  updateVideoPreview();
+  updateYouTubePreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
 
 // ===== Валидация =====
-const REQUIRED_FIELDS = ["videoId", "artist", "titleRu", "titleEs"]; // заменили youtubeInput на videoId
+const REQUIRED_FIELDS = ["youtubeInput", "artist", "titleRu", "titleEs"];
 function setInvalid(el, isInvalid) {
   if (!el) return;
   el.classList.toggle("invalid", !!isInvalid);
@@ -654,13 +661,13 @@ function clearInvalidAll() {
 }
 function validateSong(song) {
   const errors = [];
-  const videoOk = !!(song.video?.id && song.video.id.trim().length >= 1);
+  const youtubeOk = !!(song.youtubeId && song.youtubeId.trim().length >= 6);
   const artistOk = !!(song.artist && song.artist.trim().length >= 1);
   const titleOk = !!((song.title?.ru || "").trim() || (song.title?.es || "").trim());
-  if (!videoOk) errors.push("• ID видео: заполни (обязательно).");
+  if (!youtubeOk) errors.push("• YouTube: вставь ссылку или ID (обязательно).");
   if (!artistOk) errors.push("• Исполнитель: заполни (обязательно).");
   if (!titleOk) errors.push("• Название: заполни хотя бы ru или es (обязательно).");
-  setInvalid(document.getElementById("videoId"), !videoOk);
+  setInvalid(document.getElementById("youtubeInput"), !youtubeOk);
   setInvalid(document.getElementById("artist"), !artistOk);
   const titlesEmpty = !titleOk;
   setInvalid(document.getElementById("titleRu"), titlesEmpty);
@@ -744,143 +751,4 @@ function saveSong() {
 document.addEventListener("DOMContentLoaded", () => {
   const tasksContainer = document.getElementById("tasksContainer");
   const liveTasksContainer = document.getElementById("liveTasksContainer");
-  renumberTasks();
-  renumberLiveTasks();
-
-  // Заменили youtubeInput на videoId и добавили videoProvider
-  ["videoId","artist","titleRu","titleEs"].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener("input", () => {
-      setInvalid(el, false);
-      showErrors([]);
-    });
-  });
-
-  // Предпросмотр видео при изменении провайдера или ID
-  let previewTimeout;
-  const debouncedUpdatePreview = () => {
-    clearTimeout(previewTimeout);
-    previewTimeout = setTimeout(updateVideoPreview, 400);
-  };
-  document.getElementById('videoId').addEventListener('input', debouncedUpdatePreview);
-  document.getElementById('videoProvider').addEventListener('change', debouncedUpdatePreview);
-
-  document.getElementById("btnAddTask").addEventListener("click", () => {
-    tasksContainer.appendChild(createTaskEditor(tasksContainer.children.length));
-    renumberTasks();
-  });
-
-  document.getElementById("btnAddLiveTask").addEventListener("click", () => {
-    liveTasksContainer.appendChild(createLiveTaskEditor(liveTasksContainer.children.length));
-    renumberLiveTasks();
-  });
-
-  document.getElementById("btnSaveSong").addEventListener("click", saveSong);
-
-  document.getElementById("btnNewSong").addEventListener("click", () => {
-    document.getElementById("btnClear").click();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  document.getElementById("btnExportSetJs").addEventListener("click", () => {
-    const set = loadSet();
-    if (!set.length) return alert("Общий набор пустой.");
-    downloadText("songs-data.js", exportSongsDataJs(set), "application/javascript;charset=utf-8");
-    showToast(`Экспортировано ${set.length} песен`);
-  });
-
-  document.getElementById("btnClear").addEventListener("click", () => {
-    if (confirm("Очистить форму? Все несохранённые данные будут потеряны.")) {
-      document.getElementById("id").value = "";
-      document.getElementById("videoProvider").value = "youtube";
-      document.getElementById("videoId").value = "";
-      document.getElementById("titleRu").value = "";
-      document.getElementById("titleEs").value = "";
-      document.getElementById("artist").value = "";
-      document.getElementById("level").value = "";
-      document.getElementById("age").value = "16+";
-      document.getElementById("otherLang").value = "false";
-      document.getElementById("profanity").value = "none";
-      document.getElementById("restrNote").value = "";
-      document.querySelectorAll('#cultureTags input[type="checkbox"]').forEach(ch => ch.checked = false);
-      document.getElementById("cultureItems").value = "";
-      document.getElementById("vocabulary").value = "";
-      document.getElementById("grammar").value = "";
-      document.getElementById("pdfLink").value = "";
-      document.getElementById("themes").value = "";
-      document.getElementById("lyrics").value = "";
-      document.getElementById("translations").value = "";
-      document.getElementById("tasksContainer").innerHTML = "";
-      document.getElementById("liveTasksContainer").innerHTML = "";
-      renumberTasks();
-      renumberLiveTasks();
-      updateVideoPreview();
-      clearInvalidAll();
-      showErrors([]);
-      showToast("Форма очищена");
-    }
-  });
-
-  document.getElementById("btnClearSet").addEventListener("click", () => {
-    const ok = confirm("Точно очистить общий набор? Это удалит все песни из localStorage.");
-    if (!ok) return;
-    clearSet();
-    renderSet();
-    showToast("Общий набор очищен");
-  });
-
-  const setList = document.getElementById("setList");
-  if (setList) {
-    setList.addEventListener("click", async (e) => {
-      const btn = e.target.closest("button[data-act]");
-      const infoDiv = e.target.closest(".set-item-info");
-      if (infoDiv) {
-        const id = infoDiv.dataset.id;
-        const song = getSongFromSet(id);
-        if (song) {
-          loadSongIntoForm(song);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-        return;
-      }
-      if (!btn) return;
-      const id = btn.getAttribute("data-id");
-      const act = btn.getAttribute("data-act");
-      const set = loadSet();
-      const song = set.find(s => String(s.id) === String(id));
-      if (act === "remove") {
-        if (confirm("Удалить эту песню из набора?")) {
-          removeSongFromSet(id);
-          renderSet();
-          showToast("Песня удалена");
-        }
-        return;
-      }
-      if (act === "edit" && song) {
-        loadSongIntoForm(song);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    });
-  }
-
-  (function autoSyncExternalToSet() {
-    const external = getExternalSongs();
-    if (!external || !external.length) return;
-    const currentSet = loadSet();
-    const merged = mergeSongs(external, currentSet);
-    const same = JSON.stringify(merged) === JSON.stringify(currentSet);
-    if (!same) saveSet(merged);
-    renderSet();
-  })();
-
-  const scrollBtn = document.getElementById('scrollTop');
-  if (scrollBtn) {
-    window.addEventListener('scroll', () => {
-      scrollBtn.classList.toggle('visible', window.scrollY > 300);
-    });
-    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  }
-
-  setTimeout(updateVideoPreview, 100);
-});
+  renumberTasks
