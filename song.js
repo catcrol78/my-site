@@ -872,4 +872,222 @@ function makeLyricsClickable() {
     };
   });
 }
+// ===== Обновлённые функции для рендеринга заданий (карточки) =====
+function renderTasks(tasks) {
+  const container = $('tasks-container');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!tasks || !tasks.length) {
+    container.innerHTML = `<p class="muted">${t('noTasks')}</p>`;
+    return;
+  }
+  tasks.forEach((task, index) => {
+    if (task.type === 'flashcards') return;
+    const taskDiv = document.createElement('div');
+    taskDiv.className = 'task-card';
+    const header = document.createElement('div');
+    header.className = 'task-header';
+    header.innerHTML = `<h3 class="task-title">${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3><span class="task-type">${task.type || 'задание'}</span>`;
+    taskDiv.appendChild(header);
+    if (task.instruction) {
+      const instr = document.createElement('div');
+      instr.className = 'task-instruction';
+      instr.innerHTML = `<i class="fas fa-info-circle"></i> ${safeText(task.instruction)}`;
+      taskDiv.appendChild(instr);
+    }
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'task-content';
+    if (task.type === 'gapfill') renderGapFill(contentDiv, task);
+    else if (task.type === 'quiz') renderQuiz(contentDiv, task);
+    else if (task.type === 'match') renderMatchTask(contentDiv, task);
+    else if (task.type === 'grammar') renderGrammarTask(contentDiv, task);
+    else renderDefault(contentDiv, task);
+    taskDiv.appendChild(contentDiv);
+    container.appendChild(taskDiv);
+  });
+}
+
+function renderDefault(container, task) {
+  if (task.content) { const p = document.createElement('p'); p.textContent = task.content; container.appendChild(p); }
+  if (task.wordBank) {
+    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
+    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+    container.appendChild(bankDiv);
+  }
+}
+
+function renderGrammarTask(container, task) {
+  if (task.grammarRules) {
+    const rulesDiv = document.createElement('div');
+    rulesDiv.className = 'grammar-rules';
+    rulesDiv.innerHTML = `<strong>📘 ${t('grammarRule')}:</strong> ${escapeHtml(task.grammarRules)}`;
+    container.appendChild(rulesDiv);
+  }
+  if (task.content) {
+    const p = document.createElement('p');
+    p.textContent = task.content;
+    container.appendChild(p);
+  }
+  if (task.wordBank && task.wordBank.length) {
+    const bankDiv = document.createElement('div'); bankDiv.className = 'word-bank';
+    bankDiv.innerHTML = '<strong>' + (currentLang === 'es' ? 'Palabras:' : 'Слова:') + '</strong> ' + task.wordBank.map(w => `<span class="chip">${escapeHtml(w)}</span>`).join('');
+    container.appendChild(bankDiv);
+  }
+}
+
+function renderGapFill(container, task) {
+  if (!task.text) return;
+  const parts = task.text.split('___');
+  const answers = task.answers || [];
+  const options = task.options || [];
+  const form = document.createElement('div'); form.className = 'gap-fill-form';
+  parts.forEach((part, idx) => {
+    if (part) { const span = document.createElement('span'); span.textContent = part; form.appendChild(span); }
+    if (idx < parts.length - 1) {
+      if (options[idx] && Array.isArray(options[idx])) {
+        const select = document.createElement('select'); select.className = 'gap-select';
+        const def = document.createElement('option'); def.textContent = '...'; select.appendChild(def);
+        options[idx].forEach(opt => { const o = document.createElement('option'); o.value = opt; o.textContent = opt; select.appendChild(o); });
+        form.appendChild(select);
+      } else {
+        const input = document.createElement('input'); input.className = 'gap-input'; input.placeholder = '...'; form.appendChild(input);
+      }
+    }
+  });
+  container.appendChild(form);
+  if (answers.length) {
+    const btn = document.createElement('button'); btn.className = 'task-btn primary'; btn.textContent = t('checkAnswer');
+    const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
+    btn.onclick = () => {
+      const inputs = form.querySelectorAll('.gap-input, .gap-select');
+      let corr = 0;
+      inputs.forEach((inp, i) => {
+        if (inp.value.trim().toLowerCase() === answers[i].toLowerCase()) { inp.style.borderColor = 'green'; corr++; } else { inp.style.borderColor = 'red'; }
+      });
+      if (corr === answers.length) {
+        res.textContent = t('correct');
+        res.className = `result-message correct`;
+      } else {
+        res.textContent = t('incorrectWithAnswer', { answer: answers.join(', ') });
+        res.className = `result-message incorrect`;
+      }
+      res.style.display = 'block';
+    };
+    container.appendChild(btn); container.appendChild(res);
+  }
+}
+
+function renderQuiz(container, task) {
+  if (!task.questions) return;
+  const form = document.createElement('div');
+  task.questions.forEach((q, i) => {
+    const div = document.createElement('div'); div.className = 'quiz-question';
+    div.innerHTML = `<p><strong>${q.question}</strong></p>`;
+    q.options.forEach((opt, oi) => {
+      const lbl = document.createElement('label'); lbl.className = 'quiz-option';
+      lbl.innerHTML = `<input type="radio" name="q_${i}" value="${oi}"> ${opt}`;
+      div.appendChild(lbl);
+    });
+    form.appendChild(div);
+  });
+  container.appendChild(form);
+  const btn = document.createElement('button'); btn.className = 'task-btn primary'; btn.textContent = t('checkAnswer');
+  const res = document.createElement('div'); res.className = 'result-message'; res.style.display = 'none';
+  btn.onclick = () => {
+    let corr = 0;
+    task.questions.forEach((q, i) => { const sel = document.querySelector(`input[name="q_${i}"]:checked`); if (sel && +sel.value === q.correct) corr++; });
+    if (corr === task.questions.length) {
+      res.textContent = t('correct');
+      res.className = `result-message correct`;
+    } else {
+      res.textContent = t('incorrect');
+      res.className = `result-message incorrect`;
+    }
+    res.style.display = 'block';
+  };
+  container.appendChild(btn); container.appendChild(res);
+}
+
+function renderMatchTask(container, task) {
+  if (!task.pairs) return;
+
+  const leftItems = task.pairs.map((p, idx) => ({ text: p.left, id: idx }));
+  const rightItems = task.pairs.map((p, idx) => ({ text: p.right, id: idx }));
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  shuffle(leftItems);
+  shuffle(rightItems);
+
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+
+  const lCol = document.createElement('div');
+  lCol.className = 'match-column';
+
+  const rCol = document.createElement('div');
+  rCol.className = 'match-column';
+
+  let selectedId = null;
+  const matched = new Set();
+
+  leftItems.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = item.text;
+    el.dataset.id = item.id;
+    el.dataset.side = 'left';
+
+    el.onclick = () => {
+      if (matched.has(item.id)) return;
+      if (selectedId === item.id) {
+        el.classList.remove('selected');
+        selectedId = null;
+      } else {
+        document.querySelectorAll('.match-item.selected').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedId = item.id;
+      }
+    };
+
+    lCol.appendChild(el);
+  });
+
+  rightItems.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = item.text;
+    el.dataset.id = item.id;
+    el.dataset.side = 'right';
+
+    el.onclick = () => {
+      if (matched.has(item.id)) return;
+      if (selectedId !== null && selectedId === item.id) {
+        const leftEl = document.querySelector(`.match-item[data-id="${item.id}"][data-side="left"]`);
+        if (leftEl) {
+          leftEl.classList.add('matched');
+          leftEl.classList.remove('selected');
+        }
+        el.classList.add('matched');
+        matched.add(item.id);
+        selectedId = null;
+      } else {
+        el.style.backgroundColor = '#fee2e2';
+        setTimeout(() => el.style.backgroundColor = '', 300);
+      }
+    };
+
+    rCol.appendChild(el);
+  });
+
+  grid.appendChild(lCol);
+  grid.appendChild(rCol);
+  container.appendChild(grid);
+}
 
