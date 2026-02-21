@@ -43,7 +43,8 @@ const i18nSong = {
     liveTasks: "Живые задания",
     highlight: "Подсветка",
     translations: "Переводы",
-    resetProgress: "Сбросить прогресс"
+    resetProgress: "Сбросить прогресс",
+    noGrammarRules: "Грамматические правила не добавлены",
   },
   es: {
     tabLyrics: "Letra",
@@ -85,7 +86,8 @@ const i18nSong = {
     liveTasks: "Ejercicios en vivo",
     highlight: "Resaltado",
     translations: "Traducciones",
-    resetProgress: "Reiniciar progreso"
+    resetProgress: "Reiniciar progreso",
+    noGrammarRules: "No hay reglas gramaticales",
   }
 };
 
@@ -265,6 +267,7 @@ function renderSong(song) {
   renderLyrics(song.lyrics);
   renderTasks(song.tasks);
   renderVocabulary(song.vocabulary);
+  renderGrammarRules(song.grammarRules);
 
   liveTasks = song.liveTasks || [];
   completedLiveTasks.clear();
@@ -873,4 +876,15 @@ function makeLyricsClickable() {
       if (ms > 0) player.seekTo(ms / 1000, true);
     };
   });
+}
+// ===== Отображение грамматических правил =====
+function renderGrammarRules(rules) {
+  const container = document.getElementById('grammar-rules-content');
+  if (!container) return;
+  if (!rules || rules.trim() === '') {
+    container.innerHTML = `<p class="muted">${t('noGrammarRules')}</p>`;
+    return;
+  }
+  // Заменяем переносы строк на <br> для читаемости
+  container.innerHTML = `<p>${escapeHtml(rules).replace(/\n/g, '<br>')}</p>`;
 }
