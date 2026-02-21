@@ -1728,3 +1728,35 @@ html {
     min-height: 450px; /* фиксируем минимальную высоту для всех вкладок */
   }
 }
+/* Исправление прыгающего плеера — фиксированная высота правой панели */
+@media (min-width: 981px) {
+  .detail-panels {
+    position: sticky;
+    top: 140px;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+  }
+
+  .detail-panel.active {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panel-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #lyrics-content,
+  #tasks-container,
+  #vocab-content,
+  #grammar-rules-content,
+  .flashcards-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
