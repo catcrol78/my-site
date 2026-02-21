@@ -749,11 +749,6 @@ function saveSong() {
 
 // ===== Инициализация =====
 document.addEventListener("DOMContentLoaded", () => {
-  const tasksContainer = document.getElementById("tasksContainer");
-  const liveTasksContainer = document.getElementById("liveTasksContainer");
-  renumberTasks
-// ===== Инициализация админки =====
-document.addEventListener('DOMContentLoaded', () => {
   // Загружаем внешние песни (из songs-data.js)
   const external = getExternalSongs();
   // Загружаем сохранённый набор из localStorage
@@ -768,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Рендерим список песен
   renderSet();
   
-  // Обработчики кнопок (если их ещё нет)
+  // Обработчики кнопок
   const btnNewSong = document.getElementById('btnNewSong');
   if (btnNewSong) {
     btnNewSong.addEventListener('click', () => {
