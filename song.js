@@ -375,7 +375,7 @@ function renderTasks(tasks) {
     taskDiv.className = 'task-block';
     const header = document.createElement('div');
     header.className = 'task-header';
-    header.innerHTML = `<h3>${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3><span class="task-type-badge">${task.type || 'задание'}</span>`;
+    header.innerHTML = `<h3>${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3>;
     taskDiv.appendChild(header);
     if (task.instruction) {
       const instr = document.createElement('div');
@@ -887,7 +887,7 @@ function renderTasks(tasks) {
     taskDiv.className = 'task-card';
     const header = document.createElement('div');
     header.className = 'task-header';
-    header.innerHTML = `<h3 class="task-title">${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3><span class="task-type">${task.type || 'задание'}</span>`;
+    header.innerHTML = `<h3 class="task-title">${safeText(task.title) || `${t('tasksHeader')} ${index + 1}`}</h3>;
     taskDiv.appendChild(header);
     if (task.instruction) {
       const instr = document.createElement('div');
@@ -1090,4 +1090,5 @@ function renderMatchTask(container, task) {
   grid.appendChild(rCol);
   container.appendChild(grid);
 }
+
 
