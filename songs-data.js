@@ -19,6 +19,7 @@ const songsDataFromExternal = [
     "grammar": [
       "gustar"
     ],
+    "grammarRules": "",
     "vocabulary": [
       "el corazón",
       "la escucha",
@@ -368,7 +369,7 @@ const songsDataFromExternal = [
           "es": "Gustar"
         },
         "instruction": {
-          "ru": "",
+          "ru": "выбери правильный ответ",
           "es": ""
         },
         "type": "quiz",
