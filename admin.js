@@ -614,11 +614,10 @@ function loadSongIntoForm(song) {
   document.getElementById("vocabulary").value = (song.vocabulary || []).join("\n");
   document.getElementById("grammar").value = (song.grammar || []).join(", ");
   document.getElementById("grammarRulesRu").value = song.grammarRules?.ru || "";
-document.getElementById("grammarRulesEs").value = song.grammarRules?.es || "";
+  document.getElementById("grammarRulesEs").value = song.grammarRules?.es || "";
   document.getElementById("pdfLink").value = song.pdf || "";
   document.getElementById("miroLink").value = song.miro || "";
   document.getElementById("themes").value = (song.themes || []).join(", ");
-  document.getElementById("grammarRules").value = song.grammarRules || "";
 
   const lyricsText = (song.lyrics || []).map(l => l.time ? `${l.time} | ${l.text}` : l.text).join("\n");
   document.getElementById("lyrics").value = lyricsText;
@@ -649,7 +648,6 @@ document.getElementById("grammarRulesEs").value = song.grammarRules?.es || "";
   updateYouTubePreview();
   showToast(`Песня "${song.title?.ru || song.title?.es || song.id}" загружена`);
 }
-
 // ===== Валидация =====
 const REQUIRED_FIELDS = ["youtubeInput", "artist", "titleRu", "titleEs"];
 function setInvalid(el, isInvalid) {
