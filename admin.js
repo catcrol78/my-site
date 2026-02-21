@@ -752,3 +752,79 @@ document.addEventListener("DOMContentLoaded", () => {
   const tasksContainer = document.getElementById("tasksContainer");
   const liveTasksContainer = document.getElementById("liveTasksContainer");
   renumberTasks
+// ===== Инициализация админки =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Загружаем внешние песни (из songs-data.js)
+  const external = getExternalSongs();
+  // Загружаем сохранённый набор из localStorage
+  let stored = loadSet();
+  
+  // Если сохранённый набор пуст, инициализируем его внешними данными
+  if (stored.length === 0 && external.length > 0) {
+    saveSet(external);
+    stored = external;
+  }
+  
+  // Рендерим список песен
+  renderSet();
+  
+  // Обработчики кнопок (если их ещё нет)
+  const btnNewSong = document.getElementById('btnNewSong');
+  if (btnNewSong) {
+    btnNewSong.addEventListener('click', () => {
+      document.getElementById('id').value = '';
+      document.getElementById('songForm').reset();
+      document.getElementById('ytPreview').style.display = 'none';
+      document.getElementById('tasksContainer').innerHTML = '';
+      document.getElementById('liveTasksContainer').innerHTML = '';
+      renumberTasks();
+      renumberLiveTasks();
+      showToast('Новая песня (заполните форму)');
+    });
+  }
+
+  const btnSaveSong = document.getElementById('btnSaveSong');
+  if (btnSaveSong) btnSaveSong.addEventListener('click', saveSong);
+  
+  const btnExport = document.getElementById('btnExportSetJs');
+  if (btnExport) {
+    btnExport.addEventListener('click', () => {
+      const set = loadSet();
+      const content = exportSongsDataJs(set);
+      downloadText('songs-data.js', content, 'application/javascript');
+      showToast('Экспортировано в songs-data.js');
+    });
+  }
+
+  const btnClear = document.getElementById('btnClear');
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      if (confirm('Очистить форму?')) {
+        document.getElementById('songForm').reset();
+        document.getElementById('id').value = '';
+        document.getElementById('ytPreview').style.display = 'none';
+        document.getElementById('tasksContainer').innerHTML = '';
+        document.getElementById('liveTasksContainer').innerHTML = '';
+        renumberTasks();
+        renumberLiveTasks();
+      }
+    });
+  }
+
+  const btnClearSet = document.getElementById('btnClearSet');
+  if (btnClearSet) {
+    btnClearSet.addEventListener('click', () => {
+      if (confirm('Очистить весь набор песен? Это действие необратимо.')) {
+        clearSet();
+        renderSet();
+        showToast('Набор очищен');
+      }
+    });
+  }
+
+  // Предпросмотр YouTube при вводе
+  const youtubeInput = document.getElementById('youtubeInput');
+  if (youtubeInput) {
+    youtubeInput.addEventListener('input', updateYouTubePreview);
+  }
+});
