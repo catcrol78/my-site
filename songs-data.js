@@ -4,7 +4,7 @@ const songsDataFromExternal = [
     "id": 9,
     "title": {
       "ru": "Me Gustas Tú",
-      "es": "проверка Me Gustas Tú"
+      "es": "Me Gustas Tú"
     },
     "artist": "Manu Chao",
     "youtubeId": "rs6Y4kZ8qtw",
@@ -19,7 +19,7 @@ const songsDataFromExternal = [
     "grammar": [
       "gustar"
     ],
-    "grammarRules": "",
+    "grammarRules": "В песне Manu Chao «Me gustas tú» отлично видна особенность испанского глагола gustar — он работает «в обратную сторону»: не «я люблю тебя», а «ты нравишься мне». Поэтому мы говорим me gustas tú (буквально «мне нравишься ты»). Перед глаголом ставится местоимение, указывающее, кому нравится: me (мне), te (тебе), le (ему/ей), nos (нам). Сам глагол изменяется по числам в зависимости от того, что именно нравится: если один предмет или действие — gusta (me gusta el café), если несколько — gustan (me gustan los aviones). А если нравится человек, мы используем форму, согласованную с ним: tú → gustas, él → gusta, ellos → gustan.\n\nВ песне встречаются все варианты: me gusta la mañana, me gustan los aviones, ¡me gustas tú! Ту же логику используют другие глаголы чувств, например encantar (me encanta el viento — я в восторге от ветра). Отрицание ставится перед местоимением: no me gusta el frío.",
     "vocabulary": [
       "el corazón",
       "la escucha",
