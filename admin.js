@@ -1,4 +1,4 @@
-// admin.js – полная версия с поддержкой грамматических правил
+// admin.js – полная версия с поддержкой грамматических правил и редактированием списка
 console.log("admin.js загружен");
 
 // ===== Вспомогательные функции =====
@@ -544,10 +544,8 @@ function buildSong() {
   const pdf = (document.getElementById("pdfLink")?.value || "").trim();
   const miro = (document.getElementById("miroLink")?.value || "").trim();
   
-  // НОВОЕ: грамматические правила
   const grammarRules = document.getElementById("grammarRules")?.value.trim() || "";
 
-  // Текст и переводы
   const lyrics = parseLyrics(document.getElementById("lyrics").value);
   const translationsText = document.getElementById("translations").value;
   const translations = linesToArray(translationsText);
@@ -580,7 +578,7 @@ function buildSong() {
     level: level ? [level] : [],
     themes,
     grammar,
-    grammarRules, // НОВОЕ: добавляем поле
+    grammarRules,
     vocabulary,
     culture: { tags: cultureTags, items: cultureItems },
     restrictions: { age, containsOtherLanguages, profanity, sensitiveTopics: [], note },
@@ -616,8 +614,6 @@ function loadSongIntoForm(song) {
   document.getElementById("pdfLink").value = song.pdf || "";
   document.getElementById("miroLink").value = song.miro || "";
   document.getElementById("themes").value = (song.themes || []).join(", ");
-  
-  // НОВОЕ: загружаем грамматические правила
   document.getElementById("grammarRules").value = song.grammarRules || "";
 
   const lyricsText = (song.lyrics || []).map(l => l.time ? `${l.time} | ${l.text}` : l.text).join("\n");
@@ -821,5 +817,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const youtubeInput = document.getElementById('youtubeInput');
   if (youtubeInput) {
     youtubeInput.addEventListener('input', updateYouTubePreview);
+  }
+
+  // Делегирование событий на список песен (редактирование/удаление)
+  const setList = document.getElementById('setList');
+  if (setList) {
+    setList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const act = btn.dataset.act;
+      const id = btn.dataset.id;
+      if (act === 'edit') {
+        const song = getSongFromSet(id);
+        if (song) loadSongIntoForm(song);
+      } else if (act === 'remove') {
+        if (confirm('Удалить песню?')) {
+          removeSongFromSet(id);
+          renderSet();
+          showToast('Песня удалена');
+        }
+      }
+    });
   }
 });
