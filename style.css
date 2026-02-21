@@ -1690,3 +1690,6 @@ body{
 .back-link-over-video i {
   font-size: 12px;
 }
+.detail-panels {
+  padding-top: 16px; /* отступ между вкладками и содержимым */
+}
