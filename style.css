@@ -1760,3 +1760,36 @@ html {
     min-height: 0;
   }
 }
+/* Исправление прыгающего плеера — фиксированная высота правой панели */
+@media (min-width: 981px) {
+  .detail-panels {
+    position: sticky;
+    top: 140px;
+    height: calc(100vh - 160px); /* фиксированная высота = всё окно минус отступы */
+    overflow-y: auto;
+  }
+
+  .detail-panel.active {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%; /* растягиваем на всю высоту родителя */
+  }
+
+  .panel-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #lyrics-content,
+  #tasks-container,
+  #vocab-content,
+  #grammar-rules-content,
+  .flashcards-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
