@@ -1593,3 +1593,27 @@ body{
 html {
   scroll-padding-top: 120px; /* отступ сверху при прокрутке (высота шапки + вкладки) */
 }
+/* Стили для кнопки "Проверить" (если используется класс .check-btn) */
+.check-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.check-btn:hover {
+  background: #2d3748;
+}
+
+/* Уменьшаем отступ между инструкцией и вопросами */
+.task-instruction {
+  margin-bottom: 8px; /* было больше, можно подобрать на глаз */
+}
+
+/* Если нужно ещё уменьшить интервал между вопросами и кнопкой */
+.quiz-question {
+  margin-bottom: 16px; /* уменьшите по желанию */
+}
