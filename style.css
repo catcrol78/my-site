@@ -1643,3 +1643,26 @@ body{
   background: #fee2e2;
   color: #991b1b;
 }
+/* Кнопка возврата в каталог */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 24px 0;        /* отступы сверху и снизу */
+  padding: 10px 18px;
+  background-color: #f1f5f9;    /* светло-серый фон */
+  border: 1px solid var(--border);
+  border-radius: 40px;           /* скруглённые края */
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  font-size: 15px;
+}
+.back-link:hover {
+  background-color: #e2e8f0;    /* чуть темнее при наведении */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.back-link i {
+  font-size: 14px;
+}
