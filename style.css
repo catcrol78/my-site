@@ -1666,3 +1666,30 @@ body{
 .back-link i {
   font-size: 14px;
 }
+/* Фиксированная кнопка возврата */
+.back-link-fixed {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 10px 18px;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.back-link-fixed:hover {
+  background: #f1f5f9;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.back-link-fixed i {
+  font-size: 14px;
+}
