@@ -613,6 +613,8 @@ function loadSongIntoForm(song) {
   document.getElementById("cultureItems").value = (song.culture?.items || []).join("\n");
   document.getElementById("vocabulary").value = (song.vocabulary || []).join("\n");
   document.getElementById("grammar").value = (song.grammar || []).join(", ");
+  document.getElementById("grammarRulesRu").value = song.grammarRules?.ru || "";
+document.getElementById("grammarRulesEs").value = song.grammarRules?.es || "";
   document.getElementById("pdfLink").value = song.pdf || "";
   document.getElementById("miroLink").value = song.miro || "";
   document.getElementById("themes").value = (song.themes || []).join(", ");
