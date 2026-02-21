@@ -1626,3 +1626,8 @@ html {
 .task-block {
   margin-bottom: 10px; /* если хотите изменить – отрегулируйте здесь */
 }
+/* Центрирование текста в карточках */
+.flashcard-front,
+.flashcard-back {
+  justify-content: center !important;
+}
