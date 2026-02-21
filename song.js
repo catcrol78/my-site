@@ -589,12 +589,8 @@ function renderFlashcards(flashcards) {
   const nextBtn = $('flashcards-next');
   const progressFill = $('flashcards-progress-fill');
   const progressText = $('flashcards-progress-text');
+  const learnBtn = $('flashcards-learn');
   const resetBtn = $('flashcards-reset');
-
-  // Обновляем текст кнопки сброса сразу (даже если карточек нет)
-  if (resetBtn) {
-    resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
-  }
 
   if (!flashcards || !flashcards.length) {
     console.log('❌ Карточек нет, показываем заглушку');
@@ -608,11 +604,15 @@ function renderFlashcards(flashcards) {
     if (progressText) progressText.textContent = '0/0';
     if (prevBtn) prevBtn.disabled = true;
     if (nextBtn) nextBtn.disabled = true;
+    if (learnBtn) learnBtn.style.display = 'none';
+    if (resetBtn) resetBtn.style.display = 'none';
     return;
   }
 
   console.log('✅ Карточки есть, начинаем рендер');
   if (emptyDiv) emptyDiv.style.display = 'none';
+  if (learnBtn) learnBtn.style.display = 'inline-flex';
+  if (resetBtn) resetBtn.style.display = 'inline-flex';
 
   let currentIndex = 0;
   let learned = new Array(flashcards.length).fill(false);
@@ -631,8 +631,6 @@ function renderFlashcards(flashcards) {
     const isLearned = learned[currentIndex];
     console.log(`🃏 Обновляем карточку ${currentIndex + 1}:`, card.es);
 
-    // Лицевая сторона: испанское слово + пример на испанском (если есть)
-    // Оборот: перевод слова + перевод примера (если есть)
     container.innerHTML = `
       <div class="flashcard ${isLearned ? 'flashcard-learned' : ''}">
         <div class="flashcard-front">
@@ -646,12 +644,7 @@ function renderFlashcards(flashcards) {
           ${card.example_translation ? `<div class="example-translation">${escapeHtml(card.example_translation)}</div>` : ''}
         </div>
       </div>
-      <div class="flashcard-footer-actions" style="display: flex; justify-content: center; margin-top: 16px; width: 100%;">
-        <button class="flashcards-btn learn-toggle ${isLearned ? 'danger' : ''}" style="min-width: 120px;">
-          <i class="fas ${isLearned ? 'fa-times' : 'fa-check'}"></i>
-          ${isLearned ? t('notLearned') : t('know')}
-        </button>
-      </div>`;
+    `;
 
     const flashcardEl = container.querySelector('.flashcard');
     if (flashcardEl) {
@@ -661,9 +654,13 @@ function renderFlashcards(flashcards) {
       };
     }
 
-    const toggleBtn = container.querySelector('.learn-toggle');
-    if (toggleBtn) {
-      toggleBtn.onclick = (e) => {
+    // Обновляем кнопку "Знаю"
+    if (learnBtn) {
+      learnBtn.innerHTML = isLearned
+        ? `<i class="fas fa-times"></i> ${t('notLearned')}`
+        : `<i class="fas fa-check"></i> ${t('know')}`;
+      learnBtn.classList.toggle('danger', isLearned);
+      learnBtn.onclick = (e) => {
         e.stopPropagation();
         learned[currentIndex] = !learned[currentIndex];
         updateProgress();
@@ -676,7 +673,7 @@ function renderFlashcards(flashcards) {
     if (nextBtn) nextBtn.disabled = currentIndex === flashcards.length - 1;
   }
 
-  // Обновляем текст кнопки сброса (на случай, если язык поменялся)
+  // Обработчик для кнопки сброса
   if (resetBtn) {
     resetBtn.innerHTML = `<i class="fas fa-undo-alt"></i> ${t('resetProgress')}`;
     resetBtn.onclick = () => {
@@ -875,3 +872,4 @@ function makeLyricsClickable() {
     };
   });
 }
+
