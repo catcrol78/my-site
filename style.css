@@ -371,9 +371,9 @@ body{
   background:#f8fafc;
   border:1px solid var(--border);
   border-radius: 16px;
-  padding:14px;
+  padding:20px; /* Увеличено для отступа сверху */
 }
-.panel-card h3{ margin:0 0 10px; }
+.panel-card h3{ margin:0 0 32px 0; padding-bottom:8px; border-bottom:1px solid var(--border); } /* Увеличен нижний отступ */
 .muted{ color:var(--muted); margin:0 0 10px; font-size:13px; }
 
 .lyrics-text p{
@@ -496,7 +496,7 @@ body{
   font-size: 16px;
 }
 .gap-input, .gap-select {
-
+  border:1px solid var(--border);
   border-radius: 20px;
   padding: 8px 12px;
   font-size: 14px;
@@ -512,7 +512,7 @@ body{
   margin-bottom: 20px;
   padding: 12px;
   background: white;
-
+  border:1px solid var(--border);
   border-radius: 16px;
 }
 .quiz-option {
@@ -643,7 +643,7 @@ body{
   background: white;
   color: var(--text);
   transform: rotateY(180deg);
-
+  border:1px solid var(--border);
   overflow-y: auto;
 }
 .flashcard-back .translation {
@@ -693,7 +693,7 @@ body{
   width: 44px;
   height: 44px;
   border-radius: 50%;
-
+  border:1px solid var(--border);
   background: white;
   color: var(--text);
   cursor: pointer;
@@ -725,7 +725,7 @@ body{
 }
 .flashcards-btn {
   padding: 8px 16px;
-
+  border:1px solid var(--border);
   background: white;
   border-radius: 30px;
   font-size: 13px;
@@ -866,13 +866,14 @@ body{
     min-width: 0;
     position: sticky;
     top: 140px;
-    max-height: calc(100vh - 160px);
+    height: calc(100vh - 160px); /* фиксированная высота */
     overflow-y: auto;
   }
   .detail-panel.active {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 100%;
   }
   .panel-card {
     flex: 1;
@@ -1262,12 +1263,6 @@ body{
   flex-direction: column;
 }
 
-.panel-card h3 {
-  margin: 0 0 325px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
 /* Для грамматических правил */
 #grammar-rules-content {
   flex: 1;
@@ -1316,12 +1311,6 @@ body{
   justify-content: center;
 }
 
-/* Добавляем плавный отступ для всех panel-card */
-.panel-card {
-  padding: 20px;
-  transition: all 0.2s ease;
-}
-
 /* Делаем фон чуть светлее для лучшей читаемости */
 .panel-card {
   background: #ffffff;
@@ -1344,99 +1333,7 @@ body{
 }
 /* Фикс для выравнивания колонок */
 @media (min-width: 981px) {
-  #song-content {
-    display: grid;
-    grid-template-columns: 450px 1fr;
-    grid-template-areas: 
-      "video tabs"
-      "video content";
-    gap: 24px;
-    align-items: start;
-  }
-
-  .detail-panels {
-    grid-area: content;
-    min-width: 0;
-    min-height: 500px; /* Фиксированная минимальная высота */
-  }
-
-  .detail-panel.active {
-    min-height: 450px; /* Минимальная высота активной панели */
-    display: flex;
-    flex-direction: column;
-  }
-
-  .panel-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Для панели лексики */
-  [data-panel="vocab"] .panel-card {
-    min-height: 300px;
-  }
-
-  #vocab-content {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 8px;
-    min-height: 200px;
-  }
-
-  /* Для панели грамматики */
-  [data-panel="grammar"] .panel-card {
-    min-height: 300px;
-  }
-
-  #grammar-rules-content {
-    flex: 1;
-    min-height: 200px;
-  }
-
-  /* Для панели текста */
-  [data-panel="lyrics"] .panel-card {
-    min-height: 400px;
-  }
-
-  #lyrics-content {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 300px;
-  }
-
-  /* Для панели заданий */
-  [data-panel="tasks"] .panel-card {
-    min-height: 400px;
-  }
-
-  #tasks-container {
-    flex: 1;
-    min-height: 300px;
-  }
-
-  /* Для панели карточек */
-  [data-panel="flashcards"] .panel-card {
-    min-height: 450px;
-  }
-
-  .flashcards-container {
-    flex: 1;
-    min-height: 350px;
-  }
-}
-
-/* Для мобильных устройств */
-@media (max-width: 980px) {
-  .detail-panel.active {
-    min-height: auto;
-  }
-  
-  .panel-card {
-    min-height: auto;
-  }
+  /* Дополнительные правила, если нужны, но основное уже в song page grid */
 }
 .flashcard-footer-actions {
   display: flex;
@@ -1721,75 +1618,4 @@ body{
 
 html {
   scroll-padding-top: 120px; /* отступ сверху при прокрутке (высота шапки + вкладки) */
-}
-@media (min-width: 981px) {
-  /* ... остальные стили ... */
-  .detail-panel.active {
-    min-height: 450px; /* фиксируем минимальную высоту для всех вкладок */
-  }
-}
-/* Исправление прыгающего плеера — фиксированная высота правой панели */
-@media (min-width: 981px) {
-  .detail-panels {
-    position: sticky;
-    top: 140px;
-    max-height: calc(100vh - 160px);
-    overflow-y: auto;
-  }
-
-  .detail-panel.active {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .panel-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  #lyrics-content,
-  #tasks-container,
-  #vocab-content,
-  #grammar-rules-content,
-  .flashcards-container {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-  }
-}
-/* Исправление прыгающего плеера — фиксированная высота правой панели */
-@media (min-width: 981px) {
-  .detail-panels {
-    position: sticky;
-    top: 140px;
-    height: calc(100vh - 160px); /* фиксированная высота = всё окно минус отступы */
-    overflow-y: auto;
-  }
-
-  .detail-panel.active {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    height: 100%; /* растягиваем на всю высоту родителя */
-  }
-
-  .panel-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  #lyrics-content,
-  #tasks-container,
-  #vocab-content,
-  #grammar-rules-content,
-  .flashcards-container {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-  }
 }
