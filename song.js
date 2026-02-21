@@ -877,14 +877,16 @@ function makeLyricsClickable() {
     };
   });
 }
-// ===== Отображение грамматических правил =====
-function renderGrammarRules(rules) {
+// ===== Отображение грамматических правил (с выбором языка) =====
+function renderGrammarRules(grammarRules) {
   const container = document.getElementById('grammar-rules-content');
   if (!container) return;
-  if (!rules || rules.trim() === '') {
+  // Берём текст на текущем языке, если нет — на русском, иначе пусто
+  const rulesText = grammarRules?.[currentLang] || grammarRules?.ru || '';
+  if (!rulesText.trim()) {
     container.innerHTML = `<p class="muted">${t('noGrammarRules')}</p>`;
     return;
   }
   // Заменяем переносы строк на <br> для читаемости
-  container.innerHTML = `<p>${escapeHtml(rules).replace(/\n/g, '<br>')}</p>`;
+  container.innerHTML = `<p>${escapeHtml(rulesText).replace(/\n/g, '<br>')}</p>`;
 }
