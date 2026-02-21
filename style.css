@@ -496,7 +496,7 @@ body{
   font-size: 16px;
 }
 .gap-input, .gap-select {
-  border: 1px solid var(--border);
+
   border-radius: 20px;
   padding: 8px 12px;
   font-size: 14px;
@@ -512,7 +512,7 @@ body{
   margin-bottom: 20px;
   padding: 12px;
   background: white;
-  border: 1px solid var(--border);
+
   border-radius: 16px;
 }
 .quiz-option {
@@ -643,7 +643,7 @@ body{
   background: white;
   color: var(--text);
   transform: rotateY(180deg);
-  border: 1px solid var(--border);
+
   overflow-y: auto;
 }
 .flashcard-back .translation {
@@ -693,7 +693,7 @@ body{
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid var(--border);
+
   background: white;
   color: var(--text);
   cursor: pointer;
@@ -725,7 +725,7 @@ body{
 }
 .flashcards-btn {
   padding: 8px 16px;
-  border: 1px solid var(--border);
+
   background: white;
   border-radius: 30px;
   font-size: 13px;
