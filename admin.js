@@ -544,7 +544,9 @@ function buildSong() {
   const pdf = (document.getElementById("pdfLink")?.value || "").trim();
   const miro = (document.getElementById("miroLink")?.value || "").trim();
   
-  const grammarRules = document.getElementById("grammarRules")?.value.trim() || "";
+ const grammarRulesRu = document.getElementById("grammarRulesRu")?.value.trim() || "";
+const grammarRulesEs = document.getElementById("grammarRulesEs")?.value.trim() || "";
+const grammarRules = { ru: grammarRulesRu, es: grammarRulesEs };
 
   const lyrics = parseLyrics(document.getElementById("lyrics").value);
   const translationsText = document.getElementById("translations").value;
